@@ -1,5 +1,7 @@
 # Node.js
 /node_modules/
+dist/
+.env
 
 # Build files
 /dist/
@@ -26,6 +28,7 @@ yarn-error.log*
 *.sublime-workspace
 
 # Системные файлы
+/tmp/
 .DS_Store
 Thumbs.db
 *.swp
