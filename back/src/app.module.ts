@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user/user.entity';
 
 @Module({
   imports: [
@@ -13,9 +14,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'postgres',    // Имя пользователя (замени при необходимости)
       password: 'postgres',    // Пароль (замени при необходимости)
       database: 'disfraz',     // Имя базы данных
-      entities: [],            // Добавь сюда пути к сущностям, как только они будут готовы
+      autoLoadEntities: true,  // Автоматическая загрузка сущностей
       synchronize: true,       // Автоматическая синхронизация схемы базы данных (только для разработки)
     }),
+    TypeOrmModule.forFeature([User]), // Регистрация сущности User
   ],
   controllers: [AppController],
   providers: [AppService],
