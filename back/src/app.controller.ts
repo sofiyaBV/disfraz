@@ -9,4 +9,9 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('check-db')
+  async checkDbConnection(): Promise<string> {
+    return this.appService.checkDatabaseConnection();
+  }
 }
