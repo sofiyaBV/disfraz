@@ -16,7 +16,7 @@ import { User } from './user/user.entity';
       autoLoadEntities: true,  // Автоматическая загрузка сущностей
       synchronize: true,       // Автоматическая синхронизация схемы базы данных (только для разработки)
     }),
-    TypeOrmModule.forFeature([User]), // Регистрация сущности User
+  TypeOrmModule.forFeature([User]), // Регистрация сущности User
   ],
   controllers: [AppController],
   providers: [AppService],
