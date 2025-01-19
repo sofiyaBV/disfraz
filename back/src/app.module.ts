@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 import { User } from './user/user.entity';
 @Module({
   imports: [
@@ -17,6 +18,8 @@ import { User } from './user/user.entity';
       synchronize: true,       // Автоматическая синхронизация схемы базы данных (только для разработки)
     }),
   TypeOrmModule.forFeature([User]), // Регистрация сущности User
+  User,
+  AuthModule, // Подключаем модуль аутентификации
   ],
   controllers: [AppController],
   providers: [AppService],
