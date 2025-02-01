@@ -16,9 +16,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const payload = { sub: user.id, username: user.username }; // sub используется для userId (JWT стандарт)
+    const payload = { username: user.username, sub: user.id }; // sub используется для userId (JWT стандарт)
     return {
-      access_token: this.jwtService.sign(payload), // Генерация JWT
+      access_token: await this.jwtService.signAsync(payload),
     };
   }
 }
