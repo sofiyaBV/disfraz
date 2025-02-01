@@ -11,6 +11,11 @@ export class UserController {
     return this.userService.create(user);
   }
 
+  @Post('create')
+  async createUser(@Body() userData: { username: string; password: string }) {
+    return this.userService.create(userData);
+  }
+
   @Get()
   findAll() {
     return this.userService.findAll();
