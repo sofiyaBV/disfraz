@@ -7,15 +7,37 @@ async function bootstrap() {
 
   // Конфигурация Swagger
   const config = new DocumentBuilder()
-    .setTitle('API Documentation') // Название API
-    .setDescription('API для вашего проекта') // Описание
-    .setVersion('1.0') // Версия API
-    // .addBearerAuth() 
+    .setTitle('User API')
+    .setDescription('Документация API для работы с пользователями')
+    .setVersion('1.0')
+    .addBearerAuth() // JWT поддержка
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  // Дополнительные настройки Swagger
+  const documentOptions = {
+    operationIdFactory: (_controllerKey: string, methodKey: string) => methodKey, // Убираем `Controller_` из названий операций
+    autoTagControllers: true, // Использует название контроллера в качестве тега
+  };
 
-  await app.listen(process.env.PORT ?? 3000);
+  const document = SwaggerModule.createDocument(app, config, documentOptions);
+
+  // Кастомные настройки UI Swagger
+  const swaggerCustomOptions = {
+    jsonDocumentUrl: 'swagger/json', // JSON-документация по /swagger/json
+    yamlDocumentUrl: 'swagger/yaml', // YAML-документация по /swagger/yaml
+    explorer: true, // Включаем переключатель версий API
+    customCss: '.topbar { background-color: #4CAF50 }', // Меняем цвет заголовка
+    customSiteTitle: 'User API Docs', // Кастомное название страницы
+  };
+
+// Адресса
+// Swagger UI — http://localhost:3000/api
+// JSON-документация — http://localhost:3000/swagger/json
+// YAML-документация — http://localhost:3000/swagger/yaml
+
+  // Открываем Swagger UI по `/api`
+  SwaggerModule.setup('api', app, document, swaggerCustomOptions);
+
+  await app.listen(3000);
 }
 bootstrap();
