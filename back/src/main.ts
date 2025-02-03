@@ -30,14 +30,15 @@ async function bootstrap() {
     customSiteTitle: 'User API Docs', // Кастомное название страницы
   };
 
-// Адресса
-// Swagger UI — http://localhost:3000/api
-// JSON-документация — http://localhost:3000/swagger/json
-// YAML-документация — http://localhost:3000/swagger/yaml
-
   // Открываем Swagger UI по `/api`
   SwaggerModule.setup('api', app, document, swaggerCustomOptions);
 
   await app.listen(3000);
 }
 bootstrap();
+
+
+// Адреса документации:
+  // Swagger UI: http://localhost:3000/api
+  // JSON: http://localhost:3000/swagger/json
+  // YAML: http://localhost:3000/swagger/yaml
