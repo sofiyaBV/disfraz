@@ -1,28 +1,14 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { UserService } from './user.service';
+import { Controller } from '@nestjs/common';
+import { Crud, CrudController } from '@nestjsx/crud';
 import { User } from './user.entity';
+import { UserService } from './user.service';
 
-@Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
-
-  @Post()
-  create(@Body() user: Partial<User>) {
-    return this.userService.create(user);
-  }
-
-  @Post('create')
-  async createUser(@Body() userData: { username: string; password: string }) {
-    return this.userService.create(userData);
-  }
-
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.userService.findOne(id);
-  }
+@Crud({
+  model: {
+    type: User,
+  },
+})
+@Controller('user')
+export class UserController implements CrudController<User> {
+  constructor(public service: UserService) {}
 }
