@@ -39,6 +39,6 @@ bootstrap();
 
 
 // Адреса документации:
-  // Swagger UI: http://localhost:3000/api
+  // Swagger UI: http://localhost:3000/doc
   // JSON: http://localhost:3000/swagger/json
   // YAML: http://localhost:3000/swagger/yaml
