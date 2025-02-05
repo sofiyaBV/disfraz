@@ -31,7 +31,7 @@ async function bootstrap() {
   };
 
   // Открываем Swagger UI по `/api`
-  SwaggerModule.setup('api', app, document, swaggerCustomOptions);
+  SwaggerModule.setup('doc', app, document, swaggerCustomOptions);
 
   await app.listen(3000);
 }
