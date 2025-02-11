@@ -31,7 +31,7 @@ async function bootstrap() {
   };
 
   // Открываем Swagger UI по `/api`
-  SwaggerModule.setup('api', app, document, swaggerCustomOptions);
+  SwaggerModule.setup('doc', app, document, swaggerCustomOptions);
 
   await app.listen(3000);
 }
@@ -39,6 +39,6 @@ bootstrap();
 
 
 // Адреса документации:
-  // Swagger UI: http://localhost:3000/api
+  // Swagger UI: http://localhost:3000/doc
   // JSON: http://localhost:3000/swagger/json
   // YAML: http://localhost:3000/swagger/yaml

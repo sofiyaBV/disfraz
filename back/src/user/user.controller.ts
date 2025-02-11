@@ -1,21 +1,31 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { CreateUserDto } from '../dto/create-user.dto'; // ✅ Импорт DTO
 
-@ApiTags('Users')
-@Controller('users')
+@ApiTags('User')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully created', type: User })
-  @ApiBody({ type: User, description: 'User data' })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully created',
+    type: User,
+  })
+  @ApiBody({ type: CreateUserDto }) // ✅ Используем DTO в Swagger
   @Post()
-  create(@Body() user: Partial<User>) {
-    return this.userService.create(user);
+  create(@Body() createUserDto: CreateUserDto) { // ✅ Заменяем Partial<User> на CreateUserDto
+    return this.userService.create(createUserDto);
   }
-
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
