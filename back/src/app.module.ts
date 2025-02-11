@@ -4,24 +4,32 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './user/user.entity';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
+
 @Module({
   imports: [
-    // Подключение к базе данных PostgreSQL
     TypeOrmModule.forRoot({
-      type: 'postgres', // Используем PostgreSQL
-      host: 'localhost', // Адрес сервера
-      port: 5432, // Порт PostgreSQL
-      username: 'postgres', // Имя пользователя
-      password: 'postgres', // Пароль
-      database: 'disfraz', // Имя базы данных
-      autoLoadEntities: true, // Автоматическая загрузка сущностей
-      synchronize: true, // Автоматическая синхронизация схемы базы данных (только для разработки)
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'postgres',
+      database: 'disfraz',
+      autoLoadEntities: true,
+      synchronize: true,
     }),
-    TypeOrmModule.forFeature([User]), // Регистрация сущности User
+    TypeOrmModule.forFeature([User]),
     User,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard, // ✅ Добавлен глобальный Guard
+    },
+  ],
 })
 export class AppModule {}
