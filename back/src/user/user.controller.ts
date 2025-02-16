@@ -3,8 +3,8 @@ import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/s
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { User } from './user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @ApiTags('User')

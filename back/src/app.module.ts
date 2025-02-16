@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { User } from './user/user.entity';
 import { RolesGuard } from './auth/guards/roles.guard';
-import { APP_GUARD } from '@nestjs/core';
+import { OrderModule } from './order/order.module';
+import { ProductModule } from './product/product.module';
+import { User } from './user/entities/user.entity';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { APP_GUARD } from '@nestjs/core';
     TypeOrmModule.forFeature([User]),
     User,
     AuthModule,
+    OrderModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [
