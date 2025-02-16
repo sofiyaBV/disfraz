@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { Role } from '../auth/role.enum';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Role } from '../auth/enums/role.enum';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
