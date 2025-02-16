@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
-import { UserService } from './user.service';
-import { User } from './user.entity';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../auth/role.enum';
+import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { User } from './user.entity';
+import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
