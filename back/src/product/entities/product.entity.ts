@@ -2,9 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
-  JoinTable,
+  OneToMany,
 } from 'typeorm';
+import { Order } from '../../order/entities/order.entity';
 
 @Entity()
 export class Product {
@@ -21,36 +21,35 @@ export class Product {
   description: string;
 
   @Column({ type: 'simple-array', nullable: true })
-  images: string[]; // Список URL изображений товара
+  images: string[];
 
   @Column({ type: 'simple-array', nullable: true })
-  sizes: string[]; // Доступные размеры
+  sizes: string[];
 
   @Column({ type: 'simple-array', nullable: true })
-  materials: string[]; // Список материалов
+  materials: string[];
 
   @Column({ type: 'varchar', length: 255 })
-  theme: string; // Тематика костюма
+  theme: string;
 
   @Column({ type: 'simple-array', nullable: true })
-  bodyParts: string[]; // Части тела, на которые надевается
+  bodyParts: string[];
 
   @Column({ type: 'boolean', default: false })
-  isSet: boolean; // Это комплект или отдельный элемент
+  isSet: boolean;
 
   @Column({ type: 'text', nullable: true })
-  additionalInfo: string; // Дополнительная информация
+  additionalInfo: string;
 
   @Column({ type: 'boolean', default: true })
-  inStock: boolean; // Есть ли в наличии
+  inStock: boolean;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  discount: number; // Скидка в процентах
+  discount: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  discountedPrice: number; // Цена со скидкой
+  discountedPrice: number;
 
-  @ManyToMany(() => Product)
-  @JoinTable()
-  relatedProducts: Product[]; // Список похожих товаров
+  @OneToMany(() => Order, (order) => order.product)
+  orders: Order[];
 }
