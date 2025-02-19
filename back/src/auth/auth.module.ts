@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
+import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [
     UserModule,
@@ -17,6 +18,7 @@ import { AuthGuard } from './auth.guard';
   ],
   providers: [
     AuthService,
+    JwtStrategy,
     {
       provide: APP_GUARD,
       useClass: AuthGuard, // Глобально применяем AuthGuard

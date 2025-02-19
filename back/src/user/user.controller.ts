@@ -17,7 +17,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User successfully created', type: User })
   @ApiBody({ type: CreateUserDto })
   @Post()
-  // @Roles(Role.Admin) // Только админ может создавать пользователей
+  @Roles(Role.Admin, Role.User) // Только админ может создавать пользователей
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }

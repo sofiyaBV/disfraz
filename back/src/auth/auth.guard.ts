@@ -15,13 +15,6 @@ export class AuthGuard implements CanActivate {
   // Список публичных маршрутов, где не требуется авторизация
   private readonly publicRoutes = [
     { method: 'POST', path: '/auth/signin' },
-    { method: 'POST', path: '/user' },
-    { method: 'GET', path: '/user' },
-    { method: 'GET', path: '/products' },
-    { method: 'POST', path: '/products' },
-    { method: 'GET', path: '/orders' },
-    { method: 'POST', path: '/orders' },
-    { method: 'DELETE', path: '/orders' },
   ];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
