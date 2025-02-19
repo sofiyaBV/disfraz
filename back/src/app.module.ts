@@ -22,7 +22,6 @@ import { User } from './user/entities/user.entity';
       synchronize: true,
     }),
     TypeOrmModule.forFeature([User]),
-    User,
     AuthModule,
     OrderModule,
     ProductModule,

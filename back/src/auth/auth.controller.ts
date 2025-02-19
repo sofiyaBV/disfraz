@@ -6,28 +6,37 @@ import {
   HttpStatus,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard'; // Импортируй JWT Guard
 
+@ApiTags('Authentication') // Swagger тег
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public() // 👈 Делаем вход публичным
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  async signIn(
-    @Body('username') username: string,
-    @Body('password') password: string,
-  ) {
-    console.log('Sign-in attempt:', { username });
-    return this.authService.signIn(username, password);
+  @ApiOperation({ summary: 'Авторизация пользователя' })
+  @ApiBody({ type: SignInDto })
+  @ApiResponse({ status: 200, type: SignInResponseDto, description: 'Успешный вход' })
+  @ApiResponse({ status: 401, description: 'Ошибка авторизации' })
+  async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
+    return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
   @Get('profile')
+  @UseGuards(JwtAuthGuard) // 👈 Теперь защищено JWT
+  @ApiBearerAuth() // 👈 Добавляет поддержку Bearer Token в Swagger
+  @ApiOperation({ summary: 'Получение профиля пользователя' })
+  @ApiResponse({ status: 200, description: 'Информация о пользователе' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный запрос' })
   getProfile(@Request() req) {
-    console.log('User in Request:', req.user);
     return req.user;
   }
 }
