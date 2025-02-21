@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -9,7 +10,7 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
-@UseGuards(RolesGuard) // Применяем Guard ко всему контроллеру
+@UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -17,7 +18,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User successfully created', type: User })
   @ApiBody({ type: CreateUserDto })
   @Post()
-  @Roles(Role.Admin, Role.User) // Только админ может создавать пользователей
+  @Roles(Role.Admin) // ✅ Только админ может создавать пользователей
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
@@ -25,7 +26,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   @Get()
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  @Roles(Role.User, Role.Admin) 
   findAll() {
     return this.userService.findAll();
   }
@@ -35,7 +36,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ только для зарегистрированных пользователей
+  @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: number) {
     return this.userService.findOne(id);
   }
