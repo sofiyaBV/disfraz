@@ -23,4 +23,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     return super.canActivate(context);
   }
+
+  handleRequest(err, user, info, context) {
+    const request = context.switchToHttp().getRequest();
+
+    if (err || !user) {
+      this.logger.warn(`JWT Authentication failed: ${info?.message || 'Unknown error'}`);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    request.user = user; // ✅ Явно устанавливаем пользователя в request
+    this.logger.log(`JWT Authenticated user: ${user.username} with roles: ${user.roles}`);
+
+    return user;
+  }
 }
