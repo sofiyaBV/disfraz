@@ -14,11 +14,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
 
-    this.logger.log(`Authorization Header: ${authHeader}`);
+    this.logger.log(`Authorization Header: ${authHeader || 'NONE'}`);
 
     if (!authHeader) {
       this.logger.error('No Authorization Header found');
-      throw new UnauthorizedException('Authorization header missing');
+      throw new UnauthorizedException('Token is not found');
     }
 
     return super.canActivate(context);
