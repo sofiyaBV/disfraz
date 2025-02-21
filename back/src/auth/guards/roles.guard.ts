@@ -22,10 +22,16 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user) {
-      this.logger.warn('Request without user - rejected');
+    if (!user || !user.roles) { // ✅ Проверяем, есть ли вообще роли
+      this.logger.warn('Request without user or roles - rejected');
       return false;
     }
+
+
+    // if (!user) {
+    //   this.logger.warn('Request without user - rejected');
+    //   return false;
+    // }
 
     this.logger.log(`User ${user.username} role-modelled: ${user.roles}`);
 
