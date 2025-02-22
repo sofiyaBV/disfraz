@@ -13,7 +13,7 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret, // Укажите ваш секретный ключ
-      signOptions: { expiresIn: '360s' },
+      signOptions: { expiresIn: '36000s' },
     }),
   ],
   providers: [
