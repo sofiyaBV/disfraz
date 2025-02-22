@@ -35,10 +35,6 @@ import { User } from './user/entities/user.entity';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard, // ✅ Глобальный Guard
-    },
   ],
 })
 export class AppModule {}
