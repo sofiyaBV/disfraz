@@ -37,7 +37,10 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.13.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "@casl/ability": "^6.7.3",
+    "@nestjs/config": "^4.0.0",
+    "passport-google-oauth2": "^0.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
