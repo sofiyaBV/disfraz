@@ -27,7 +27,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   @Get()
   @ApiBearerAuth()
-  @Roles(Role.User) 
+  @Roles(Role.Admin) 
   findAll() {
     return this.userService.findAll();
   }
