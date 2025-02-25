@@ -7,39 +7,33 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private logger = new Logger('AuthGuard');
+
   constructor(private jwtService: JwtService) {}
 
-  // Список публичных маршрутов, где не требуется авторизация
   private readonly publicRoutes = [
     { method: 'POST', path: '/auth/signin' },
-    { method: 'POST', path: '/user' },
-    { method: 'GET', path: '/user' },
-    { method: 'GET', path: '/products' },
-    { method: 'POST', path: '/products' },
-    { method: 'GET', path: '/orders' },
-    { method: 'POST', path: '/orders' },
-    { method: 'DELETE', path: '/orders' },
   ];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // Проверяем, является ли маршрут публичным
+    // ✅ Проверяем публичные маршруты
     if (this.isPublicRoute(request)) {
-      console.log(`Public route accessed: ${request.method} ${request.url}`);
+      this.logger.log(`Публичный маршрут: ${request.method} ${request.path}`);
       return true;
     }
 
     const token = this.extractTokenFromHeader(request);
-    console.log('Authorization Header:', request.headers.authorization);
-    console.log('Extracted Token:', token);
+    this.logger.log(`Authorization Header: ${request.headers.authorization || 'NONE'}`);
 
     if (!token) {
-      console.log('No token found, throwing UnauthorizedException');
-      throw new UnauthorizedException();
+      this.logger.warn('Missing token');
+      throw new UnauthorizedException('Token is not found');
     }
 
     try {
@@ -47,11 +41,11 @@ export class AuthGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
 
-      console.log('Decoded JWT Payload:', payload);
+      this.logger.log(`JWT Decoded: ${JSON.stringify(payload)}`);
       request['user'] = payload;
     } catch (error) {
-      console.error('JWT Verification Error:', error.message);
-      throw new UnauthorizedException();
+      this.logger.error(`JWT verification error: ${error.message}`);
+      throw new UnauthorizedException('Token verification error');
     }
 
     return true;
@@ -64,7 +58,7 @@ export class AuthGuard implements CanActivate {
 
   private isPublicRoute(request: Request): boolean {
     return this.publicRoutes.some(
-      (route) => route.method === request.method && request.url.startsWith(route.path),
+      (route) => route.method === request.method && request.path.startsWith(route.path),
     );
   }
 }
