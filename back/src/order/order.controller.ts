@@ -14,6 +14,7 @@ import {
   ApiParam,
   ApiResponse,
   ApiTags,
+  ApiBearerAuth
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -22,10 +23,11 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
-
+import { AuthGuard } from '@nestjs/passport'; 
 @ApiTags('Orders')
 @Controller('orders')
-@UseGuards(RolesGuard) // Применяем Guard ко всему контроллеру
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard) 
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -37,7 +39,7 @@ export class OrderController {
   })
   @ApiBody({ type: CreateOrderDto })
   @Post()
-  // @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(createOrderDto);
   }

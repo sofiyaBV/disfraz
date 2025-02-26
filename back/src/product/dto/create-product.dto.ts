@@ -16,33 +16,9 @@ export class CreateProductDto {
   })
   images: string[];
 
-  @ApiProperty({ example: ['M', 'L', 'XL'], description: 'Розміри' })
-  sizes: string[];
-
-  @ApiProperty({ example: ['Шкіра', 'Тканина'], description: 'Матеріали' })
-  materials: string[];
-
-  @ApiProperty({ example: 'Фентезі', description: 'Тематика' })
-  theme: string;
-
-  @ApiProperty({ example: ['Голова', 'Тіло'], description: 'Частини тіла' })
-  bodyParts: string[];
-
-  @ApiProperty({ example: true, description: 'Це комплект?' })
-  isSet: boolean;
-
   @ApiProperty({
-    example: 'Додаткова інформація про товар',
-    description: 'Додаткові відомості',
+    example: [5, 7],
+    description: 'Список ID схожих товарів',
   })
-  additionalInfo: string;
-
-  @ApiProperty({ example: true, description: 'У наявності?' })
-  inStock: boolean;
-
-  @ApiProperty({ example: 10, description: 'Знижка у відсотках' })
-  discount: number;
-
-  @ApiProperty({ example: 179.99, description: 'Ціна зі знижкою' })
-  discountedPrice: number;
+  similarProducts: number[]; // Масив ID схожих товарів
 }
