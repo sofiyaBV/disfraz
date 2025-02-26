@@ -37,7 +37,7 @@ export class ProductController {
   })
   @ApiBody({ type: CreateProductDto })
   @Post()
-  // @Roles(Role.Admin) // Только админ может создавать продукты
+  @Roles(Role.Admin) // Только админ может создавать продукты
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
