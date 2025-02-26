@@ -4,7 +4,7 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
-import { Order } from '../../order/entities/order.entity';
+import { OrderItem } from '../../order-items/entities/order-item.entity';
 
 @Entity()
 export class Product {
@@ -23,33 +23,11 @@ export class Product {
   @Column({ type: 'simple-array', nullable: true })
   images: string[];
 
+  // Додаємо схожі товари як JSON
   @Column({ type: 'simple-array', nullable: true })
-  sizes: string[];
+  similarProducts: number[]; // Масив ID схожих товарів
 
-  @Column({ type: 'simple-array', nullable: true })
-  materials: string[];
-
-  @Column({ type: 'varchar', length: 255 })
-  theme: string;
-
-  @Column({ type: 'simple-array', nullable: true })
-  bodyParts: string[];
-
-  @Column({ type: 'boolean', default: false })
-  isSet: boolean;
-
-  @Column({ type: 'text', nullable: true })
-  additionalInfo: string;
-
-  @Column({ type: 'boolean', default: true })
-  inStock: boolean;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  discount: number;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  discountedPrice: number;
-
-  @OneToMany(() => Order, (order) => order.product)
-  orders: Order[];
+  // Зв’язок через OrderItem
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 }

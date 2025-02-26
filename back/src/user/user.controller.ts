@@ -10,6 +10,7 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
+@ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -26,7 +27,6 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   @Get()
-  @ApiBearerAuth()
   @Roles(Role.Admin, Role.User) 
   findAll() {
     return this.userService.findAll();
