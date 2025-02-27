@@ -10,48 +10,44 @@ export class CreateAttributeDto {
   name: string;
 
   @ApiProperty({ 
-    example: true, 
-    description: 'Чи є атрибут матеріалом (наприклад, «Шкіра»)', 
-    required: false, 
-    default: false 
+    example: 'Шкіра', 
+    description: 'Значення для матеріалу (наприклад, «Шкіра»)', 
+    required: false 
   })
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  isMaterial?: boolean;
+  material?: string;
+
+  @ApiProperty({ 
+    example: 'M', 
+    description: 'Значення для розміру (наприклад, «M»)', 
+    required: false 
+  })
+  @IsString()
+  @IsOptional()
+  size?: string;
+
+  @ApiProperty({ 
+    example: 'Фентезі', 
+    description: 'Значення для тематики (наприклад, «Фентезі»)', 
+    required: false 
+  })
+  @IsString()
+  @IsOptional()
+  theme?: string;
+
+  @ApiProperty({ 
+    example: 'Руки', 
+    description: 'Значення для частини тіла (наприклад, «Руки»)', 
+    required: false 
+  })
+  @IsString()
+  @IsOptional()
+  bodyPart?: string;
 
   @ApiProperty({ 
     example: true, 
-    description: 'Чи є атрибут розміром (наприклад, «M»)', 
-    required: false, 
-    default: false 
-  })
-  @IsBoolean()
-  @IsOptional()
-  isSize?: boolean;
-
-  @ApiProperty({ 
-    example: true, 
-    description: 'Чи є атрибут тематикою (наприклад, «Фентезі»)', 
-    required: false, 
-    default: false 
-  })
-  @IsBoolean()
-  @IsOptional()
-  isTheme?: boolean;
-
-  @ApiProperty({ 
-    example: true, 
-    description: 'Чи є атрибут частиною тіла (наприклад, «Руки»)', 
-    required: false, 
-    default: false 
-  })
-  @IsBoolean()
-  @IsOptional()
-  isBodyPart?: boolean;
-
-  @ApiProperty({ 
-    example: true, 
-    description: 'Чи є атрибут вказівкою на комплект', 
+    description: 'Чи є атрибут вказівкою на комплект (наприклад, костюм із кількох частин)', 
     required: false, 
     default: false 
   })
@@ -60,47 +56,34 @@ export class CreateAttributeDto {
   isSet?: boolean;
 
   @ApiProperty({ 
-    example: true, 
-    description: 'Чи є атрибут додатковою інформацією', 
-    required: false, 
-    default: false 
-  })
-  @IsBoolean()
-  @IsOptional()
-  isAdditionalInfo?: boolean;
-
-  @ApiProperty({ 
-    example: true, 
-    description: 'Чи є атрибут інформацією про наявність', 
-    required: false, 
-    default: false 
-  })
-  @IsBoolean()
-  @IsOptional()
-  isInStock?: boolean;
-
-  @ApiProperty({ 
-    example: true, 
-    description: 'Булеве значення (наприклад, для isSet чи inStock)', 
+    example: 'Вага 1.5 кг', 
+    description: 'Значення для додаткової інформації (наприклад, «Вага 1.5 кг»)', 
     required: false 
   })
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  valueBoolean?: boolean;
+  additionalInfo?: string;
 
   @ApiProperty({ 
-    example: 'Додаткова інформація про атрибут', 
-    description: 'Текстове значення (наприклад, для матеріалу, розміру, тематики, додаткової інформації)', 
+    example: 'Доступний на складі', 
+    description: 'Значення для наявності (наприклад, «Доступний на складі»)', 
     required: false 
+  })
+  @IsString()
+  @IsOptional()
+  inStock?: string;
+
+  @ApiProperty({ 
+    example: 'Матеріал шкіри високої якості, стійкий до зносу', 
+    description: 'Текстове значення (наприклад, для матеріалу, розміру, тематики, додаткової інформації)' 
   })
   @IsString()
   @IsOptional()
   valueText?: string;
 
   @ApiProperty({ 
-    example: 10.5, 
-    description: 'Числове значення (наприклад, для ціни чи розміру)', 
-    required: false 
+    example: 45.0, 
+    description: 'Числове значення (наприклад, для ціни чи розміру, наприклад, розмір у см)' 
   })
   @IsNumber()
   @IsOptional()

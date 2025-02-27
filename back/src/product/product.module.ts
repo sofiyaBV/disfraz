@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Product } from './entities/product.entity';
+import { Attribute } from '../attribute/entities/attribute.entity';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
-import { Product } from './entities/product.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product])], // Подключаем модель
+  imports: [TypeOrmModule.forFeature([Product, Attribute])], // Додаємо Attribute
   controllers: [ProductController],
   providers: [ProductService],
-  exports: [ProductService], // Для других модулей
+  exports: [ProductService],
 })
 export class ProductModule {}

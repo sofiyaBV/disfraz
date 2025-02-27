@@ -8,32 +8,29 @@ export class Attribute {
   @Column({ type: 'varchar', length: 255 })
   name: string; // Назва атрибута (наприклад, «шкіра», «M», «фентезі», «руки»)
 
-  @Column({ type: 'boolean', default: false })
-  isMaterial: boolean; // Чи є атрибут матеріалом (наприклад, «Шкіра»)
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  material: string; // Значення для матеріалу (наприклад, «Шкіра»)
 
-  @Column({ type: 'boolean', default: false })
-  isSize: boolean; // Чи є атрибут розміром (наприклад, «M»)
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  size: string; // Значення для розміру (наприклад, «M»)
 
-  @Column({ type: 'boolean', default: false })
-  isTheme: boolean; // Чи є атрибут тематикою (наприклад, «Фентезі»)
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  theme: string; // Значення для тематики (наприклад, «Фентезі»)
 
-  @Column({ type: 'boolean', default: false })
-  isBodyPart: boolean; // Чи є атрибут частиною тіла (наприклад, «Руки»)
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  bodyPart: string; // Значення для частини тіла (наприклад, «Руки»)
 
   @Column({ type: 'boolean', default: false })
   isSet: boolean; // Чи є атрибут вказівкою на комплект (наприклад, true/false)
 
-  @Column({ type: 'boolean', default: false })
-  isAdditionalInfo: boolean; // Чи є атрибут додатковою інформацією
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  additionalInfo: string; // Значення для додаткової інформації (наприклад, «Вага 1.5 кг»)
 
-  @Column({ type: 'boolean', default: false })
-  isInStock: boolean; // Чи є атрибут інформацією про наявність
-
-  @Column({ type: 'boolean', default: false, nullable: true })
-  valueBoolean?: boolean; // Для булевих значень (наприклад, isSet, isInStock)
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  inStock: string; // Значення для наявності (наприклад, «Доступний на складі»)
 
   @Column({ type: 'text', nullable: true })
-  valueText?: string; // Для текстових значень (наприклад, матеріали, розміри, тематика, додаткова інформація)
+  valueText?: string; // Для текстових значень (загальне поле для всіх текстів, якщо потрібно)
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   valueNumber?: number; // Для числових значень, якщо потрібно (наприклад, ціна чи розмір у числовому форматі)
