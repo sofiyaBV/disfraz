@@ -44,4 +44,5 @@ export class AttributesService {
   async findByName(name: string): Promise<Attribute> {
     return this.attributeRepository.findOne({ where: { name } });
   }
+  
 }

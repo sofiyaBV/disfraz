@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AttributeController } from './attribute.controller';
-import { AttributeService } from './attribute.service';
+import { AttributesController } from './attribute.controller';
+import { AttributesService } from './attribute.service';
 
 describe('AttributeController', () => {
-  let controller: AttributeController;
+  let controller: AttributesController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AttributeController],
-      providers: [AttributeService],
+      controllers: [AttributesController],
+      providers: [AttributesService],
     }).compile();
 
-    controller = module.get<AttributeController>(AttributeController);
+    controller = module.get<AttributesController>(AttributesController);
   });
 
   it('should be defined', () => {
