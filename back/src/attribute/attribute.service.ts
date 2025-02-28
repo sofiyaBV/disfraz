@@ -53,28 +53,4 @@ export class AttributesService {
   async findByName(name: string): Promise<Attribute> {
     return this.attributeRepository.findOne({ where: { name } });
   }
-
-  // Отримати продукти, які мають цей атрибут
-  async getProducts(attributeId: number): Promise<Product[]> {
-    const attribute = await this.attributeRepository.findOneOrFail({ where: { id: attributeId }, relations: ['products'] });
-    return attribute.products;
-  }
-
-  // Додати продукт до атрибута
-  async addProduct(attributeId: number, productId: number): Promise<Attribute> {
-    const attribute = await this.attributeRepository.findOneOrFail({ where: { id: attributeId }, relations: ['products'] });
-    const product = await this.productRepository.findOneOrFail({ where: { id: productId } });
-    attribute.products = attribute.products || [];
-    if (!attribute.products.some(prod => prod.id === productId)) {
-      attribute.products.push(product);
-    }
-    return this.attributeRepository.save(attribute);
-  }
-
-  // Видалити продукт з атрибута
-  async removeProduct(attributeId: number, productId: number): Promise<Attribute> {
-    const attribute = await this.attributeRepository.findOneOrFail({ where: { id: attributeId }, relations: ['products'] });
-    attribute.products = attribute.products.filter(prod => prod.id !== productId);
-    return this.attributeRepository.save(attribute);
-  }
 }
