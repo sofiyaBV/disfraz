@@ -3,8 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { OrderItem } from '../../order-items/entities/order-item.entity';
+import { Attribute } from '../../attribute/entities/attribute.entity';
+import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
 
 @Entity()
 export class Product {
@@ -30,4 +34,13 @@ export class Product {
   // Зв’язок через OrderItem
   @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
   orderItems: OrderItem[];
+
+  // Зв’язок багато до багатьох із Attribute через ProductAttribute
+  @ManyToMany(() => Attribute, (attribute) => attribute.products)
+  @JoinTable({
+    name: 'product_attribute', // Назва таблиці зв’язку
+    joinColumn: { name: 'productId', referencedColumnName: 'id' }, // Колонка для Product
+    inverseJoinColumn: { name: 'attributeId', referencedColumnName: 'id' }, // Колонка для Attribute
+  })
+  attributes: Attribute[];
 }

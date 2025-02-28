@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import { User } from './user/entities/user.entity';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { AttributesModule } from './attribute/attribute.module';
+import { ProductAttributesModule } from './product-attribute/product-attribute.module';
 
 import databaseConfig from './config/database.config';
 
@@ -31,6 +32,7 @@ import databaseConfig from './config/database.config';
     ProductModule,
     OrderItemsModule,
     AttributesModule,
+    ProductAttributesModule
   ],
   controllers: [AppController],
   providers: [AppService],
