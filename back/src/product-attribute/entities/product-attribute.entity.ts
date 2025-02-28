@@ -15,7 +15,5 @@ export class ProductAttribute {
   @JoinColumn({ name: 'attributeId' })
   attribute: Attribute;
 
-  // Опціонально: можна додати додаткові поля, наприклад, порядок чи вагу зв’язку
-  // @Column({ type: 'int', nullable: true })
-  // order: number; // Порядок атрибута для продукту
+  
 }

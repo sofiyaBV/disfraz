@@ -101,7 +101,7 @@ export class OrderController {
     example: 1,
   })
   @Delete(':id')
-  // @Roles(Role.Admin) // Только админ может удалять заказ
+  @Roles(Role.Admin) // Только админ может удалять заказ
   remove(@Param('id') id: number) {
     return this.orderService.remove(id);
   }
