@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import { Product } from '../../product/entities/product.entity';
 
 @Entity()
 export class Attribute {
@@ -34,4 +35,8 @@ export class Attribute {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   valueNumber?: number; // Для числових значень, якщо потрібно (наприклад, ціна чи розмір у числовому форматі)
+
+  // Зв’язок багато до багатьох із Product через ProductAttribute
+  @ManyToMany(() => Product, (product) => product.attributes)
+  products: Product[];
 }

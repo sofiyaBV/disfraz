@@ -29,6 +29,6 @@ export default registerAs('database', () => {
     password: value.POSTGRES_PASSWORD,
     database: value.POSTGRES_DB,
     autoLoadEntities: true,
-    synchronize: true,
+    synchronize: false,
   };
 });
