@@ -1,19 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Product } from '../../product/entities/product.entity';
-import { Attribute } from '../../attribute/entities/attribute.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('product_attribute')
 export class ProductAttribute {
   @PrimaryGeneratedColumn()
-  id: number; // Унікальний ідентифікатор зв’язку (опціонально, для зручності)
+  id: number; // Унікальний ідентифікатор зв’язку
 
-  @ManyToOne(() => Product, (product) => product.attributes)
-  @JoinColumn({ name: 'productId' })
-  product: Product;
+  @Column({ type: 'int' })
+  productId: number; // ID продукту
 
-  @ManyToOne(() => Attribute, (attribute) => attribute.products)
-  @JoinColumn({ name: 'attributeId' })
-  attribute: Attribute;
-
-  
+  @Column({ type: 'int' })
+  attributeId: number; // ID атрибута
 }

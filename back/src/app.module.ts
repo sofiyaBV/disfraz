@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 import { User } from './user/entities/user.entity';
-import { OrderItemsModule } from './order-items/order-items.module';
 import { AttributesModule } from './attribute/attribute.module';
 import { ProductAttributesModule } from './product-attribute/product-attribute.module';
 import { CartModule } from './cart/cart.module';
@@ -31,7 +30,6 @@ import databaseConfig from './config/database.config';
     AuthModule,
     OrderModule,
     ProductModule,
-    OrderItemsModule,
     AttributesModule,
     ProductAttributesModule,
     CartModule
