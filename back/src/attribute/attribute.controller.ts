@@ -24,7 +24,7 @@ export class AttributesController {
   })
   @ApiBody({ type: CreateAttributeDto })
   @Post()
-  @Roles(Role.Admin) // Тільки адмін може створювати атрибути
+  @Roles(Role.Admin, Role.User) // Тільки адмін може створювати атрибути
   create(@Body() createAttributeDto: CreateAttributeDto) {
     return this.attributesService.create(createAttributeDto);
   }

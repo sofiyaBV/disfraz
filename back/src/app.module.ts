@@ -8,7 +8,7 @@ import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 import { User } from './user/entities/user.entity';
 import { AttributesModule } from './attribute/attribute.module';
-import { ProductAttributesModule } from './product-attribute/product-attribute.module';
+import { ProductAttributeModule } from './product-attribute/product-attribute.module';
 import { CartModule } from './cart/cart.module';
 
 import databaseConfig from './config/database.config';
@@ -31,7 +31,7 @@ import databaseConfig from './config/database.config';
     OrderModule,
     ProductModule,
     AttributesModule,
-    ProductAttributesModule,
+    ProductAttributeModule,
     CartModule
   ],
   controllers: [AppController],
