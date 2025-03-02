@@ -1,26 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Column, 
+  ManyToOne, 
+  JoinColumn
+} from 'typeorm';
+import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
+import { User } from '../../user/entities/user.entity'; // Предполагается, что существует сущность User
 
-@Entity('cart')
+@Entity()
 export class Cart {
   @PrimaryGeneratedColumn()
-  id: number; // Унікальний ідентифікатор кошика
+  id: number; // Уникальный идентификатор элемента корзины
 
-  @Column({ type: 'simple-array', nullable: true }) // Масив ID товарів у кошику
-  productIds: number[]; // Список ID товарів, які користувач вибрав (наприклад, [1, 2, 3])
 
-  @Column({ type: 'simple-json', nullable: true }) // JSON для зберігання деталей товарів і кількостей
-  items: {
-    productId: number; // ID товару
-    quantity: number; // Кількість товару в кошику
-    price: number; // Ціна товару на момент додавання
-  }[]; // Деталі товарів у кошику (ID, кількість, ціна)
+  @ManyToOne(() => ProductAttribute, (productAttribute) => productAttribute.carts)
+  @JoinColumn({ name: 'productAttributeId' })
+  productAttribute: ProductAttribute; // Связь с product_attribute
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 }) // Загальна сума кошика
-  totalAmount: number; // Загальна сума всіх товарів у кошику (з урахуванням кількостей і цін)
+  @Column({ type: 'int', default: 1 })
+  quantity: number; // Количество данного продукта в корзине
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }) // Дата створення кошика
-  createdAt: Date;
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  price: number; // Цена за единицу (может быть вычислена на основе productAttribute.product.price)
 
-  @Column({ type: 'timestamp', nullable: true }) // Дата оновлення кошика
-  updatedAt: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  addedAt: Date; // Дата добавления в корзину
 }

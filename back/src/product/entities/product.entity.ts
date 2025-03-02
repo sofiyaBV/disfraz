@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
 import { Attribute } from '../../attribute/entities/attribute.entity';
 
 @Entity()
@@ -21,11 +15,15 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'text', array: true, nullable: true }) // Змінено на 'text' з array: true для images
   images: string[];
 
-  // Додаємо схожі товари як JSON
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({
+    type: 'integer', // Вказуємо 'integer' для базового типу
+    array: true, // Вказуємо, що це масив
+    nullable: true,
+    name: 'similarproducts', // Змінено на реальну назву колонки в базі даних
+  })
   similarProducts: number[]; // Масив ID схожих товарів
 
   // Зв’язок багато до багатьох із Attribute через ProductAttribute

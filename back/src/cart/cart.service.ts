@@ -2,45 +2,68 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart } from './entities/cart.entity';
+import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectRepository(Cart)
     private cartRepository: Repository<Cart>,
+    @InjectRepository(ProductAttribute)
+    private productAttributeRepository: Repository<ProductAttribute>,
   ) {}
 
   async create(createCartDto: CreateCartDto): Promise<Cart> {
-    const cart = this.cartRepository.create(createCartDto);
+    const { productAttributeId, quantity, price } = createCartDto;
+
+    // Знаходимо ProductAttribute за його ID
+    const productAttribute = await this.productAttributeRepository.findOneOrFail({ where: { id: productAttributeId } });
+
+    // Створюємо новий запис у кошику
+    const cart = this.cartRepository.create({
+      productAttribute,
+      quantity,
+      price: price || productAttribute.product.price, // Використовуємо ціну з Product, якщо price не вказано в DTO
+    });
+
     return this.cartRepository.save(cart);
   }
 
   async findAll(): Promise<Cart[]> {
-    return this.cartRepository.find();
+    return this.cartRepository.find({
+      relations: ['productAttribute', 'productAttribute.product', 'productAttribute.attribute'], // Завантажуємо пов’язані сутності
+    });
   }
 
   async findOne(id: number): Promise<Cart> {
-    return this.cartRepository.findOneOrFail({ where: { id } });
+    return this.cartRepository.findOneOrFail({
+      where: { id },
+      relations: ['productAttribute', 'productAttribute.product', 'productAttribute.attribute'],
+    });
   }
 
-  async update(id: number, updateCartDto: UpdateCartDto): Promise<Cart> {
-    await this.cartRepository.update(id, updateCartDto);
-    return this.findOne(id);
+  async update(id: number, updateCartDto: Partial<CreateCartDto>): Promise<Cart> {
+    const cart = await this.findOne(id);
+    const { productAttributeId, quantity, price } = updateCartDto;
+
+    if (productAttributeId) {
+      const productAttribute = await this.productAttributeRepository.findOneOrFail({ where: { id: productAttributeId } });
+      cart.productAttribute = productAttribute;
+    }
+
+    if (quantity !== undefined) {
+      cart.quantity = quantity;
+    }
+
+    if (price !== undefined) {
+      cart.price = price;
+    }
+
+    return this.cartRepository.save(cart);
   }
 
   async remove(id: number): Promise<void> {
     await this.cartRepository.delete(id);
   }
-
-  // // Додатковий метод для пошуку кошика за списком товарів
-  // async findByProductIds(productIds: number[]): Promise<Cart[]> {
-  //   return this.cartRepository.find({ where: { productIds: productIds } });
-  // }
-
-  // // Додатковий метод для очищення кошика
-  // async clearCart(id: number): Promise<void> {
-  //   await this.cartRepository.update(id, { productIds: [], items: [], totalAmount: 0 });
-  // }
 }

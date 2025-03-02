@@ -1,45 +1,32 @@
+import { IsInt, IsPositive, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateCartDto {
-  @ApiProperty({ 
-    example: [1, 2], 
-    description: 'Обновленный список ID товаров, выбранных пользователем в магазине', 
-    required: false 
+  @IsInt()
+  @IsOptional()
+  @ApiProperty({
+    description: 'ID связи продукта и атрибута (из таблицы product_attribute)',
+    example: 1,
+    required: false,
   })
-  productIds?: number[];
+  productAttributeId?: number; // ID связи продукт-атрибут
 
-  @ApiProperty({ 
-    example: [
-      { productId: 1, quantity: 3, price: 199.99 },
-      { productId: 2, quantity: 1, price: 99.99 }
-    ], 
-    description: 'Обновленные детали товаров в корзине (ID, количество, цена)', 
-    required: false 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty({
+    description: 'Количество данного продукта/атрибута в корзине',
+    example: 2,
+    required: false,
   })
-  items?: Array<{
-    productId: number;
-    quantity: number;
-    price: number;
-  }>;
+  quantity?: number; // Количество
 
-  @ApiProperty({ 
-    example: 698.96, 
-    description: 'Обновленная общая сумма корзины', 
-    required: false 
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    description: 'Цена за единицу (опционально, может быть вычислена сервером)',
+    example: 199.99,
+    required: false,
   })
-  totalAmount?: number;
-
-  @ApiProperty({ 
-    example: '2025-02-28T09:00:00.000Z', 
-    description: 'Обновленная дата создания корзины (опционально)', 
-    required: false 
-  })
-  createdAt?: Date;
-
-  @ApiProperty({ 
-    example: '2025-02-28T09:05:00.000Z', 
-    description: 'Обновленная дата обновления корзины (опционально)', 
-    required: false 
-  })
-  updatedAt?: Date;
+  price?: number; // Цена (опционально, может быть вычислена сервером)
 }

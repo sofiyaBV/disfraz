@@ -1,16 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
-import {Cart} from './/entities/cart.entity'
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { Cart } from './/entities/cart.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/guards/roles.guard';
 @ApiTags('Cart')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @ApiOperation({ summary: 'Create a new cart' })
-  @ApiResponse({ status: 201, description: 'Cart successfully created', type: Cart })
+  @ApiResponse({
+    status: 201,
+    description: 'Cart successfully created',
+    type: Cart,
+  })
   @ApiBody({ type: CreateCartDto })
   @Post()
   create(@Body() createCartDto: CreateCartDto) {
@@ -34,7 +58,11 @@ export class CartController {
   }
 
   @ApiOperation({ summary: 'Update a cart by ID' })
-  @ApiResponse({ status: 200, description: 'Cart updated successfully', type: Cart })
+  @ApiResponse({
+    status: 200,
+    description: 'Cart updated successfully',
+    type: Cart,
+  })
   @ApiResponse({ status: 404, description: 'Cart not found' })
   @ApiBody({ type: UpdateCartDto })
   @ApiParam({ name: 'id', required: true, description: 'Cart ID', example: 1 })
