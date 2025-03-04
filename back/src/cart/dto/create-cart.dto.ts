@@ -30,10 +30,10 @@ export class CreateCartDto {
   @ApiPropertyOptional({
     description: 'Ціна за одиницю товару',
     example: 199.99,
-    default: 0.00,
+    default: 0.0,
   })
   @IsNumber()
   @Min(0)
   @IsOptional()
-  price?: number = 0.00; // За замовчуванням 0.00, як у сутності
+  price?: number = 0.0; // За замовчуванням 0.00, як у сутності
 }

@@ -21,10 +21,15 @@ export class CartService {
     const { productAttributeId, userId, quantity, price } = createCartDto;
 
     // Находим ProductAttribute по его ID
-    const productAttribute = await this.productAttributeRepository.findOneOrFail({ where: { id: productAttributeId } });
-    
+    const productAttribute =
+      await this.productAttributeRepository.findOneOrFail({
+        where: { id: productAttributeId },
+      });
+
     // Находим User по его ID
-    const user = await this.userRepository.findOneOrFail({ where: { id: userId } });
+    const user = await this.userRepository.findOneOrFail({
+      where: { id: userId },
+    });
 
     // Создаем новый запис в корзине
     const cart = this.cartRepository.create({
@@ -39,28 +44,46 @@ export class CartService {
 
   async findAll(): Promise<Cart[]> {
     return this.cartRepository.find({
-      relations: ['productAttribute', 'productAttribute.product', 'productAttribute.attribute', 'user'], // Загружаем связанные сущности, включая User
+      relations: [
+        'productAttribute',
+        'productAttribute.product',
+        'productAttribute.attribute',
+        'user',
+      ], // Загружаем связанные сущности, включая User
     });
   }
 
   async findOne(id: number): Promise<Cart> {
     return this.cartRepository.findOneOrFail({
       where: { id },
-      relations: ['productAttribute', 'productAttribute.product', 'productAttribute.attribute', 'user'], // Загружаем User
+      relations: [
+        'productAttribute',
+        'productAttribute.product',
+        'productAttribute.attribute',
+        'user',
+      ], // Загружаем User
     });
   }
 
-  async update(id: number, updateCartDto: Partial<CreateCartDto>): Promise<Cart> {
+  async update(
+    id: number,
+    updateCartDto: Partial<CreateCartDto>,
+  ): Promise<Cart> {
     const cart = await this.findOne(id);
     const { productAttributeId, userId, quantity, price } = updateCartDto;
 
     if (productAttributeId) {
-      const productAttribute = await this.productAttributeRepository.findOneOrFail({ where: { id: productAttributeId } });
+      const productAttribute =
+        await this.productAttributeRepository.findOneOrFail({
+          where: { id: productAttributeId },
+        });
       cart.productAttribute = productAttribute;
     }
 
     if (userId) {
-      const user = await this.userRepository.findOneOrFail({ where: { id: userId } });
+      const user = await this.userRepository.findOneOrFail({
+        where: { id: userId },
+      });
       cart.user = user; // Обновляем связь с пользователем
     }
 

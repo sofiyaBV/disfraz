@@ -25,10 +25,16 @@ export class AttributesService {
   }
 
   async findOne(id: number): Promise<Attribute> {
-    return this.attributeRepository.findOneOrFail({ where: { id }, relations: ['products'] });
+    return this.attributeRepository.findOneOrFail({
+      where: { id },
+      relations: ['products'],
+    });
   }
 
-  async update(id: number, updateAttributeDto: UpdateAttributeDto): Promise<Attribute> {
+  async update(
+    id: number,
+    updateAttributeDto: UpdateAttributeDto,
+  ): Promise<Attribute> {
     await this.attributeRepository.update(id, updateAttributeDto);
     return this.findOne(id);
   }
@@ -38,13 +44,22 @@ export class AttributesService {
   }
 
   // Пошук атрибутів за типом (за текстовими полями)
-  async findByType(type: 'material' | 'size' | 'theme' | 'bodyPart' | 'isSet' | 'additionalInfo' | 'inStock'): Promise<Attribute[]> {
+  async findByType(
+    type:
+      | 'material'
+      | 'size'
+      | 'theme'
+      | 'bodyPart'
+      | 'isSet'
+      | 'additionalInfo'
+      | 'inStock',
+  ): Promise<Attribute[]> {
     const field = type === 'isSet' ? 'isSet' : type; // Для isSet використовуємо булеве поле
     if (type === 'isSet') {
       return this.attributeRepository.find({ where: { [field]: true } });
     }
     // Повертаємо лише записи, де поле не є NULL (рекомендований підхід)
-    return this.attributeRepository.find({ where: { [field]: Not(IsNull()) } }); 
+    return this.attributeRepository.find({ where: { [field]: Not(IsNull()) } });
     // Або, якщо хочете повернути всі записи (включаючи NULL):
     // return this.attributeRepository.find({ where: { [field]: undefined } });
   }

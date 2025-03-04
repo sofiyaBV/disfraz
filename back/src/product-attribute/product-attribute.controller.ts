@@ -1,8 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductAttributeService } from './product-attribute.service';
 import { CreateProductAttributeDto } from './dto/create-product-attribute.dto';
 import { UpdateProductAttributeDto } from './dto/update-product-attribute.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -14,7 +30,9 @@ import { ProductAttribute } from './entities/product-attribute.entity';
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductAttributeController {
-  constructor(private readonly productAttributeService: ProductAttributeService) {}
+  constructor(
+    private readonly productAttributeService: ProductAttributeService,
+  ) {}
 
   @ApiOperation({ summary: 'Create a new product-attribute link' })
   @ApiResponse({
@@ -24,7 +42,7 @@ export class ProductAttributeController {
   })
   @ApiBody({ type: CreateProductAttributeDto })
   @Post()
-  @Roles(Role.Admin,Role.User) // Тільки адмін може створювати зв’язки
+  @Roles(Role.Admin, Role.User) // Тільки адмін може створювати зв’язки
   create(@Body() createProductAttributeDto: CreateProductAttributeDto) {
     return this.productAttributeService.create(createProductAttributeDto);
   }
@@ -42,7 +60,11 @@ export class ProductAttributeController {
   }
 
   @ApiOperation({ summary: 'Get a product-attribute link by ID' })
-  @ApiResponse({ status: 200, description: 'Product-attribute link found', type: ProductAttribute })
+  @ApiResponse({
+    status: 200,
+    description: 'Product-attribute link found',
+    type: ProductAttribute,
+  })
   @ApiResponse({ status: 404, description: 'Product-attribute link not found' })
   @ApiParam({
     name: 'id',
@@ -72,12 +94,18 @@ export class ProductAttributeController {
   })
   @Patch(':id')
   @Roles(Role.Admin) // Тільки адмін може оновлювати зв’язки
-  update(@Param('id') id: string, @Body() updateProductAttributeDto: UpdateProductAttributeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProductAttributeDto: UpdateProductAttributeDto,
+  ) {
     return this.productAttributeService.update(+id, updateProductAttributeDto);
   }
 
   @ApiOperation({ summary: 'Delete a product-attribute link by ID' })
-  @ApiResponse({ status: 200, description: 'Product-attribute link deleted successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product-attribute link deleted successfully',
+  })
   @ApiResponse({ status: 404, description: 'Product-attribute link not found' })
   @ApiParam({
     name: 'id',

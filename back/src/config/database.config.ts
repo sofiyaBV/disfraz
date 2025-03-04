@@ -17,9 +17,9 @@ export default registerAs('database', () => {
     POSTGRES_DB: Joi.string().required(),
   });
 
-  const { error, value } = envVarsSchema.validate(process.env, { 
-    abortEarly: false, 
-    allowUnknown: true // Разрешаем неизвестные ключи
+  const { error, value } = envVarsSchema.validate(process.env, {
+    abortEarly: false,
+    allowUnknown: true, // Разрешаем неизвестные ключи
   });
 
   if (error) {
@@ -34,7 +34,15 @@ export default registerAs('database', () => {
     username: value.POSTGRES_USER,
     password: value.POSTGRES_PASSWORD,
     database: value.POSTGRES_DB,
-    entities: [Product, Attribute, ProductAttribute, Cart, Order, User, __dirname + '/**/*.entity{.ts,.js}'],
+    entities: [
+      Product,
+      Attribute,
+      ProductAttribute,
+      Cart,
+      Order,
+      User,
+      __dirname + '/**/*.entity{.ts,.js}',
+    ],
     autoLoadEntities: true,
     synchronize: false, // Вимкнено для використання міграцій (якщо ви використовуєте міграції)
   };

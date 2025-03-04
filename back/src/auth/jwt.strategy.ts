@@ -17,13 +17,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     console.log('JWT Payload:', payload); //  Проверяем, что внутри токена
     const user = await this.usersService.findOne(payload.sub);
     console.log('User from DB:', user); //  Проверяем, что user найден
-    
-  
+
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return { id: payload.sub, username: payload.username, roles: payload.roles  };
-  
-
+    return {
+      id: payload.sub,
+      username: payload.username,
+      roles: payload.roles,
+    };
   }
 }
