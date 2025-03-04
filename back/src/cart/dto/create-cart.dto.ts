@@ -1,28 +1,39 @@
-import { IsInt, IsPositive, IsOptional, IsNumber } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsPositive, IsOptional, IsNumber, Min } from 'class-validator';
 
 export class CreateCartDto {
-  @IsInt()
   @ApiProperty({
-    description: 'ID связи продукта и атрибута (из таблицы product_attribute)',
+    description: 'ID атрибута товару (зв’язок із product_attribute)',
     example: 1,
   })
-  productAttributeId: number; // ID связи продукт-атрибут
-
   @IsInt()
   @IsPositive()
+  productAttributeId: number;
+
   @ApiProperty({
-    description: 'Количество данного продукта/атрибута в корзине',
+    description: 'ID користувача (зв’язок із user)',
     example: 2,
   })
-  quantity: number; // Количество
+  @IsInt()
+  @IsPositive()
+  userId: number;
 
-  @IsOptional()
-  @IsNumber()
-  @ApiProperty({
-    description: 'Цена за единицу (опционально, может быть вычислена сервером)',
-    example: 199.99,
-    required: false,
+  @ApiPropertyOptional({
+    description: 'Кількість товару в кошику',
+    example: 1,
   })
-  price?: number; // Цена (опционально, может быть вычислена сервером)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  quantity?: number = 1; // За замовчуванням 1, як у сутності
+
+  @ApiPropertyOptional({
+    description: 'Ціна за одиницю товару',
+    example: 199.99,
+    default: 0.00,
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  price?: number = 0.00; // За замовчуванням 0.00, як у сутності
 }

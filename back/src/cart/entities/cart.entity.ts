@@ -6,17 +6,20 @@ import {
   JoinColumn
 } from 'typeorm';
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
-import { User } from '../../user/entities/user.entity'; // Предполагается, что существует сущность User
+import { User } from '../../user/entities/user.entity'; // Імпортуємо сутність User
 
 @Entity()
 export class Cart {
   @PrimaryGeneratedColumn()
   id: number; // Уникальный идентификатор элемента корзины
 
-
   @ManyToOne(() => ProductAttribute, (productAttribute) => productAttribute.carts)
   @JoinColumn({ name: 'productAttributeId' })
   productAttribute: ProductAttribute; // Связь с product_attribute
+
+  @ManyToOne(() => User, (user) => user.carts) // Додаємо зв’язок із User
+  @JoinColumn({ name: 'userId' }) // Назва колонки для зовнішнього ключа
+  user: User; // Зв’язок з користувачем, який додав товар до кошика
 
   @Column({ type: 'int', default: 1 })
   quantity: number; // Количество данного продукта в корзине
