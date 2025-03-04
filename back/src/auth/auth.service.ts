@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
     private usersService: UserService,
-    private jwtService: JwtService, // Добавлено JwtService
+    private jwtService: JwtService,
   ) {}
 
   async signIn(
@@ -19,9 +19,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const payload = { sub: user.id, username: user.username }; // sub используется для userId (JWT стандарт)
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      roles: user.roles,
+    }; // ✅ Теперь в токене есть roles
     return {
-      access_token: this.jwtService.sign(payload), // Генерация JWT
+      access_token: this.jwtService.sign(payload),
     };
   }
 }
