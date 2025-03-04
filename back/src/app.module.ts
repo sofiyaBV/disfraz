@@ -32,7 +32,7 @@ import databaseConfig from './config/database.config';
     ProductModule,
     AttributesModule,
     ProductAttributeModule,
-    CartModule
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

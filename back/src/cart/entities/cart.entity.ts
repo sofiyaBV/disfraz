@@ -1,9 +1,9 @@
-import { 
-  Entity, 
-  PrimaryGeneratedColumn, 
-  Column, 
-  ManyToOne, 
-  JoinColumn
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
 import { User } from '../../user/entities/user.entity'; // Імпортуємо сутність User
@@ -13,7 +13,10 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number; // Уникальный идентификатор элемента корзины
 
-  @ManyToOne(() => ProductAttribute, (productAttribute) => productAttribute.carts)
+  @ManyToOne(
+    () => ProductAttribute,
+    (productAttribute) => productAttribute.carts,
+  )
   @JoinColumn({ name: 'productAttributeId' })
   productAttribute: ProductAttribute; // Связь с product_attribute
 
@@ -24,7 +27,7 @@ export class Cart {
   @Column({ type: 'int', default: 1 })
   quantity: number; // Количество данного продукта в корзине
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   price: number; // Цена за единицу (может быть вычислена на основе productAttribute.product.price)
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

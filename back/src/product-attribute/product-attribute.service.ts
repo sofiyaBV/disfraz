@@ -17,13 +17,19 @@ export class ProductAttributeService {
     private attributeRepository: Repository<Attribute>,
   ) {}
 
-  async create(createProductAttributeDto: CreateProductAttributeDto): Promise<ProductAttribute> {
+  async create(
+    createProductAttributeDto: CreateProductAttributeDto,
+  ): Promise<ProductAttribute> {
     const { productId, attributeId } = createProductAttributeDto;
 
     // Знаходимо Product за ID
-    const product = await this.productRepository.findOneOrFail({ where: { id: productId } });
+    const product = await this.productRepository.findOneOrFail({
+      where: { id: productId },
+    });
     // Знаходимо Attribute за ID
-    const attribute = await this.attributeRepository.findOneOrFail({ where: { id: attributeId } });
+    const attribute = await this.attributeRepository.findOneOrFail({
+      where: { id: attributeId },
+    });
 
     // Створюємо новий зв’язок
     const productAttribute = this.productAttributeRepository.create({
@@ -47,17 +53,24 @@ export class ProductAttributeService {
     });
   }
 
-  async update(id: number, updateProductAttributeDto: Partial<CreateProductAttributeDto>): Promise<ProductAttribute> {
+  async update(
+    id: number,
+    updateProductAttributeDto: Partial<CreateProductAttributeDto>,
+  ): Promise<ProductAttribute> {
     const productAttribute = await this.findOne(id);
     const { productId, attributeId } = updateProductAttributeDto;
 
     if (productId) {
-      const product = await this.productRepository.findOneOrFail({ where: { id: productId } });
+      const product = await this.productRepository.findOneOrFail({
+        where: { id: productId },
+      });
       productAttribute.product = product;
     }
 
     if (attributeId) {
-      const attribute = await this.attributeRepository.findOneOrFail({ where: { id: attributeId } });
+      const attribute = await this.attributeRepository.findOneOrFail({
+        where: { id: attributeId },
+      });
       productAttribute.attribute = attribute;
     }
 
