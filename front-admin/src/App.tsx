@@ -1,25 +1,16 @@
 import {
   Admin,
   Resource,
-  ListGuesser,
-  EditGuesser,
-  ShowGuesser,
 } from "react-admin";
 import { Layout } from "./Layout";
 import { dataProvider } from "./dataProvider";
-import { authProvider } from "./authProvider";
+import { UserCreate, UserEdit, UserList, UserShow } from "./pages/users/users";
+
 
 export const App = () => (
-  <Admin
-    layout={Layout}
-    dataProvider={dataProvider}
-    authProvider={authProvider}
-  >
-    <Resource
-      name="admin"
-      list={ListGuesser}
-      edit={EditGuesser}
-      show={ShowGuesser}
-    />
+  <Admin layout={Layout} dataProvider={dataProvider}>
+        <Resource name="users" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} />//Создание ресурса users и вывод его в виде списка
+
   </Admin>
+  
 );
