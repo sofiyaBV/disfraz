@@ -6,17 +6,21 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
+import { JwtStrategy } from './jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret, // Укажите ваш секретный ключ
-      signOptions: { expiresIn: '360s' },
+      signOptions: { expiresIn: '36000s' },
     }),
   ],
   providers: [
     AuthService,
+    JwtStrategy,
     {
       provide: APP_GUARD,
       useClass: AuthGuard, // Глобально применяем AuthGuard
