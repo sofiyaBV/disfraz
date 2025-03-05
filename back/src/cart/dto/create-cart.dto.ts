@@ -3,37 +3,29 @@ import { IsInt, IsPositive, IsOptional, IsNumber, Min } from 'class-validator';
 
 export class CreateCartDto {
   @ApiProperty({
-    description: 'ID атрибута товару (зв’язок із product_attribute)',
+    description: 'ID атрибута товара (связь с product_attribute)',
     example: 1,
   })
   @IsInt()
   @IsPositive()
   productAttributeId: number;
 
-  @ApiProperty({
-    description: 'ID користувача (зв’язок із user)',
-    example: 2,
-  })
-  @IsInt()
-  @IsPositive()
-  userId: number;
-
   @ApiPropertyOptional({
-    description: 'Кількість товару в кошику',
+    description: 'Количество товара в корзине',
     example: 1,
   })
   @IsInt()
   @IsPositive()
   @IsOptional()
-  quantity?: number = 1; // За замовчуванням 1, як у сутності
+  quantity?: number = 1; // По умолчанию 1, как в сущности
 
   @ApiPropertyOptional({
-    description: 'Ціна за одиницю товару',
+    description: 'Цена за единицу товара',
     example: 199.99,
     default: 0.0,
   })
   @IsNumber()
   @Min(0)
   @IsOptional()
-  price?: number = 0.0; // За замовчуванням 0.00, як у сутності
+  price?: number = 0.0; // По умолчанию 0.00, как в сущности
 }
