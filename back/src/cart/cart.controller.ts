@@ -19,62 +19,80 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Cart } from './/entities/cart.entity';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { Cart } from './entities/cart.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; // Убедитесь, что импортирован правильный guard
+import { User } from '../auth/decorators/user.decorator'; // Импортируйте декоратор User
+
 @ApiTags('Cart')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard) // Используем наш кастомный JwtAuthGuard
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @ApiOperation({ summary: 'Create a new cart' })
+  @ApiOperation({
+    summary: 'Создать новую корзину для авторизованного пользователя',
+  })
   @ApiResponse({
     status: 201,
-    description: 'Cart successfully created',
+    description: 'Корзина успешно создана',
     type: Cart,
   })
   @ApiBody({ type: CreateCartDto })
   @Post()
-  create(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.create(createCartDto);
+  async create(@Body() createCartDto: CreateCartDto, @User() user: any) {
+    return this.cartService.create(createCartDto, user.id); // Передаем user.id в сервис
   }
 
-  @ApiOperation({ summary: 'Get all carts' })
-  @ApiResponse({ status: 200, description: 'List of all carts', type: [Cart] })
+  @ApiOperation({ summary: 'Получить все корзины' })
+  @ApiResponse({ status: 200, description: 'Список всех корзин', type: [Cart] })
   @Get()
   findAll() {
     return this.cartService.findAll();
   }
 
-  @ApiOperation({ summary: 'Get a cart by ID' })
-  @ApiResponse({ status: 200, description: 'Cart found', type: Cart })
-  @ApiResponse({ status: 404, description: 'Cart not found' })
-  @ApiParam({ name: 'id', required: true, description: 'Cart ID', example: 1 })
+  @ApiOperation({ summary: 'Получить корзину по ID' })
+  @ApiResponse({ status: 200, description: 'Корзина найдена', type: Cart })
+  @ApiResponse({ status: 404, description: 'Корзина не найдена' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID корзины',
+    example: 1,
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cartService.findOne(+id);
   }
 
-  @ApiOperation({ summary: 'Update a cart by ID' })
+  @ApiOperation({ summary: 'Обновить корзину по ID' })
   @ApiResponse({
     status: 200,
-    description: 'Cart updated successfully',
+    description: 'Корзина успешно обновлена',
     type: Cart,
   })
-  @ApiResponse({ status: 404, description: 'Cart not found' })
+  @ApiResponse({ status: 404, description: 'Корзина не найдена' })
   @ApiBody({ type: UpdateCartDto })
-  @ApiParam({ name: 'id', required: true, description: 'Cart ID', example: 1 })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID корзины',
+    example: 1,
+  })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
     return this.cartService.update(+id, updateCartDto);
   }
 
-  @ApiOperation({ summary: 'Delete a cart by ID' })
-  @ApiResponse({ status: 200, description: 'Cart deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Cart not found' })
-  @ApiParam({ name: 'id', required: true, description: 'Cart ID', example: 1 })
+  @ApiOperation({ summary: 'Удалить корзину по ID' })
+  @ApiResponse({ status: 200, description: 'Корзина успешно удалена' })
+  @ApiResponse({ status: 404, description: 'Корзина не найдена' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID корзины',
+    example: 1,
+  })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cartService.remove(+id);

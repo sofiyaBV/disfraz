@@ -13,12 +13,12 @@ export class CartService {
     private cartRepository: Repository<Cart>,
     @InjectRepository(ProductAttribute)
     private productAttributeRepository: Repository<ProductAttribute>,
-    @InjectRepository(User) // Внедряем репозиторий User
+    @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createCartDto: CreateCartDto): Promise<Cart> {
-    const { productAttributeId, userId, quantity, price } = createCartDto;
+  async create(createCartDto: CreateCartDto, userId: number): Promise<Cart> {
+    const { productAttributeId, quantity, price } = createCartDto;
 
     // Находим ProductAttribute по его ID
     const productAttribute =
@@ -26,16 +26,16 @@ export class CartService {
         where: { id: productAttributeId },
       });
 
-    // Находим User по его ID
+    // Находим User по его ID (из токена)
     const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
     });
 
-    // Создаем новый запис в корзине
+    // Создаем новую запись в корзине
     const cart = this.cartRepository.create({
       productAttribute,
       user, // Устанавливаем связь с пользователем
-      quantity,
+      quantity: quantity || 1, // По умолчанию 1, как в сущности
       price: price || productAttribute.product.price, // Используем цену из Product, если price не указан в DTO
     });
 
@@ -70,7 +70,7 @@ export class CartService {
     updateCartDto: Partial<CreateCartDto>,
   ): Promise<Cart> {
     const cart = await this.findOne(id);
-    const { productAttributeId, userId, quantity, price } = updateCartDto;
+    const { productAttributeId, quantity, price } = updateCartDto;
 
     if (productAttributeId) {
       const productAttribute =
@@ -78,13 +78,6 @@ export class CartService {
           where: { id: productAttributeId },
         });
       cart.productAttribute = productAttribute;
-    }
-
-    if (userId) {
-      const user = await this.userRepository.findOneOrFail({
-        where: { id: userId },
-      });
-      cart.user = user; // Обновляем связь с пользователем
     }
 
     if (quantity !== undefined) {
