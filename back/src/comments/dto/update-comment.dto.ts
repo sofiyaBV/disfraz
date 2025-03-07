@@ -1,20 +1,19 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsOptional } from 'class-validator';
 
 export class UpdateCommentDto {
   @ApiPropertyOptional({
-    example: 'Чудовий костюм, дуже сподобався!',
-    description: 'Текст коментаря',
+    description: 'Новый текст комментария',
+    example: 'Обновленный отзыв!',
   })
-  @IsOptional()
   @IsString()
+  @IsOptional()
   content?: string;
 
   @ApiPropertyOptional({
+    description: 'Статус модерации',
     example: true,
-    description: 'Чи пройшов коментар модерацію',
   })
   @IsOptional()
-  @IsBoolean()
   isModerated?: boolean;
 }
