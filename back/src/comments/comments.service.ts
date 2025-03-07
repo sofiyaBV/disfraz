@@ -5,6 +5,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class CommentsService {
@@ -13,9 +14,14 @@ export class CommentsService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(ProductAttribute)
     private readonly productAttributeRepository: Repository<ProductAttribute>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto): Promise<Comment> {
+  async create(
+    createCommentDto: CreateCommentDto,
+    userId: number,
+  ): Promise<Comment> {
     const { productAttributeId, content } = createCommentDto;
 
     // Находим ProductAttribute
@@ -24,10 +30,16 @@ export class CommentsService {
         where: { id: productAttributeId },
       });
 
+    // Находим User по его ID (из токена)
+    const user = await this.userRepository.findOneOrFail({
+      where: { id: userId },
+    });
+
     // Создаем новый комментарий
     const comment = this.commentRepository.create({
       content,
       productAttribute,
+      user, // Устанавливаем связь с пользователем
       isModerated: false, // По умолчанию не модерирован
     });
 
@@ -36,14 +48,14 @@ export class CommentsService {
 
   async findAll(): Promise<Comment[]> {
     return await this.commentRepository.find({
-      relations: ['productAttribute'], // Загружаем связанные сущности
+      relations: ['productAttribute', 'user'], // Загружаем связанные сущности
     });
   }
 
   async findOne(id: number): Promise<Comment> {
     const comment = await this.commentRepository.findOne({
       where: { id },
-      relations: ['productAttribute'],
+      relations: ['productAttribute', 'user'],
     });
     if (!comment) {
       throw new NotFoundException(`Comment with ID ${id} not found`);

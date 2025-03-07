@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
+import { User } from '../../user/entities/user.entity'; // Импортируем User
 
 @Entity()
 export class Comment {
@@ -27,4 +28,8 @@ export class Comment {
   )
   @JoinColumn({ name: 'productAttributeId' })
   productAttribute: ProductAttribute; // Связь с продуктом/атрибутом
+
+  @ManyToOne(() => User, (user) => user.comments) // Добавляем связь с User
+  @JoinColumn({ name: 'userId' }) // Внешний ключ userId
+  user: User; // Связь с пользователем, оставившим комментарий
 }

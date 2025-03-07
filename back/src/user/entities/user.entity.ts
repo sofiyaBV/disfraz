@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 import { Role } from '../../auth/enums/role.enum';
 import { Cart } from '../../cart/entities/cart.entity'; // Імпортуємо сутність Cart
-
+import { Comment } from '../../comments/entities/comment.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -51,4 +51,6 @@ export class User {
 
   @OneToMany(() => Cart, (cart) => cart.user) // Додаємо зв’язок із Cart
   carts: Cart[]; // Список кошиків користувача
+  @OneToMany(() => Comment, (comment) => comment.user) // Обратное отношение к комментариям
+  comments: Comment[];
 }
