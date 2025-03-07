@@ -10,6 +10,7 @@ import { User } from './user/entities/user.entity';
 import { AttributesModule } from './attribute/attribute.module';
 import { ProductAttributeModule } from './product-attribute/product-attribute.module';
 import { CartModule } from './cart/cart.module';
+import { CommentsModule } from './comments/comments.module';
 
 import databaseConfig from './config/database.config';
 
@@ -33,6 +34,7 @@ import databaseConfig from './config/database.config';
     AttributesModule,
     ProductAttributeModule,
     CartModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
