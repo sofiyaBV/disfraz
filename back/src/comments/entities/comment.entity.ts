@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
 
 @Entity()
 export class Comment {
@@ -13,4 +20,11 @@ export class Comment {
 
   @Column({ type: 'boolean', default: false })
   isModerated: boolean; // Чи пройшов коментар модерацію
+
+  @ManyToOne(
+    () => ProductAttribute,
+    (productAttribute) => productAttribute.comments,
+  )
+  @JoinColumn({ name: 'productAttributeId' })
+  productAttribute: ProductAttribute; // Связь с продуктом/атрибутом
 }

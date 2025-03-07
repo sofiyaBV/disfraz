@@ -27,82 +27,86 @@ import { Comment } from './entities/comment.entity';
 
 @ApiTags('Comments')
 @Controller('comments')
-@ApiBearerAuth() // Вказує, що потрібен JWT-токен для доступу
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Захист через JWT і ролі
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @ApiOperation({ summary: 'Create a new comment' })
+  @ApiOperation({ summary: 'Создать новый комментарий к продукту' })
   @ApiResponse({
     status: 201,
-    description: 'Comment successfully created',
+    description: 'Комментарий успешно создан',
     type: Comment,
   })
   @ApiBody({ type: CreateCommentDto })
   @Post()
-  @Roles(Role.User, Role.Admin) // Доступ для авторизованих користувачів і адмінів
-  create(@Body() createCommentDto: CreateCommentDto) {
+  @Roles(Role.User, Role.Admin)
+  async create(@Body() createCommentDto: CreateCommentDto) {
     return this.commentsService.create(createCommentDto);
   }
 
-  @ApiOperation({ summary: 'Get all comments' })
+  @ApiOperation({ summary: 'Получить все комментарии' })
   @ApiResponse({
     status: 200,
-    description: 'List of all comments',
+    description: 'Список всех комментариев',
     type: [Comment],
   })
   @Get()
-  @Roles(Role.Admin) // Тільки адмін може бачити всі коментарі
+  @Roles(Role.Admin)
   findAll() {
     return this.commentsService.findAll();
   }
 
-  @ApiOperation({ summary: 'Get a comment by ID' })
-  @ApiResponse({ status: 200, description: 'Comment found', type: Comment })
-  @ApiResponse({ status: 404, description: 'Comment not found' })
+  @ApiOperation({ summary: 'Получить комментарий по ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Комментарий найден',
+    type: Comment,
+  })
+  @ApiResponse({ status: 404, description: 'Комментарий не найден' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Comment ID',
+    description: 'ID комментария',
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ для авторизованих користувачів і адмінів
+  @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(+id);
   }
 
-  @ApiOperation({ summary: 'Update a comment by ID' })
+  @ApiOperation({ summary: 'Обновить комментарий по ID' })
   @ApiResponse({
     status: 200,
-    description: 'Comment updated successfully',
+    description: 'Комментарий успешно обновлен',
     type: Comment,
   })
-  @ApiResponse({ status: 404, description: 'Comment not found' })
+  @ApiResponse({ status: 404, description: 'Комментарий не найден' })
   @ApiBody({ type: UpdateCommentDto })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Comment ID',
+    description: 'ID комментария',
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Тільки адмін може оновлювати коментар (модерація)
+  @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
   }
 
-  @ApiOperation({ summary: 'Delete a comment by ID' })
-  @ApiResponse({ status: 200, description: 'Comment deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Comment not found' })
+  @ApiOperation({ summary: 'Удалить комментарий по ID' })
+  @ApiResponse({ status: 200, description: 'Комментарий успешно удален' })
+  @ApiResponse({ status: 404, description: 'Комментарий не найден' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Comment ID',
+    description: 'ID комментария',
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Тільки адмін може видаляти коментар
+  @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.commentsService.remove(+id);
   }

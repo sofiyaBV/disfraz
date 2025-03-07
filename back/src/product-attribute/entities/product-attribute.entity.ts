@@ -8,6 +8,7 @@ import {
 import { Product } from '../../product/entities/product.entity';
 import { Attribute } from '../../attribute/entities/attribute.entity';
 import { Cart } from '../../cart/entities/cart.entity';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity('product_attribute')
 export class ProductAttribute {
@@ -23,5 +24,8 @@ export class ProductAttribute {
   attribute: Attribute;
 
   @OneToMany(() => Cart, (cart) => cart.productAttribute)
-  carts: Cart[]; // Связь с корзиной (многие продукты/атрибуты могут быть в разных корзинах)
+  carts: Cart[]; // Связь с корзиной
+
+  @OneToMany(() => Comment, (comment) => comment.productAttribute)
+  comments: Comment[]; // Связь с комментариями
 }
