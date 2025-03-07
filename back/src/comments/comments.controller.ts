@@ -24,6 +24,7 @@ import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
+import { User } from '../auth/decorators/user.decorator'; // Импортируйте декоратор User
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -40,9 +41,9 @@ export class CommentsController {
   })
   @ApiBody({ type: CreateCommentDto })
   @Post()
-  @Roles(Role.User, Role.Admin)
-  async create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
+  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  async create(@Body() createCommentDto: CreateCommentDto, @User() user: any) {
+    return this.commentsService.create(createCommentDto, user.id); // Передаем user.id
   }
 
   @ApiOperation({ summary: 'Получить все комментарии' })
@@ -52,7 +53,7 @@ export class CommentsController {
     type: [Comment],
   })
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin) // Только админ может видеть все комментарии
   findAll() {
     return this.commentsService.findAll();
   }
@@ -91,7 +92,7 @@ export class CommentsController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin) // Только админ может модерировать
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
   }
