@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, IsNull } from 'typeorm'; // Імпортуємо Not і IsNull
+import { Repository, EntityManager, Not, IsNull } from 'typeorm';
 import { Attribute } from './entities/attribute.entity';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
@@ -11,8 +11,9 @@ export class AttributesService {
   constructor(
     @InjectRepository(Attribute)
     private attributeRepository: Repository<Attribute>,
-    @InjectRepository(Product) // Додаємо репозиторій для Product
+    @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    private readonly entityManager: EntityManager, // Добавляем EntityManager для транзакций
   ) {}
 
   async create(createAttributeDto: CreateAttributeDto): Promise<Attribute> {
@@ -25,22 +26,57 @@ export class AttributesService {
   }
 
   async findOne(id: number): Promise<Attribute> {
-    return this.attributeRepository.findOneOrFail({
+    const attribute = await this.attributeRepository.findOne({
       where: { id },
       relations: ['products'],
     });
+    if (!attribute) {
+      throw new NotFoundException(`Атрибут с ID ${id} не найден`);
+    }
+    return attribute;
   }
 
   async update(
     id: number,
     updateAttributeDto: UpdateAttributeDto,
   ): Promise<Attribute> {
-    await this.attributeRepository.update(id, updateAttributeDto);
-    return this.findOne(id);
+    return this.entityManager.transaction(async (manager) => {
+      // Находим атрибут
+      const attribute = await manager.findOne(Attribute, {
+        where: { id },
+        relations: ['products'],
+      });
+
+      if (!attribute) {
+        throw new NotFoundException(`Атрибут с ID ${id} не найден`);
+      }
+
+      // Обновляем базовые поля
+      manager.merge(Attribute, attribute, updateAttributeDto);
+
+      // Обновляем связи с продуктами, если переданы productIds
+      if (updateAttributeDto.productIds) {
+        const products = await manager.findByIds(
+          Product,
+          updateAttributeDto.productIds,
+        );
+        if (products.length !== updateAttributeDto.productIds.length) {
+          throw new NotFoundException('Некоторые продукты не найдены');
+        }
+        attribute.products = products;
+      }
+
+      // Сохраняем изменения
+      await manager.save(attribute);
+      return attribute;
+    });
   }
 
   async remove(id: number): Promise<void> {
-    await this.attributeRepository.delete(id);
+    const result = await this.attributeRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Атрибут с ID ${id} не найден`);
+    }
   }
 
   // Пошук атрибутів за типом (за текстовими полями)
@@ -54,18 +90,35 @@ export class AttributesService {
       | 'additionalInfo'
       | 'inStock',
   ): Promise<Attribute[]> {
-    const field = type === 'isSet' ? 'isSet' : type; // Для isSet використовуємо булеве поле
+    if (
+      ![
+        'material',
+        'size',
+        'theme',
+        'bodyPart',
+        'isSet',
+        'additionalInfo',
+        'inStock',
+      ].includes(type)
+    ) {
+      throw new Error('Недопустимый тип атрибута');
+    }
+
+    const field = type === 'isSet' ? 'isSet' : type;
     if (type === 'isSet') {
       return this.attributeRepository.find({ where: { [field]: true } });
     }
-    // Повертаємо лише записи, де поле не є NULL (рекомендований підхід)
     return this.attributeRepository.find({ where: { [field]: Not(IsNull()) } });
-    // Або, якщо хочете повернути всі записи (включаючи NULL):
-    // return this.attributeRepository.find({ where: { [field]: undefined } });
   }
 
   // Пошук атрибутів за назвою
   async findByName(name: string): Promise<Attribute> {
-    return this.attributeRepository.findOne({ where: { name } });
+    const attribute = await this.attributeRepository.findOne({
+      where: { name },
+    });
+    if (!attribute) {
+      throw new NotFoundException(`Атрибут с названием ${name} не найден`);
+    }
+    return attribute;
   }
 }

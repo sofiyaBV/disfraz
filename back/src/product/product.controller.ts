@@ -87,7 +87,7 @@ export class ProductController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Только админ может обновлять продукт
+  @Roles(Role.Admin, Role.User) // Только админ может обновлять продукт
   update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
   }
