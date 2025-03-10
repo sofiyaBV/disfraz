@@ -1,5 +1,12 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -10,12 +17,17 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
+@ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully created', type: User })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully created',
+    type: User,
+  })
   @ApiBody({ type: CreateUserDto })
   @Post()
   @Roles(Role.Admin) // ✅ Только админ может создавать пользователей
@@ -26,8 +38,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   @Get()
-  @ApiBearerAuth()
-  @Roles(Role.Admin, Role.User) 
+  @Roles(Role.Admin, Role.User)
   findAll() {
     return this.userService.findAll();
   }

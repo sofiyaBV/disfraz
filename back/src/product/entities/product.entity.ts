@@ -1,10 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-} from 'typeorm';
-import { Order } from '../../order/entities/order.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Attribute } from '../../attribute/entities/attribute.entity';
 
 @Entity()
 export class Product {
@@ -20,36 +15,23 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'simple-array', nullable: true })
+  @Column({ type: 'text', array: true, nullable: true }) // Змінено на 'text' з array: true для images
   images: string[];
 
-  @Column({ type: 'simple-array', nullable: true })
-  sizes: string[];
+  @Column({
+    type: 'integer', // Вказуємо 'integer' для базового типу
+    array: true, // Вказуємо, що це масив
+    nullable: true,
+    name: 'similarproducts', // Змінено на реальну назву колонки в базі даних
+  })
+  similarProducts: number[]; // Масив ID схожих товарів
 
-  @Column({ type: 'simple-array', nullable: true })
-  materials: string[];
-
-  @Column({ type: 'varchar', length: 255 })
-  theme: string;
-
-  @Column({ type: 'simple-array', nullable: true })
-  bodyParts: string[];
-
-  @Column({ type: 'boolean', default: false })
-  isSet: boolean;
-
-  @Column({ type: 'text', nullable: true })
-  additionalInfo: string;
-
-  @Column({ type: 'boolean', default: true })
-  inStock: boolean;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  discount: number;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  discountedPrice: number;
-
-  @OneToMany(() => Order, (order) => order.product)
-  orders: Order[];
+  // Зв’язок багато до багатьох із Attribute через ProductAttribute
+  @ManyToMany(() => Attribute, (attribute) => attribute.products)
+  @JoinTable({
+    name: 'product_attribute', // Назва таблиці зв’язку
+    joinColumn: { name: 'productId', referencedColumnName: 'id' }, // Колонка для Product
+    inverseJoinColumn: { name: 'attributeId', referencedColumnName: 'id' }, // Колонка для Attribute
+  })
+  attributes: Attribute[];
 }
