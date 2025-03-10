@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -24,6 +25,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { AuthGuard } from '@nestjs/passport';
+
 @ApiTags('Products')
 @Controller('products')
 @ApiBearerAuth()
@@ -39,9 +41,9 @@ export class ProductController {
   })
   @ApiBody({ type: CreateProductDto })
   @Post()
-  @ApiBearerAuth()
-  @Roles(Role.Admin, Role.User) // Только админ может создавать продукты
-  create(@Body() createProductDto: CreateProductDto) {
+  @Roles(Role.Admin) // Ограничиваем создание только для админов
+  async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+    console.log('Creating product with body:', createProductDto);
     return this.productService.create(createProductDto);
   }
 
@@ -53,7 +55,7 @@ export class ProductController {
   })
   @Get()
   @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
-  findAll() {
+  async findAll(): Promise<Product[]> {
     return this.productService.findAll();
   }
 
@@ -67,8 +69,8 @@ export class ProductController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ только для зарегистрированных пользователей
-  findOne(@Param('id') id: number) {
+  @Roles(Role.User, Role.Admin) // Доступ для зарегистрированных пользователей
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.productService.findOne(id);
   }
 
@@ -87,8 +89,12 @@ export class ProductController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin, Role.User) // Только админ может обновлять продукт
-  update(@Param('id') id: number, @Body() updateProductDto: UpdateProductDto) {
+  @Roles(Role.Admin, Role.User) // Ограничиваем обновление только для админов
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    console.log(`Updating product with id: ${id}, body:`, updateProductDto);
     return this.productService.update(id, updateProductDto);
   }
 
@@ -103,7 +109,7 @@ export class ProductController {
   })
   @Delete(':id')
   @Roles(Role.Admin) // Только админ может удалять продукт
-  remove(@Param('id') id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.productService.remove(id);
   }
 }
