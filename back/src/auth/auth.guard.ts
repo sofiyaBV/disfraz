@@ -15,9 +15,7 @@ export class AuthGuard implements CanActivate {
 
   constructor(private jwtService: JwtService) {}
 
-  private readonly publicRoutes = [
-    { method: 'POST', path: '/auth/signin' },
-  ];
+  private readonly publicRoutes = [{ method: 'POST', path: '/auth/signin' }];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -29,7 +27,9 @@ export class AuthGuard implements CanActivate {
     }
 
     const token = this.extractTokenFromHeader(request);
-    this.logger.log(`Authorization Header: ${request.headers.authorization || 'NONE'}`);
+    this.logger.log(
+      `Authorization Header: ${request.headers.authorization || 'NONE'}`,
+    );
 
     if (!token) {
       this.logger.warn('Missing token');
@@ -58,7 +58,8 @@ export class AuthGuard implements CanActivate {
 
   private isPublicRoute(request: Request): boolean {
     return this.publicRoutes.some(
-      (route) => route.method === request.method && request.path.startsWith(route.path),
+      (route) =>
+        route.method === request.method && request.path.startsWith(route.path),
     );
   }
 }

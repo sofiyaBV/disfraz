@@ -1,5 +1,11 @@
 import * as Joi from 'joi';
 import { registerAs } from '@nestjs/config';
+import { Product } from '../product/entities/product.entity';
+import { Attribute } from '../attribute/entities/attribute.entity';
+import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
+import { Cart } from '../cart/entities/cart.entity';
+import { Order } from '../order/entities/order.entity';
+import { User } from '../user/entities/user.entity';
 
 export default registerAs('database', () => {
   // Валидация переменных окружения с разрешением неизвестных ключей
@@ -11,9 +17,9 @@ export default registerAs('database', () => {
     POSTGRES_DB: Joi.string().required(),
   });
 
-  const { error, value } = envVarsSchema.validate(process.env, { 
-    abortEarly: false, 
-    allowUnknown: true // Разрешаем неизвестные ключи
+  const { error, value } = envVarsSchema.validate(process.env, {
+    abortEarly: false,
+    allowUnknown: true, // Разрешаем неизвестные ключи
   });
 
   if (error) {
@@ -28,7 +34,16 @@ export default registerAs('database', () => {
     username: value.POSTGRES_USER,
     password: value.POSTGRES_PASSWORD,
     database: value.POSTGRES_DB,
+    entities: [
+      Product,
+      Attribute,
+      ProductAttribute,
+      Cart,
+      Order,
+      User,
+      __dirname + '/**/*.entity{.ts,.js}',
+    ],
     autoLoadEntities: true,
-    synchronize: true,
+    synchronize: false, // Вимкнено для використання міграцій (якщо ви використовуєте міграції)
   };
 });

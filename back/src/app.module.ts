@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { RolesGuard } from './auth/guards/roles.guard';
 import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 import { User } from './user/entities/user.entity';
+import { AttributesModule } from './attribute/attribute.module';
+import { ProductAttributeModule } from './product-attribute/product-attribute.module';
+import { CartModule } from './cart/cart.module';
+import { CommentsModule } from './comments/comments.module';
+
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -28,6 +31,10 @@ import databaseConfig from './config/database.config';
     AuthModule,
     OrderModule,
     ProductModule,
+    AttributesModule,
+    ProductAttributeModule,
+    CartModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

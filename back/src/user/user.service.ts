@@ -20,7 +20,7 @@ export class UserService {
     const userCount = await this.userRepository.count();
 
     const user = new User();
-    user.username = createUserDto.username;
+    user.email = createUserDto.email;
     user.password = await bcrypt.hash(createUserDto.password, salt);
 
     // Первый пользователь - администратор, остальные - обычные пользователи
@@ -36,7 +36,7 @@ export class UserService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async findByUsername(username: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ username });
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ email });
   }
 }

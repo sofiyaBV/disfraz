@@ -1,6 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Product } from '../../product/entities/product.entity';
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
@@ -27,12 +25,5 @@ export class Order {
   @Column({ type: 'varchar', length: 50, default: 'Pending' })
   status: string;
 
-  @Column({ type: 'int' })
-  quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  totalPrice: number;
-
-  @ManyToOne(() => Product, (product) => product.orders, { eager: true })
-  product: Product;
 }

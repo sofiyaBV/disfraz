@@ -14,6 +14,7 @@ import {
   ApiParam,
   ApiResponse,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -22,10 +23,11 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
-
+import { AuthGuard } from '@nestjs/passport';
 @ApiTags('Products')
 @Controller('products')
-@UseGuards(RolesGuard) // Применяем Guard ко всему контроллеру
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -37,7 +39,8 @@ export class ProductController {
   })
   @ApiBody({ type: CreateProductDto })
   @Post()
-  // @Roles(Role.Admin) // Только админ может создавать продукты
+  @ApiBearerAuth()
+  @Roles(Role.Admin, Role.User) // Только админ может создавать продукты
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }

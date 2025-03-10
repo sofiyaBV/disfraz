@@ -10,18 +10,15 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(
-    username: string,
-    pass: string,
-  ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findByUsername(username);
+  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+    const user = await this.usersService.findByEmail(email);
     if (!user || !(await bcrypt.compare(pass, user.password))) {
-      throw new UnauthorizedException('Invalid username or password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const payload = {
       sub: user.id,
-      username: user.username,
+      email: user.email,
       roles: user.roles,
     }; // ✅ Теперь в токене есть roles
     return {

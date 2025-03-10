@@ -2,7 +2,6 @@
 /dist
 /node_modules
 /build
-
 # Logs
 logs
 *.log
@@ -11,7 +10,7 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-
+data
 # OS
 .DS_Store
 

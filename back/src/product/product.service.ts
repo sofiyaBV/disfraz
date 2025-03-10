@@ -18,17 +18,14 @@ export class ProductService {
   }
 
   async findAll(): Promise<Product[]> {
-    return await this.productRepository.find();
+    return await this.productRepository.find({ relations: ['attributes'] });
   }
 
   async findOne(id: number): Promise<Product> {
-    return await this.productRepository.findOne({ where: { id } });
+    return await this.productRepository.findOne({ where: { id }, relations: ['attributes'] });
   }
 
-  async update(
-    id: number,
-    updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
+  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
     await this.productRepository.update(id, updateProductDto);
     return this.findOne(id);
   }
@@ -36,4 +33,6 @@ export class ProductService {
   async remove(id: number): Promise<void> {
     await this.productRepository.delete(id);
   }
+
+  
 }
