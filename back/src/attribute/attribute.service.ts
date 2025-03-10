@@ -13,7 +13,7 @@ export class AttributesService {
     private attributeRepository: Repository<Attribute>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
-    private readonly entityManager: EntityManager, // Добавляем EntityManager для транзакций
+    private readonly entityManager: EntityManager,
   ) {}
 
   async create(createAttributeDto: CreateAttributeDto): Promise<Attribute> {
@@ -41,7 +41,6 @@ export class AttributesService {
     updateAttributeDto: UpdateAttributeDto,
   ): Promise<Attribute> {
     return this.entityManager.transaction(async (manager) => {
-      // Находим атрибут
       const attribute = await manager.findOne(Attribute, {
         where: { id },
         relations: ['products'],
@@ -51,22 +50,20 @@ export class AttributesService {
         throw new NotFoundException(`Атрибут с ID ${id} не найден`);
       }
 
-      // Обновляем базовые поля
       manager.merge(Attribute, attribute, updateAttributeDto);
 
-      // Обновляем связи с продуктами, если переданы productIds
       if (updateAttributeDto.productIds) {
-        const products = await manager.findByIds(
+        const existingProducts = await manager.findByIds(
           Product,
           updateAttributeDto.productIds,
         );
-        if (products.length !== updateAttributeDto.productIds.length) {
-          throw new NotFoundException('Некоторые продукты не найдены');
+        if (existingProducts.length > 0) {
+          attribute.products = existingProducts; // Устанавливаем только найденные продукты
+        } else {
+          console.warn(`Ни один продукт не найден для attributeId: ${id}`);
         }
-        attribute.products = products;
       }
 
-      // Сохраняем изменения
       await manager.save(attribute);
       return attribute;
     });
@@ -79,7 +76,6 @@ export class AttributesService {
     }
   }
 
-  // Пошук атрибутів за типом (за текстовими полями)
   async findByType(
     type:
       | 'material'
@@ -111,7 +107,6 @@ export class AttributesService {
     return this.attributeRepository.find({ where: { [field]: Not(IsNull()) } });
   }
 
-  // Пошук атрибутів за назвою
   async findByName(name: string): Promise<Attribute> {
     const attribute = await this.attributeRepository.findOne({
       where: { name },

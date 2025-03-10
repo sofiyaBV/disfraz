@@ -13,7 +13,7 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Attribute)
     private readonly attributeRepository: Repository<Attribute>,
-    private readonly entityManager: EntityManager, // Добавляем EntityManager для транзакций
+    private readonly entityManager: EntityManager,
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
@@ -41,7 +41,6 @@ export class ProductService {
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
     return this.entityManager.transaction(async (manager) => {
-      // Находим продукт
       const product = await manager.findOne(Product, {
         where: { id },
         relations: ['attributes'],
@@ -56,17 +55,17 @@ export class ProductService {
 
       // Обновляем связи с атрибутами, если переданы attributeIds
       if (updateProductDto.attributeIds) {
-        const attributes = await manager.findByIds(
+        const existingAttributes = await manager.findByIds(
           Attribute,
           updateProductDto.attributeIds,
         );
-        if (attributes.length !== updateProductDto.attributeIds.length) {
-          throw new NotFoundException('Некоторые атрибуты не найдены');
+        if (existingAttributes.length > 0) {
+          product.attributes = existingAttributes; // Устанавливаем только найденные атрибуты
+        } else {
+          console.warn('Ни один атрибут не найден для productId:', id);
         }
-        product.attributes = attributes;
       }
 
-      // Сохраняем изменения
       await manager.save(product);
       return product;
     });
