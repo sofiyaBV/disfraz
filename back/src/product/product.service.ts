@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
+import { Attribute } from '../attribute/entities/attribute.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(Attribute)
+    private readonly attributeRepository: Repository<Attribute>,
+    private readonly entityManager: EntityManager,
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
@@ -22,17 +26,55 @@ export class ProductService {
   }
 
   async findOne(id: number): Promise<Product> {
-    return await this.productRepository.findOne({ where: { id }, relations: ['attributes'] });
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: ['attributes'],
+    });
+    if (!product) {
+      throw new NotFoundException(`Продукт с ID ${id} не найден`);
+    }
+    return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
-    await this.productRepository.update(id, updateProductDto);
-    return this.findOne(id);
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    return this.entityManager.transaction(async (manager) => {
+      const product = await manager.findOne(Product, {
+        where: { id },
+        relations: ['attributes'],
+      });
+
+      if (!product) {
+        throw new NotFoundException(`Продукт с ID ${id} не найден`);
+      }
+
+      // Обновляем базовые поля
+      manager.merge(Product, product, updateProductDto);
+
+      // Обновляем связи с атрибутами, если переданы attributeIds
+      if (updateProductDto.attributeIds) {
+        const existingAttributes = await manager.findByIds(
+          Attribute,
+          updateProductDto.attributeIds,
+        );
+        if (existingAttributes.length > 0) {
+          product.attributes = existingAttributes; // Устанавливаем только найденные атрибуты
+        } else {
+          console.warn('Ни один атрибут не найден для productId:', id);
+        }
+      }
+
+      await manager.save(product);
+      return product;
+    });
   }
 
   async remove(id: number): Promise<void> {
-    await this.productRepository.delete(id);
+    const result = await this.productRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Продукт с ID ${id} не найден`);
+    }
   }
-
-  
 }
