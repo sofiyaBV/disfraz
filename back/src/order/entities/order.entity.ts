@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Cart } from '../../cart/entities/cart.entity'; // Импортируем сущность Cart
+
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
@@ -25,5 +34,11 @@ export class Order {
   @Column({ type: 'varchar', length: 50, default: 'Pending' })
   status: string;
 
+  // Добавляем связь ManyToOne с Cart
+  @ManyToOne(() => Cart, (cart) => cart.id, { nullable: true })
+  @JoinColumn({ name: 'cartId' }) // Указываем имя колонки для внешнего ключа
+  cart: Cart;
 
+  @Column({ type: 'int', nullable: true }) // Поле для хранения cartId
+  cartId: number;
 }

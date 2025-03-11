@@ -9,7 +9,6 @@ import {
   IsEnum,
 } from 'class-validator';
 
-// Перечисление для способов доставки
 export enum DeliveryMethod {
   SelfPickup = 'Самовивіз',
   NovaPoshtaBranch = 'Нова Пошта - відділення',
@@ -63,13 +62,13 @@ export class CreateOrderDto {
   @IsOptional()
   status?: string;
 
+  // Новое поле для cartId
   @ApiProperty({
-    example: [1, 2, 3],
-    description: 'Список ID елементів корзини',
+    example: 1,
+    description: 'ID корзины, связанной с заказом',
     required: false,
   })
-  @IsArray()
-  @IsInt({ each: true })
+  @IsInt()
   @IsOptional()
-  cartIds?: number[];
+  cartId?: number;
 }

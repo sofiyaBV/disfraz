@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateOrderDto, DeliveryMethod } from './create-order.dto'; // Исправлен импорт DeliveryMethod
+import { CreateOrderDto, DeliveryMethod } from './create-order.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsInt, IsOptional, IsEnum, IsString } from 'class-validator'; // Добавлен IsString
+import { IsArray, IsInt, IsOptional, IsEnum, IsString } from 'class-validator';
 
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   @ApiPropertyOptional({
@@ -14,20 +14,20 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   override deliveryMethod?: DeliveryMethod;
 
   @ApiPropertyOptional({
-    example: [1, 2, 3],
-    description: 'Список ID елементів корзини',
-    required: false,
-  })
-  @IsArray()
-  @IsInt({ each: true })
-  @IsOptional()
-  override cartIds?: number[];
-
-  @ApiPropertyOptional({
     example: 'Delivered',
     description: 'Статус замовлення',
   })
   @IsString()
   @IsOptional()
   override status?: string;
+
+  // Новое поле для cartId
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'ID корзины, связанной с заказом',
+    required: false,
+  })
+  @IsInt()
+  @IsOptional()
+  override cartId?: number;
 }

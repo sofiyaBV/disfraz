@@ -24,6 +24,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { AuthGuard } from '@nestjs/passport';
+
 @ApiTags('Orders')
 @Controller('orders')
 @ApiBearerAuth()
@@ -37,9 +38,12 @@ export class OrderController {
     description: 'Order successfully created',
     type: Order,
   })
-  @ApiBody({ type: CreateOrderDto })
+  @ApiBody({
+    type: CreateOrderDto,
+    description: 'Includes optional cartId to link the order with a cart',
+  })
   @Post()
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  @Roles(Role.User, Role.Admin)
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(createOrderDto);
   }
@@ -47,17 +51,21 @@ export class OrderController {
   @ApiOperation({ summary: 'Get all orders' })
   @ApiResponse({
     status: 200,
-    description: 'List of all orders',
+    description: 'List of all orders with their associated carts',
     type: [Order],
   })
   @Get()
-  @Roles(Role.Admin) // Только админ может видеть все заказы
+  @Roles(Role.Admin)
   findAll() {
     return this.orderService.findAll();
   }
 
   @ApiOperation({ summary: 'Get an order by ID' })
-  @ApiResponse({ status: 200, description: 'Order found', type: Order })
+  @ApiResponse({
+    status: 200,
+    description: 'Order found with its associated cart',
+    type: Order,
+  })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiParam({
     name: 'id',
@@ -66,7 +74,7 @@ export class OrderController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ только для зарегистрированных пользователей
+  @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: number) {
     return this.orderService.findOne(id);
   }
@@ -78,7 +86,10 @@ export class OrderController {
     type: Order,
   })
   @ApiResponse({ status: 404, description: 'Order not found' })
-  @ApiBody({ type: UpdateOrderDto })
+  @ApiBody({
+    type: UpdateOrderDto,
+    description: 'Includes optional cartId to update the linked cart',
+  })
   @ApiParam({
     name: 'id',
     required: true,
@@ -86,7 +97,7 @@ export class OrderController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Только админ может обновлять заказ
+  @Roles(Role.Admin)
   update(@Param('id') id: number, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.update(id, updateOrderDto);
   }
@@ -101,7 +112,7 @@ export class OrderController {
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Только админ может удалять заказ
+  @Roles(Role.Admin)
   remove(@Param('id') id: number) {
     return this.orderService.remove(id);
   }
