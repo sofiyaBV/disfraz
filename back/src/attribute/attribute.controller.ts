@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AttributesService } from './attribute.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
@@ -40,8 +41,11 @@ export class AttributesController {
   })
   @ApiBody({ type: CreateAttributeDto })
   @Post()
-  @Roles(Role.Admin, Role.User) // Тільки адмін може створювати атрибути
-  create(@Body() createAttributeDto: CreateAttributeDto) {
+  @Roles(Role.Admin) // Ограничиваем создание только для админов
+  async create(
+    @Body() createAttributeDto: CreateAttributeDto,
+  ): Promise<Attribute> {
+    console.log('Creating attribute with body:', createAttributeDto);
     return this.attributesService.create(createAttributeDto);
   }
 
@@ -52,8 +56,8 @@ export class AttributesController {
     type: [Attribute],
   })
   @Get()
-  @Roles(Role.User, Role.Admin) // Доступ для користувача та адміна для перегляду всіх атрибутів
-  findAll() {
+  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  async findAll(): Promise<Attribute[]> {
     return this.attributesService.findAll();
   }
 
@@ -67,9 +71,9 @@ export class AttributesController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ для користувача та адміна для перегляду атрибута
-  findOne(@Param('id') id: string) {
-    return this.attributesService.findOne(+id);
+  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Attribute> {
+    return this.attributesService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update an attribute by ID' })
@@ -87,12 +91,13 @@ export class AttributesController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Тільки адмін може оновлювати атрибути
-  update(
-    @Param('id') id: string,
+  @Roles(Role.Admin, Role.User) // Ограничиваем обновление только для админов
+  async update(
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateAttributeDto: UpdateAttributeDto,
-  ) {
-    return this.attributesService.update(+id, updateAttributeDto);
+  ): Promise<Attribute> {
+    console.log(`Updating attribute with id: ${id}, body:`, updateAttributeDto);
+    return this.attributesService.update(id, updateAttributeDto);
   }
 
   @ApiOperation({ summary: 'Delete an attribute by ID' })
@@ -105,8 +110,8 @@ export class AttributesController {
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Тільки адмін може видаляти атрибути
-  remove(@Param('id') id: string) {
-    return this.attributesService.remove(+id);
+  @Roles(Role.Admin) // Только админ может удалять атрибуты
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.attributesService.remove(id);
   }
 }
