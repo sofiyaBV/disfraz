@@ -40,7 +40,8 @@ export class OrderController {
   })
   @ApiBody({
     type: CreateOrderDto,
-    description: 'Includes optional cartId to link the order with a cart',
+    description:
+      'Includes optional cartId and userId to link the order with a cart and user',
   })
   @Post()
   @Roles(Role.User, Role.Admin)
@@ -51,7 +52,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Get all orders' })
   @ApiResponse({
     status: 200,
-    description: 'List of all orders with their associated carts',
+    description: 'List of all orders with their associated carts and users',
     type: [Order],
   })
   @Get()
@@ -63,7 +64,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Get an order by ID' })
   @ApiResponse({
     status: 200,
-    description: 'Order found with its associated cart',
+    description: 'Order found with its associated cart and user',
     type: Order,
   })
   @ApiResponse({ status: 404, description: 'Order not found' })
@@ -88,7 +89,8 @@ export class OrderController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiBody({
     type: UpdateOrderDto,
-    description: 'Includes optional cartId to update the linked cart',
+    description:
+      'Includes optional cartId and userId to update the linked cart and user',
   })
   @ApiParam({
     name: 'id',

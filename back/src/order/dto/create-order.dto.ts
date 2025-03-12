@@ -3,7 +3,6 @@ import {
   IsString,
   IsEmail,
   IsPhoneNumber,
-  IsArray,
   IsInt,
   IsOptional,
   IsEnum,
@@ -62,7 +61,6 @@ export class CreateOrderDto {
   @IsOptional()
   status?: string;
 
-  // Новое поле для cartId
   @ApiProperty({
     example: 1,
     description: 'ID корзины, связанной с заказом',
@@ -71,4 +69,14 @@ export class CreateOrderDto {
   @IsInt()
   @IsOptional()
   cartId?: number;
+
+  // Новое поле для userId
+  @ApiProperty({
+    example: 1,
+    description: 'ID пользователя, создавшего заказ',
+    required: false,
+  })
+  @IsInt()
+  @IsOptional()
+  userId?: number;
 }
