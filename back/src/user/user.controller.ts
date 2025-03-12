@@ -17,8 +17,6 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -30,6 +28,8 @@ export class UserController {
   })
   @ApiBody({ type: CreateUserDto })
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
   @Roles(Role.Admin) // ✅ Только админ может создавать пользователей
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
@@ -38,6 +38,8 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [User] })
   @Get()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
   @Roles(Role.Admin, Role.User)
   findAll() {
     return this.userService.findAll();
@@ -48,6 +50,8 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
   @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
   @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: number) {
     return this.userService.findOne(id);

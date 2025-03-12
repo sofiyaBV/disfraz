@@ -15,7 +15,10 @@ export class AuthGuard implements CanActivate {
 
   constructor(private jwtService: JwtService) {}
 
-  private readonly publicRoutes = [{ method: 'POST', path: '/auth/signin' }];
+  private readonly publicRoutes = [
+    { method: 'POST', path: '/auth/signin' },
+    { method: 'POST', path: '/user' },
+  ];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
