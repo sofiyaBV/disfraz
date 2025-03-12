@@ -3,7 +3,6 @@ import {
   IsString,
   IsEmail,
   IsPhoneNumber,
-  IsInt,
   IsOptional,
   IsEnum,
 } from 'class-validator';
@@ -60,13 +59,4 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   status?: string;
-
-  @ApiProperty({
-    example: 1,
-    description: 'ID корзины, связанной с заказом',
-    required: false,
-  })
-  @IsInt()
-  @IsOptional()
-  cartId?: number;
 }
