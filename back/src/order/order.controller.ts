@@ -24,32 +24,38 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { User } from '../auth/decorators/user.decorator'; // Импортируем декоратор User
+import { User } from '../auth/decorators/user.decorator';
 
 @ApiTags('Orders')
 @Controller('orders')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard) // Защищаем все маршруты JWT и ролями
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiOperation({ summary: 'Create a new order for the authenticated user' })
+  @ApiOperation({
+    summary:
+      'Создать новые заказы для авторизованного пользователя на основе корзины',
+  })
   @ApiResponse({
     status: 201,
-    description: 'Order successfully created',
-    type: Order,
+    description: 'Заказы успешно созданы',
+    type: [Order], // Обновляем тип на массив заказов
   })
-  @ApiBody({ type: CreateOrderDto, description: 'Includes optional cartId' })
+  @ApiBody({
+    type: CreateOrderDto,
+    description: 'Включает данные для создания заказа',
+  })
   @Post()
   @Roles(Role.User, Role.Admin)
   async create(@Body() createOrderDto: CreateOrderDto, @User() user: any) {
-    return this.orderService.create(createOrderDto, user.id); // Передаем user.id из JWT
+    return this.orderService.create(createOrderDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Get all orders' })
+  @ApiOperation({ summary: 'Получить все заказы' })
   @ApiResponse({
     status: 200,
-    description: 'List of all orders with their associated carts and users',
+    description: 'Список всех заказов с их корзинами и пользователями',
     type: [Order],
   })
   @Get()
@@ -58,17 +64,17 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @ApiOperation({ summary: 'Get an order by ID' })
+  @ApiOperation({ summary: 'Получить заказ по ID' })
   @ApiResponse({
     status: 200,
-    description: 'Order found with its associated cart and user',
+    description: 'Заказ найден с его корзиной и пользователем',
     type: Order,
   })
-  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 404, description: 'Заказ не найден' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Order ID',
+    description: 'ID заказа',
     example: 1,
   })
   @Get(':id')
@@ -77,21 +83,22 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Update an order by ID' })
+  @ApiOperation({ summary: 'Обновить заказ по ID' })
   @ApiResponse({
     status: 200,
-    description: 'Order updated successfully',
+    description: 'Заказ успешно обновлен',
     type: Order,
   })
-  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 404, description: 'Заказ не найден' })
   @ApiBody({
     type: UpdateOrderDto,
-    description: 'Includes optional cartId to update the linked cart',
+    description:
+      'Включает опциональный cartId для обновления связанной корзины',
   })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Order ID',
+    description: 'ID заказа',
     example: 1,
   })
   @Patch(':id')
@@ -100,13 +107,13 @@ export class OrderController {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @ApiOperation({ summary: 'Delete an order by ID' })
-  @ApiResponse({ status: 200, description: 'Order deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiOperation({ summary: 'Удалить заказ по ID' })
+  @ApiResponse({ status: 200, description: 'Заказ успешно удален' })
+  @ApiResponse({ status: 404, description: 'Заказ не найден' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Order ID',
+    description: 'ID заказа',
     example: 1,
   })
   @Delete(':id')

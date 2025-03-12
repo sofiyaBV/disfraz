@@ -18,79 +18,78 @@ export class OrderService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
-    let cart: Cart | null = null;
-    let user: User | null = null;
-
-    // Проверяем cartId, если он передан
-    if (createOrderDto.cartId) {
-      cart = await this.cartRepository.findOne({
-        where: { id: createOrderDto.cartId },
-      });
-      if (!cart) {
-        throw new NotFoundException(
-          `Cart with ID ${createOrderDto.cartId} not found`,
-        );
-      }
-      // Автоматически берем userId из корзины, если он доступен (для проверки)
-      if (cart.user && cart.user.id && !userId) {
-        userId = cart.user.id;
-      }
-    }
-
-    // Находим User по userId из JWT
-    user = await this.userRepository.findOne({ where: { id: userId } });
+  // Метод для создания заказа на основе записей корзины авторизованного пользователя
+  async create(
+    createOrderDto: CreateOrderDto,
+    userId: number,
+  ): Promise<Order[]> {
+    // Находим пользователя по userId из JWT
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+      throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
     }
 
-    // Создаем заказ
-    const order = this.orderRepository.create({
-      ...createOrderDto,
-      cart,
-      user, // Связываем с пользователем из JWT
+    // Находим все записи корзины, связанные с этим пользователем
+    const cartItems = await this.cartRepository.find({
+      where: { user: { id: userId } }, // Ищем корзины по userId
+      relations: ['user'], // Загружаем связанные данные о пользователе
     });
-    return await this.orderRepository.save(order);
+
+    if (!cartItems || cartItems.length === 0) {
+      throw new NotFoundException(
+        `Корзина для пользователя с ID ${userId} пуста или не найдена`,
+      );
+    }
+
+    // Массив для хранения созданных заказов
+    const createdOrders: Order[] = [];
+
+    // Проходим по всем записям корзины и создаем заказы
+    for (const cart of cartItems) {
+      const order = this.orderRepository.create({
+        ...createOrderDto, // Данные из DTO (например, customerName, customerEmail и т.д.)
+        cart, // Связываем заказ с корзиной
+        cartId: cart.id, // Явно задаем cartId
+        user, // Связываем заказ с пользователем
+        createdAt: new Date(), // Устанавливаем дату создания
+        status: 'Pending', // Устанавливаем статус по умолчанию
+      });
+
+      // Сохраняем заказ в базе данных
+      const savedOrder = await this.orderRepository.save(order);
+      createdOrders.push(savedOrder);
+    }
+
+    return createdOrders; // Возвращаем массив созданных заказов
   }
 
+  // Получение всех заказов
   async findAll(): Promise<Order[]> {
     return await this.orderRepository.find({ relations: ['cart', 'user'] });
   }
 
+  // Получение заказа по ID
   async findOne(id: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
       where: { id },
       relations: ['cart', 'user'],
     });
     if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
+      throw new NotFoundException(`Заказ с ID ${id} не найден`);
     }
     return order;
   }
 
+  // Обновление заказа
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    let cart: Cart | null = null;
-
-    // Проверяем cartId, если он передан
-    if (updateOrderDto.cartId) {
-      cart = await this.cartRepository.findOne({
-        where: { id: updateOrderDto.cartId },
-      });
-      if (!cart) {
-        throw new NotFoundException(
-          `Cart with ID ${updateOrderDto.cartId} not found`,
-        );
-      }
-    }
-
-    // Обновляем заказ
+    // Убираем проверку cartId, так как он больше не входит в UpdateOrderDto
     await this.orderRepository.update(id, {
       ...updateOrderDto,
-      cart,
     });
     return this.findOne(id);
   }
 
+  // Удаление заказа
   async remove(id: number): Promise<void> {
     const order = await this.findOne(id);
     await this.orderRepository.delete(id);
