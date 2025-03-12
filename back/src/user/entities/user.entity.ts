@@ -43,10 +43,9 @@ export class User {
   updatedAt: Date;
 
   @Column({
-    type: 'enum',
-    enum: Role,
-    array: true, // Храним массив ролей
-    default: [Role.User], // По умолчанию обычный пользователь
+    type: 'varchar', // Змінено з enum на varchar для кращої сумісності
+    array: true,
+    default: ['user'], // Значення за замовчуванням як масив рядків
   })
   roles: Role[];
 
