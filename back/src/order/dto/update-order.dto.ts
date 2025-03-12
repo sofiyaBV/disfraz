@@ -29,14 +29,4 @@ export class UpdateOrderDto extends PartialType(CreateOrderDto) {
   @IsInt()
   @IsOptional()
   override cartId?: number;
-
-  // Новое поле для userId
-  @ApiPropertyOptional({
-    example: 1,
-    description: 'ID пользователя, создавшего заказ',
-    required: false,
-  })
-  @IsInt()
-  @IsOptional()
-  override userId?: number;
 }
