@@ -6,6 +6,7 @@ import { ProductAttribute } from '../product-attribute/entities/product-attribut
 import { Cart } from '../cart/entities/cart.entity';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
+import { Comment } from 'src/comments/entities/comment.entity';
 
 export default registerAs('database', () => {
   // Валидация переменных окружения с разрешением неизвестных ключей
@@ -41,6 +42,7 @@ export default registerAs('database', () => {
       Cart,
       Order,
       User,
+      Comment,
       __dirname + '/**/*.entity{.ts,.js}',
     ],
     autoLoadEntities: true,

@@ -28,8 +28,6 @@ export class UserController {
   })
   @ApiBody({ type: CreateUserDto })
   @Post()
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
   @Roles(Role.Admin) // ✅ Только админ может создавать пользователей
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
