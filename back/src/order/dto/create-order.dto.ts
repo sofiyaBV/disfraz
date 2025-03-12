@@ -69,14 +69,4 @@ export class CreateOrderDto {
   @IsInt()
   @IsOptional()
   cartId?: number;
-
-  // Новое поле для userId
-  @ApiProperty({
-    example: 1,
-    description: 'ID пользователя, создавшего заказ',
-    required: false,
-  })
-  @IsInt()
-  @IsOptional()
-  userId?: number;
 }

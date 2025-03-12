@@ -23,30 +23,27 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../auth/decorators/user.decorator'; // Импортируем декоратор User
 
 @ApiTags('Orders')
 @Controller('orders')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard) // Защищаем все маршруты JWT и ролями
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({ summary: 'Create a new order for the authenticated user' })
   @ApiResponse({
     status: 201,
     description: 'Order successfully created',
     type: Order,
   })
-  @ApiBody({
-    type: CreateOrderDto,
-    description:
-      'Includes optional cartId and userId to link the order with a cart and user',
-  })
+  @ApiBody({ type: CreateOrderDto, description: 'Includes optional cartId' })
   @Post()
   @Roles(Role.User, Role.Admin)
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  async create(@Body() createOrderDto: CreateOrderDto, @User() user: any) {
+    return this.orderService.create(createOrderDto, user.id); // Передаем user.id из JWT
   }
 
   @ApiOperation({ summary: 'Get all orders' })
@@ -89,8 +86,7 @@ export class OrderController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiBody({
     type: UpdateOrderDto,
-    description:
-      'Includes optional cartId and userId to update the linked cart and user',
+    description: 'Includes optional cartId to update the linked cart',
   })
   @ApiParam({
     name: 'id',

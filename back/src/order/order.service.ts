@@ -5,7 +5,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { Cart } from '../cart/entities/cart.entity';
-import { User } from '../user/entities/user.entity'; // Импортируем User
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class OrderService {
@@ -15,10 +15,10 @@ export class OrderService {
     @InjectRepository(Cart)
     private readonly cartRepository: Repository<Cart>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>, // Добавляем репозиторий для User
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  async create(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
     let cart: Cart | null = null;
     let user: User | null = null;
 
@@ -32,41 +32,35 @@ export class OrderService {
           `Cart with ID ${createOrderDto.cartId} not found`,
         );
       }
-      // Автоматически берем userId из корзины, если он доступен
-      if (cart.user && cart.user.id) {
-        createOrderDto.userId = cart.user.id;
+      // Автоматически берем userId из корзины, если он доступен (для проверки)
+      if (cart.user && cart.user.id && !userId) {
+        userId = cart.user.id;
       }
     }
 
-    // Проверяем userId, если он передан
-    if (createOrderDto.userId) {
-      user = await this.userRepository.findOne({
-        where: { id: createOrderDto.userId },
-      });
-      if (!user) {
-        throw new NotFoundException(
-          `User with ID ${createOrderDto.userId} not found`,
-        );
-      }
+    // Находим User по userId из JWT
+    user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
     // Создаем заказ
     const order = this.orderRepository.create({
       ...createOrderDto,
       cart,
-      user, // Связываем с пользователем
+      user, // Связываем с пользователем из JWT
     });
     return await this.orderRepository.save(order);
   }
 
   async findAll(): Promise<Order[]> {
-    return await this.orderRepository.find({ relations: ['cart', 'user'] }); // Загружаем связанные данные о корзине и пользователе
+    return await this.orderRepository.find({ relations: ['cart', 'user'] });
   }
 
   async findOne(id: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['cart', 'user'], // Загружаем связанные данные о корзине и пользователе
+      relations: ['cart', 'user'],
     });
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
@@ -76,7 +70,6 @@ export class OrderService {
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
     let cart: Cart | null = null;
-    let user: User | null = null;
 
     // Проверяем cartId, если он передан
     if (updateOrderDto.cartId) {
@@ -90,23 +83,10 @@ export class OrderService {
       }
     }
 
-    // Проверяем userId, если он передан
-    if (updateOrderDto.userId) {
-      user = await this.userRepository.findOne({
-        where: { id: updateOrderDto.userId },
-      });
-      if (!user) {
-        throw new NotFoundException(
-          `User with ID ${updateOrderDto.userId} not found`,
-        );
-      }
-    }
-
     // Обновляем заказ
     await this.orderRepository.update(id, {
       ...updateOrderDto,
       cart,
-      user, // Обновляем связь с пользователем
     });
     return this.findOne(id);
   }
