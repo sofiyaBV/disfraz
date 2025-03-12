@@ -23,85 +23,101 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../auth/decorators/user.decorator';
+
 @ApiTags('Orders')
 @Controller('orders')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({
+    summary:
+      'Создать новые заказы для авторизованного пользователя на основе корзины',
+  })
   @ApiResponse({
     status: 201,
-    description: 'Order successfully created',
-    type: Order,
+    description: 'Заказы успешно созданы',
+    type: [Order], // Обновляем тип на массив заказов
   })
-  @ApiBody({ type: CreateOrderDto })
+  @ApiBody({
+    type: CreateOrderDto,
+    description: 'Включает данные для создания заказа',
+  })
   @Post()
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  @Roles(Role.User, Role.Admin)
+  async create(@Body() createOrderDto: CreateOrderDto, @User() user: any) {
+    return this.orderService.create(createOrderDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Get all orders' })
+  @ApiOperation({ summary: 'Получить все заказы' })
   @ApiResponse({
     status: 200,
-    description: 'List of all orders',
+    description: 'Список всех заказов с их корзинами и пользователями',
     type: [Order],
   })
   @Get()
-  @Roles(Role.Admin) // Только админ может видеть все заказы
+  @Roles(Role.Admin)
   findAll() {
     return this.orderService.findAll();
   }
 
-  @ApiOperation({ summary: 'Get an order by ID' })
-  @ApiResponse({ status: 200, description: 'Order found', type: Order })
-  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiOperation({ summary: 'Получить заказ по ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Заказ найден с его корзиной и пользователем',
+    type: Order,
+  })
+  @ApiResponse({ status: 404, description: 'Заказ не найден' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Order ID',
+    description: 'ID заказа',
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ только для зарегистрированных пользователей
+  @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: number) {
     return this.orderService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Update an order by ID' })
+  @ApiOperation({ summary: 'Обновить заказ по ID' })
   @ApiResponse({
     status: 200,
-    description: 'Order updated successfully',
+    description: 'Заказ успешно обновлен',
     type: Order,
   })
-  @ApiResponse({ status: 404, description: 'Order not found' })
-  @ApiBody({ type: UpdateOrderDto })
+  @ApiResponse({ status: 404, description: 'Заказ не найден' })
+  @ApiBody({
+    type: UpdateOrderDto,
+    description:
+      'Включает опциональный cartId для обновления связанной корзины',
+  })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Order ID',
+    description: 'ID заказа',
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Только админ может обновлять заказ
+  @Roles(Role.Admin)
   update(@Param('id') id: number, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @ApiOperation({ summary: 'Delete an order by ID' })
-  @ApiResponse({ status: 200, description: 'Order deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiOperation({ summary: 'Удалить заказ по ID' })
+  @ApiResponse({ status: 200, description: 'Заказ успешно удален' })
+  @ApiResponse({ status: 404, description: 'Заказ не найден' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Order ID',
+    description: 'ID заказа',
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Только админ может удалять заказ
+  @Roles(Role.Admin)
   remove(@Param('id') id: number) {
     return this.orderService.remove(id);
   }

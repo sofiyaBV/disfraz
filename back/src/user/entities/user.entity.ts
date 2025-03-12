@@ -16,6 +16,7 @@ import {
 import { Role } from '../../auth/enums/role.enum';
 import { Cart } from '../../cart/entities/cart.entity'; // Імпортуємо сутність Cart
 import { Comment } from '../../comments/entities/comment.entity';
+import { Order } from '../../order/entities/order.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -42,10 +43,9 @@ export class User {
   updatedAt: Date;
 
   @Column({
-    type: 'enum',
-    enum: Role,
-    array: true, // Храним массив ролей
-    default: [Role.User], // По умолчанию обычный пользователь
+    type: 'varchar', // Змінено з enum на varchar для кращої сумісності
+    array: true,
+    default: ['user'], // Значення за замовчуванням як масив рядків
   })
   roles: Role[];
 
@@ -53,4 +53,6 @@ export class User {
   carts: Cart[]; // Список кошиків користувача
   @OneToMany(() => Comment, (comment) => comment.user) // Обратное отношение к комментариям
   comments: Comment[];
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }

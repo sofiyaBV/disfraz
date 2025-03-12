@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsEmail,
-  IsOptional,
-  MinLength,
-  IsPhoneNumber,
-} from 'class-validator';
+import { IsNotEmpty, IsEmail, MinLength, IsPhoneNumber } from 'class-validator';
 import { Role } from '../../auth/enums/role.enum';
 
 export class CreateUserDto {
@@ -19,12 +13,11 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: '+380123456789',
-    description: 'Номер телефона пользователя (Украина, опционально)',
-    required: false,
+    description: 'Номер телефона пользователя (Украина)',
   })
-  @IsOptional()
+  @IsNotEmpty() // Робимо поле обов’язковим
   @IsPhoneNumber('UA')
-  phone?: string;
+  phone: string; // Прибираємо ? (опціональність)
 
   @ApiProperty({
     example: 'password123',
@@ -38,5 +31,5 @@ export class CreateUserDto {
     description: 'Роли пользователя',
     isArray: true,
   })
-  roles?: Role[]; // Опциональное поле
+  roles?: Role[]; // Опціональне поле
 }
