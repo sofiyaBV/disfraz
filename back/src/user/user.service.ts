@@ -15,19 +15,19 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const salt = await bcrypt.genSalt();
-
-    // Проверяем, есть ли уже пользователи в базе
     const userCount = await this.userRepository.count();
 
     const user = new User();
     user.email = createUserDto.email;
     user.password = await bcrypt.hash(createUserDto.password, salt);
+    user.phone = createUserDto.phone; // Тепер phone завжди буде, бо воно обов’язкове
 
-    // Первый пользователь - администратор, остальные - обычные пользователи
-    user.roles = userCount === 0 ? [Role.Admin] : [Role.User];
+    user.roles =
+      userCount === 0 ? [Role.Admin] : createUserDto.roles || [Role.User];
 
     return this.userRepository.save(user);
   }
+
   findAll(): Promise<User[]> {
     return this.userRepository.find();
   }

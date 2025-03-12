@@ -4,10 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
 import { User } from '../../user/entities/user.entity'; // Імпортуємо сутність User
-
+import { Order } from '../../order/entities/order.entity'; // Импортируем Order
 @Entity()
 export class Cart {
   @PrimaryGeneratedColumn()
@@ -32,4 +33,7 @@ export class Cart {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   addedAt: Date; // Дата добавления в корзину
+
+  @OneToMany(() => Order, (order) => order.cart)
+  orders: Order[];
 }
