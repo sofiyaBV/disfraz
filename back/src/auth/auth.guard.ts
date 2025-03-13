@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { Logger } from '@nestjs/common';
+import { JsonWebTokenError } from 'jsonwebtoken'; // Імпортуємо тип помилки
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -47,7 +48,9 @@ export class AuthGuard implements CanActivate {
       this.logger.log(`JWT Decoded: ${JSON.stringify(payload)}`);
       request['user'] = payload;
     } catch (error) {
-      this.logger.error(`JWT verification error: ${error.message}`);
+      // Явно вказуємо тип помилки
+      const jwtError = error as JsonWebTokenError;
+      this.logger.error(`JWT verification error: ${jwtError.message}`);
       throw new UnauthorizedException('Token verification error');
     }
 
