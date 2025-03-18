@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -16,6 +17,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -25,6 +27,13 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { AuthGuard } from '@nestjs/passport';
+
+interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @ApiTags('Products')
 @Controller('products')
@@ -41,22 +50,55 @@ export class ProductController {
   })
   @ApiBody({ type: CreateProductDto })
   @Post()
-  @Roles(Role.Admin) // Ограничиваем создание только для админов
+  @Roles(Role.Admin)
   async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     console.log('Creating product with body:', createProductDto);
     return this.productService.create(createProductDto);
   }
 
-  @ApiOperation({ summary: 'Get all products' })
+  @ApiOperation({ summary: 'Get all products ' })
   @ApiResponse({
     status: 200,
     description: 'List of all products',
-    type: [Product],
+    schema: {
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Product' },
+        },
+        total: { type: 'number', description: 'Загальна кількість продуктів' },
+        page: { type: 'number', description: 'Поточна сторінка' },
+        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Номер сторінки',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Кількість записів на сторінку',
   })
   @Get()
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
-  async findAll(): Promise<Product[]> {
-    return this.productService.findAll();
+  @Roles(Role.User, Role.Admin)
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<Product>> {
+    const { data, total } = await this.productService.findAllPag(page, limit);
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   @ApiOperation({ summary: 'Get a product by ID' })
@@ -69,7 +111,7 @@ export class ProductController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ для зарегистрированных пользователей
+  @Roles(Role.User, Role.Admin)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.productService.findOne(id);
   }
@@ -89,7 +131,7 @@ export class ProductController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin, Role.User) // Ограничиваем обновление только для админов
+  @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
@@ -108,7 +150,7 @@ export class ProductController {
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Только админ может удалять продукт
+  @Roles(Role.Admin)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.productService.remove(id);
   }

@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -15,6 +16,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -25,6 +27,13 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../auth/decorators/user.decorator';
+
+interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -40,7 +49,7 @@ export class OrderController {
   @ApiResponse({
     status: 201,
     description: 'Заказы успешно созданы',
-    type: [Order], // Обновляем тип на массив заказов
+    type: [Order],
   })
   @ApiBody({
     type: CreateOrderDto,
@@ -52,16 +61,49 @@ export class OrderController {
     return this.orderService.create(createOrderDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все заказы' })
+  @ApiOperation({ summary: 'Получить все заказы ' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех заказов с их корзинами и пользователями',
-    type: [Order],
+    description: 'Список всех заказов с  их корзинами и пользователями',
+    schema: {
+      properties: {
+        data: { type: 'array', items: { $ref: '#/components/schemas/Order' } },
+        total: { type: 'number', description: 'Загальна кількість замовлень' },
+        page: { type: 'number', description: 'Поточна сторінка' },
+        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Номер сторінки',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Кількість записів на сторінку',
   })
   @Get()
   @Roles(Role.Admin)
-  findAll() {
-    return this.orderService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<Order>> {
+    const { data, total } = await this.orderService.findAllWithPagination(
+      page,
+      limit,
+    );
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   @ApiOperation({ summary: 'Получить заказ по ID' })
