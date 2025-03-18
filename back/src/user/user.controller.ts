@@ -32,7 +32,7 @@ interface PaginationResponse<T> {
 }
 
 @ApiTags('User')
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -79,9 +79,6 @@ export class UserController {
     description: 'Кількість записів на сторінку',
   })
   @Get()
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin)
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,

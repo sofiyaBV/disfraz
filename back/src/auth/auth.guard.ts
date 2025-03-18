@@ -19,6 +19,7 @@ export class AuthGuard implements CanActivate {
   private readonly publicRoutes = [
     { method: 'POST', path: '/auth/signin' },
     { method: 'POST', path: '/user' },
+    { method: 'GET', path: '/user' },
   ];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
