@@ -5,31 +5,45 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger'; // Імпорт для Swagger
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
-import { User } from '../../user/entities/user.entity'; // Импортируем User
+import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class Comment {
   @PrimaryGeneratedColumn()
-  id: number; // Унікальний ідентифікатор коментаря
+  @ApiProperty({
+    example: 1,
+    description: 'Унікальний ідентифікатор коментаря',
+  })
+  id: number;
 
   @Column({ type: 'text' })
-  content: string; // Текст коментаря
+  @ApiProperty({
+    example: 'Дуже хороший продукт!',
+    description: 'Текст коментаря',
+  })
+  content: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date; // Дата створення коментаря
+  @ApiProperty({
+    example: '2023-01-01T12:00:00Z',
+    description: 'Дата створення коментаря',
+  })
+  createdAt: Date;
 
   @Column({ type: 'boolean', default: false })
-  isModerated: boolean; // Чи пройшов коментар модерацію
+  @ApiProperty({ example: false, description: 'Чи пройшов коментар модерацію' })
+  isModerated: boolean;
 
   @ManyToOne(
     () => ProductAttribute,
     (productAttribute) => productAttribute.comments,
   )
   @JoinColumn({ name: 'productAttributeId' })
-  productAttribute: ProductAttribute; // Связь с продуктом/атрибутом
+  productAttribute: ProductAttribute;
 
-  @ManyToOne(() => User, (user) => user.comments) // Добавляем связь с User
-  @JoinColumn({ name: 'userId' }) // Внешний ключ userId
-  user: User; // Связь с пользователем, оставившим комментарий
+  @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }
