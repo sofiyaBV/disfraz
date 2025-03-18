@@ -18,21 +18,18 @@ export class OrderService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  // Метод для создания заказа на основе записей корзины авторизованного пользователя
   async create(
     createOrderDto: CreateOrderDto,
     userId: number,
   ): Promise<Order[]> {
-    // Находим пользователя по userId из JWT
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
     }
 
-    // Находим все записи корзины, связанные с этим пользователем
     const cartItems = await this.cartRepository.find({
-      where: { user: { id: userId } }, // Ищем корзины по userId
-      relations: ['user'], // Загружаем связанные данные о пользователе
+      where: { user: { id: userId } },
+      relations: ['user'],
     });
 
     if (!cartItems || cartItems.length === 0) {
@@ -41,34 +38,40 @@ export class OrderService {
       );
     }
 
-    // Массив для хранения созданных заказов
     const createdOrders: Order[] = [];
 
-    // Проходим по всем записям корзины и создаем заказы
     for (const cart of cartItems) {
       const order = this.orderRepository.create({
-        ...createOrderDto, // Данные из DTO (например, customerName, customerEmail и т.д.)
-        cart, // Связываем заказ с корзиной
-        cartId: cart.id, // Явно задаем cartId
-        user, // Связываем заказ с пользователем
-        createdAt: new Date(), // Устанавливаем дату создания
-        status: 'Pending', // Устанавливаем статус по умолчанию
+        ...createOrderDto,
+        cart,
+        cartId: cart.id,
+        user,
+        createdAt: new Date(),
+        status: 'Pending',
       });
 
-      // Сохраняем заказ в базе данных
       const savedOrder = await this.orderRepository.save(order);
       createdOrders.push(savedOrder);
     }
 
-    return createdOrders; // Возвращаем массив созданных заказов
+    return createdOrders;
   }
 
-  // Получение всех заказов
+  async findAllWithPagination(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.orderRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['cart', 'user'], // Завантажуємо пов’язані сутності
+    });
+
+    return { data, total };
+  }
+
   async findAll(): Promise<Order[]> {
     return await this.orderRepository.find({ relations: ['cart', 'user'] });
   }
 
-  // Получение заказа по ID
   async findOne(id: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
       where: { id },
@@ -80,16 +83,13 @@ export class OrderService {
     return order;
   }
 
-  // Обновление заказа
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    // Убираем проверку cartId, так как он больше не входит в UpdateOrderDto
     await this.orderRepository.update(id, {
       ...updateOrderDto,
     });
     return this.findOne(id);
   }
 
-  // Удаление заказа
   async remove(id: number): Promise<void> {
     const order = await this.findOne(id);
     await this.orderRepository.delete(id);

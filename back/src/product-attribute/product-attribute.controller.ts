@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ProductAttributeService } from './product-attribute.service';
@@ -18,12 +19,20 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { ProductAttribute } from './entities/product-attribute.entity';
+
+interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
@@ -42,21 +51,57 @@ export class ProductAttributeController {
   })
   @ApiBody({ type: CreateProductAttributeDto })
   @Post()
-  @Roles(Role.Admin, Role.User) // Тільки адмін може створювати зв’язки
+  @Roles(Role.Admin, Role.User)
   create(@Body() createProductAttributeDto: CreateProductAttributeDto) {
     return this.productAttributeService.create(createProductAttributeDto);
   }
 
-  @ApiOperation({ summary: 'Get all product-attribute links' })
+  @ApiOperation({ summary: 'Get all product-attribute links ' })
   @ApiResponse({
     status: 200,
-    description: 'List of all product-attribute links',
-    type: [ProductAttribute],
+    description: 'List of all product-attribute links ',
+    schema: {
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/ProductAttribute' },
+        },
+        total: { type: 'number', description: 'Загальна кількість зв’язків' },
+        page: { type: 'number', description: 'Поточна сторінка' },
+        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Номер сторінки',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Кількість записів на сторінку',
   })
   @Get()
-  @Roles(Role.User, Role.Admin) // Доступ для користувача та адміна
-  findAll() {
-    return this.productAttributeService.findAll();
+  @Roles(Role.User, Role.Admin)
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<ProductAttribute>> {
+    const { data, total } = await this.productAttributeService.findAllPag(
+      page,
+      limit,
+    );
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   @ApiOperation({ summary: 'Get a product-attribute link by ID' })
@@ -73,7 +118,7 @@ export class ProductAttributeController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ для користувача та адміна
+  @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: string) {
     return this.productAttributeService.findOne(+id);
   }
@@ -93,7 +138,7 @@ export class ProductAttributeController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Тільки адмін може оновлювати зв’язки
+  @Roles(Role.Admin)
   update(
     @Param('id') id: string,
     @Body() updateProductAttributeDto: UpdateProductAttributeDto,
@@ -114,7 +159,7 @@ export class ProductAttributeController {
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Тільки адмін може видаляти зв’язки
+  @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.productAttributeService.remove(+id);
   }

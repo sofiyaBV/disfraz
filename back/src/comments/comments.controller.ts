@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -15,6 +16,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -24,7 +26,14 @@ import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
-import { User } from '../auth/decorators/user.decorator'; // Импортируйте декоратор User
+import { User } from '../auth/decorators/user.decorator';
+
+interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -41,21 +50,54 @@ export class CommentsController {
   })
   @ApiBody({ type: CreateCommentDto })
   @Post()
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  @Roles(Role.User, Role.Admin)
   async create(@Body() createCommentDto: CreateCommentDto, @User() user: any) {
-    return this.commentsService.create(createCommentDto, user.id); // Передаем user.id
+    return this.commentsService.create(createCommentDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все комментарии' })
+  @ApiOperation({ summary: 'Получить все комментарии ' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех комментариев',
-    type: [Comment],
+    description: 'Список всех комментариев ',
+    schema: {
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Comment' },
+        },
+        total: { type: 'number', description: 'Загальна кількість коментарів' },
+        page: { type: 'number', description: 'Поточна сторінка' },
+        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Номер сторінки',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Кількість записів на сторінку',
   })
   @Get()
-  @Roles(Role.Admin) // Только админ может видеть все комментарии
-  findAll() {
-    return this.commentsService.findAll();
+  @Roles(Role.Admin)
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<Comment>> {
+    const { data, total } = await this.commentsService.findAllPag(page, limit);
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   @ApiOperation({ summary: 'Получить комментарий по ID' })
@@ -92,7 +134,7 @@ export class CommentsController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin) // Только админ может модерировать
+  @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
   }
