@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
@@ -18,14 +19,22 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Cart } from './entities/cart.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; // Убедитесь, что импортирован правильный guard
-import { User } from '../auth/decorators/user.decorator'; // Импортируйте декоратор User
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../auth/decorators/user.decorator';
+
+interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @ApiTags('Cart')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard) // Используем наш кастомный JwtAuthGuard
+@UseGuards(JwtAuthGuard)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -41,14 +50,48 @@ export class CartController {
   @ApiBody({ type: CreateCartDto })
   @Post()
   async create(@Body() createCartDto: CreateCartDto, @User() user: any) {
-    return this.cartService.create(createCartDto, user.id); // Передаем user.id в сервис
+    return this.cartService.create(createCartDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все корзины' })
-  @ApiResponse({ status: 200, description: 'Список всех корзин', type: [Cart] })
+  @ApiOperation({ summary: 'Получить все корзины ' })
+  @ApiResponse({
+    status: 200,
+    description: 'Список всех корзин ',
+    schema: {
+      properties: {
+        data: { type: 'array', items: { $ref: '#/components/schemas/Cart' } },
+        total: { type: 'number', description: 'Загальна кількість корзин' },
+        page: { type: 'number', description: 'Поточна сторінка' },
+        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Номер сторінки',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Кількість записів на сторінку',
+  })
   @Get()
-  findAll() {
-    return this.cartService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<Cart>> {
+    const { data, total } = await this.cartService.findAllPag(page, limit);
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   @ApiOperation({ summary: 'Получить корзину по ID' })
