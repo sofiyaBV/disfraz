@@ -1,13 +1,13 @@
 import {
   Admin,
-  Resource,
-  ListGuesser,
-  EditGuesser,
-  ShowGuesser,
+  Resource
 } from "react-admin";
 import { Layout } from "./Layout";
 import { dataProvider } from "./dataProvider";
-import { authProvider } from "./authProvider";
+import { UserCreate, UserEdit, UserList, UserShow } from "./lists/users";
+import authProvider from "./authProvider";
+// import { authProvider } from "./authProvider";
+// import { UserList } from "./lists/users";
 
 export const App = () => (
   <Admin
@@ -16,10 +16,11 @@ export const App = () => (
     authProvider={authProvider}
   >
     <Resource
-      name="admin"
-      list={ListGuesser}
-      edit={EditGuesser}
-      show={ShowGuesser}
+      name="users"
+      list={UserList}
+      edit={UserEdit}
+      show={UserShow}
+      create={UserCreate}
     />
   </Admin>
 );
