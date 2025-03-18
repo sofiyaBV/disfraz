@@ -6,7 +6,7 @@ const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
 const httpClient = fetchUtils.fetchJson;
 
 export const dataProvider = {
-    getList: (resource, params) => {
+    getList: (resource: any, params: { pagination: { page: any; perPage: any; }; sort: { field: any; order: any; }; filter: any; }) => {
         const { page, perPage } = params.pagination;
         const { field, order } = params.sort;
         const query = {
@@ -18,7 +18,7 @@ export const dataProvider = {
 
         console.log("url => " + url)
 
-        return httpClient(url).then(({ headers, json }) =>
+        return httpClient(url).then(({ json }) =>
             ({
             data: json.data,
             total: json.total,
@@ -26,12 +26,12 @@ export const dataProvider = {
     },
     // other methods (getOne, getMany, etc.) should be implemented similarly
 
-    getOne: (resource, params) =>
+    getOne: (resource: any, params: { id: any; }) =>
         httpClient(`${apiUrl}/${resource}/${params.id}`).then(({ json }) => ({
             data: json,
         })),
 
-    create: (resource, params) =>
+    create: (resource: any, params: { data: any; }) =>
         httpClient(`${apiUrl}/${resource}`, {
             method: 'POST',
             body: JSON.stringify(params.data),

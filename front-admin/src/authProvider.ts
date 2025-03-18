@@ -1,7 +1,7 @@
 const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
 
 export const authProvider = {
-    async login({ username, password }) {
+    async login({ username, password }: { username: string; password: string }) {
 
 
         const request = new Request(`${apiUrl}/auth/signin`, {
@@ -17,7 +17,7 @@ export const authProvider = {
         localStorage.setItem('token', access_token);
         localStorage.setItem('username', username);
     },
-    async checkError(error) {
+    async checkError(error: { status: any; }) {
         const status = error.status;
         if (status === 401 || status === 403) {
             localStorage.removeItem('token');
