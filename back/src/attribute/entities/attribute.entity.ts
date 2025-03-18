@@ -1,47 +1,85 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'; // Імпорт для Swagger
 import { Product } from '../../product/entities/product.entity';
 
 @Entity()
 export class Attribute {
   @PrimaryGeneratedColumn()
-  id: number; // Унікальний ідентифікатор атрибута
+  @ApiProperty({ example: 1, description: 'Унікальний ідентифікатор атрибута' })
+  id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  name: string; // Назва атрибута (наприклад, «шкіра», «M», «фентезі», «руки»)
+  @ApiProperty({
+    example: 'Розмір',
+    description: 'Назва атрибута (наприклад, "Розмір", "Матеріал")',
+  })
+  name: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  material: string; // Значення для матеріалу (наприклад, «Шкіра»)
+  @ApiPropertyOptional({ example: 'Шкіра', description: 'Матеріал атрибута' })
+  material: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  size: string; // Значення для розміру (наприклад, «M»)
+  @ApiPropertyOptional({ example: 'M', description: 'Розмір атрибута' })
+  size: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  theme: string; // Значення для тематики (наприклад, «Фентезі»)
+  @ApiPropertyOptional({ example: 'Фентезі', description: 'Тематика атрибута' })
+  theme: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  bodyPart: string; // Значення для частини тіла (наприклад, «Руки»)
+  @ApiPropertyOptional({
+    example: 'Руки',
+    description: 'Частина тіла атрибута',
+  })
+  bodyPart: string;
 
   @Column({ type: 'boolean', default: false })
-  isSet: boolean; // Чи є атрибут вказівкою на комплект (наприклад, true/false)
+  @ApiProperty({
+    example: false,
+    description: 'Чи є атрибут вказівкою на комплект',
+  })
+  isSet: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  additionalInfo: string; // Значення для додаткової інформації (наприклад, «Вага 1.5 кг»)
+  @ApiPropertyOptional({
+    example: 'Вага 1.5 кг',
+    description: 'Додаткова інформація про атрибут',
+  })
+  additionalInfo: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  inStock: string; // Значення для наявності (наприклад, «Доступний на складі»)
+  @ApiPropertyOptional({
+    example: 'Доступний на складі',
+    description: 'Наявність атрибута',
+  })
+  inStock: string;
 
   @Column({ type: 'text', nullable: true })
-  valueText?: string; // Для текстових значень (загальне поле для всіх текстів, якщо потрібно)
+  @ApiPropertyOptional({
+    example: 'Додатковий опис',
+    description: 'Текстовий опис атрибута',
+  })
+  valueText?: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  valueNumber?: number; // Для числових значень, якщо потрібно (наприклад, ціна чи розмір у числовому форматі)
+  @ApiPropertyOptional({
+    example: 1.5,
+    description: 'Числове значення атрибута (наприклад, вага чи ціна)',
+  })
+  valueNumber?: number;
 
-  // Зв’язок багато до багатьох із Product через ProductAttribute
   @ManyToMany(() => Product, (product) => product.attributes)
   @JoinTable({
-    name: 'product_attribute', // Назва таблиці зв’язку
-    joinColumn: { name: 'attributeId', referencedColumnName: 'id' }, // Колонка для Attribute
-    inverseJoinColumn: { name: 'productId', referencedColumnName: 'id' }, // Колонка для Product
+    name: 'product_attribute',
+    joinColumn: { name: 'attributeId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'productId', referencedColumnName: 'id' },
   })
   products: Product[];
 }

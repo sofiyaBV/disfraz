@@ -6,34 +6,61 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger'; // Імпорт для Swagger
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
-import { User } from '../../user/entities/user.entity'; // Імпортуємо сутність User
-import { Order } from '../../order/entities/order.entity'; // Импортируем Order
+import { User } from '../../user/entities/user.entity';
+import { Order } from '../../order/entities/order.entity';
+
 @Entity()
 export class Cart {
   @PrimaryGeneratedColumn()
-  id: number; // Уникальный идентификатор элемента корзины
+  @ApiProperty({
+    example: 1,
+    description: 'Унікальний ідентифікатор елемента кошика',
+  })
+  id: number;
 
   @ManyToOne(
     () => ProductAttribute,
     (productAttribute) => productAttribute.carts,
   )
   @JoinColumn({ name: 'productAttributeId' })
-  productAttribute: ProductAttribute; // Связь с product_attribute
+  @ApiProperty({
+    type: () => ProductAttribute,
+    description: 'Зв’язок із продуктом та атрибутом',
+  })
+  productAttribute: ProductAttribute;
 
-  @ManyToOne(() => User, (user) => user.carts) // Додаємо зв’язок із User
-  @JoinColumn({ name: 'userId' }) // Назва колонки для зовнішнього ключа
-  user: User; // Зв’язок з користувачем, який додав товар до кошика
+  @ManyToOne(() => User, (user) => user.carts)
+  @JoinColumn({ name: 'userId' })
+  @ApiProperty({
+    type: () => User,
+    description: 'Користувач, який додав товар до кошика',
+  })
+  user: User;
 
   @Column({ type: 'int', default: 1 })
-  quantity: number; // Количество данного продукта в корзине
+  @ApiProperty({
+    example: 1,
+    description: 'Кількість даного продукту в кошику',
+  })
+  quantity: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
-  price: number; // Цена за единицу (может быть вычислена на основе productAttribute.product.price)
+  @ApiProperty({ example: 199.99, description: 'Ціна за одиницю товару' })
+  price: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  addedAt: Date; // Дата добавления в корзину
+  @ApiProperty({
+    example: '2023-01-01T12:00:00Z',
+    description: 'Дата додавання до кошика',
+  })
+  addedAt: Date;
 
   @OneToMany(() => Order, (order) => order.cart)
+  @ApiProperty({
+    type: () => [Order],
+    description: 'Список замовлень, пов’язаних із кошиком',
+  })
   orders: Order[];
 }
