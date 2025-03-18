@@ -20,12 +20,22 @@ export class UserService {
     const user = new User();
     user.email = createUserDto.email;
     user.password = await bcrypt.hash(createUserDto.password, salt);
-    user.phone = createUserDto.phone; // Тепер phone завжди буде, бо воно обов’язкове
+    user.phone = createUserDto.phone;
 
     user.roles =
       userCount === 0 ? [Role.Admin] : createUserDto.roles || [Role.User];
 
     return this.userRepository.save(user);
+  }
+
+  async findAllPag(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.userRepository.findAndCount({
+      skip,
+      take: limit,
+    });
+
+    return { data, total };
   }
 
   findAll(): Promise<User[]> {

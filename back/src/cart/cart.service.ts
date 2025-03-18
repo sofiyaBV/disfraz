@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { Cart } from './entities/cart.entity';
 import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
-import { User } from '../user/entities/user.entity'; // Импортируем User
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class CartService {
@@ -20,26 +20,39 @@ export class CartService {
   async create(createCartDto: CreateCartDto, userId: number): Promise<Cart> {
     const { productAttributeId, quantity, price } = createCartDto;
 
-    // Находим ProductAttribute по его ID
     const productAttribute =
       await this.productAttributeRepository.findOneOrFail({
         where: { id: productAttributeId },
       });
 
-    // Находим User по его ID (из токена)
     const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
     });
 
-    // Создаем новую запись в корзине
     const cart = this.cartRepository.create({
       productAttribute,
-      user, // Устанавливаем связь с пользователем
-      quantity: quantity || 1, // По умолчанию 1, как в сущности
-      price: price || productAttribute.product.price, // Используем цену из Product, если price не указан в DTO
+      user,
+      quantity: quantity || 1,
+      price: price || productAttribute.product.price,
     });
 
     return this.cartRepository.save(cart);
+  }
+
+  async findAllPag(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.cartRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: [
+        'productAttribute',
+        'productAttribute.product',
+        'productAttribute.attribute',
+        'user',
+      ], // Завантажуємо пов’язані сутності
+    });
+
+    return { data, total };
   }
 
   async findAll(): Promise<Cart[]> {
@@ -49,7 +62,7 @@ export class CartService {
         'productAttribute.product',
         'productAttribute.attribute',
         'user',
-      ], // Загружаем связанные сущности, включая User
+      ],
     });
   }
 
@@ -61,7 +74,7 @@ export class CartService {
         'productAttribute.product',
         'productAttribute.attribute',
         'user',
-      ], // Загружаем User
+      ],
     });
   }
 

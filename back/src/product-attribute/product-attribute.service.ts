@@ -11,9 +11,9 @@ export class ProductAttributeService {
   constructor(
     @InjectRepository(ProductAttribute)
     private productAttributeRepository: Repository<ProductAttribute>,
-    @InjectRepository(Product) // Додаємо репозиторій для Product
+    @InjectRepository(Product)
     private productRepository: Repository<Product>,
-    @InjectRepository(Attribute) // Додаємо репозиторій для Attribute
+    @InjectRepository(Attribute)
     private attributeRepository: Repository<Attribute>,
   ) {}
 
@@ -22,16 +22,13 @@ export class ProductAttributeService {
   ): Promise<ProductAttribute> {
     const { productId, attributeId } = createProductAttributeDto;
 
-    // Знаходимо Product за ID
     const product = await this.productRepository.findOneOrFail({
       where: { id: productId },
     });
-    // Знаходимо Attribute за ID
     const attribute = await this.attributeRepository.findOneOrFail({
       where: { id: attributeId },
     });
 
-    // Створюємо новий зв’язок
     const productAttribute = this.productAttributeRepository.create({
       product,
       attribute,
@@ -40,9 +37,20 @@ export class ProductAttributeService {
     return this.productAttributeRepository.save(productAttribute);
   }
 
+  async findAllPag(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.productAttributeRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['product', 'attribute'], // Завантажуємо пов’язані сутності
+    });
+
+    return { data, total };
+  }
+
   async findAll(): Promise<ProductAttribute[]> {
     return this.productAttributeRepository.find({
-      relations: ['product', 'attribute'], // Завантажуємо пов’язані сутності
+      relations: ['product', 'attribute'],
     });
   }
 

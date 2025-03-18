@@ -24,31 +24,38 @@ export class CommentsService {
   ): Promise<Comment> {
     const { productAttributeId, content } = createCommentDto;
 
-    // Находим ProductAttribute
-    const productAttribute =
-      await this.productAttributeRepository.findOneOrFail({
-        where: { id: productAttributeId },
-      });
+    const productAttribute = await this.productAttributeRepository.findOneOrFail({
+      where: { id: productAttributeId },
+    });
 
-    // Находим User по его ID (из токена)
     const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
     });
 
-    // Создаем новый комментарий
     const comment = this.commentRepository.create({
       content,
       productAttribute,
-      user, // Устанавливаем связь с пользователем
-      isModerated: false, // По умолчанию не модерирован
+      user,
+      isModerated: false,
     });
 
     return await this.commentRepository.save(comment);
   }
 
+  async findAllPag(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.commentRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['productAttribute', 'user'], // Завантажуємо пов’язані сутності
+    });
+
+    return { data, total };
+  }
+
   async findAll(): Promise<Comment[]> {
     return await this.commentRepository.find({
-      relations: ['productAttribute', 'user'], // Загружаем связанные сущности
+      relations: ['productAttribute', 'user'],
     });
   }
 

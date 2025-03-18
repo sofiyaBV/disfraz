@@ -21,6 +21,17 @@ export class AttributesService {
     return this.attributeRepository.save(attribute);
   }
 
+  async findAllPag(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.attributeRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['products'], // Завантажуємо пов’язані сутності
+    });
+
+    return { data, total };
+  }
+
   async findAll(): Promise<Attribute[]> {
     return this.attributeRepository.find({ relations: ['products'] });
   }
@@ -58,7 +69,7 @@ export class AttributesService {
           updateAttributeDto.productIds,
         );
         if (existingProducts.length > 0) {
-          attribute.products = existingProducts; // Устанавливаем только найденные продукты
+          attribute.products = existingProducts;
         } else {
           console.warn(`Ни один продукт не найден для attributeId: ${id}`);
         }
