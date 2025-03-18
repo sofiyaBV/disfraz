@@ -4,6 +4,9 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: [/^http:\/\/localhost:\d+$/],
+  });
   dotenv.config();
   // Конфигурация Swagger
   const config = new DocumentBuilder()

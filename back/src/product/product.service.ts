@@ -21,6 +21,17 @@ export class ProductService {
     return await this.productRepository.save(product);
   }
 
+  async findAllPag(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.productRepository.findAndCount({
+      skip,
+      take: limit,
+      relations: ['attributes'], // Завантажуємо пов’язані сутності
+    });
+
+    return { data, total };
+  }
+
   async findAll(): Promise<Product[]> {
     return await this.productRepository.find({ relations: ['attributes'] });
   }
@@ -50,17 +61,15 @@ export class ProductService {
         throw new NotFoundException(`Продукт с ID ${id} не найден`);
       }
 
-      // Обновляем базовые поля
       manager.merge(Product, product, updateProductDto);
 
-      // Обновляем связи с атрибутами, если переданы attributeIds
       if (updateProductDto.attributeIds) {
         const existingAttributes = await manager.findByIds(
           Attribute,
           updateProductDto.attributeIds,
         );
         if (existingAttributes.length > 0) {
-          product.attributes = existingAttributes; // Устанавливаем только найденные атрибуты
+          product.attributes = existingAttributes;
         } else {
           console.warn('Ни один атрибут не найден для productId:', id);
         }
