@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { AttributesService } from './attribute.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
@@ -19,12 +20,21 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Attribute } from './entities/attribute.entity';
+
+// Додаємо інтерфейс для відповіді з пагинацією
+interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 @ApiTags('Attributes')
 @Controller('attributes')
@@ -41,7 +51,7 @@ export class AttributesController {
   })
   @ApiBody({ type: CreateAttributeDto })
   @Post()
-  @Roles(Role.Admin) // Ограничиваем создание только для админов
+  @Roles(Role.Admin)
   async create(
     @Body() createAttributeDto: CreateAttributeDto,
   ): Promise<Attribute> {
@@ -53,12 +63,48 @@ export class AttributesController {
   @ApiResponse({
     status: 200,
     description: 'List of all attributes',
-    type: [Attribute],
+    schema: {
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Attribute' },
+        },
+        total: { type: 'number', description: 'Загальна кількість атрибутів' },
+        page: { type: 'number', description: 'Поточна сторінка' },
+        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+    description: 'Номер сторінки',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Кількість записів на сторінку',
   })
   @Get()
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
-  async findAll(): Promise<Attribute[]> {
-    return this.attributesService.findAll();
+  @Roles(Role.User, Role.Admin)
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PaginationResponse<Attribute>> {
+    const { data, total } = await this.attributesService.findAllPag(
+      page,
+      limit,
+    );
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   @ApiOperation({ summary: 'Get an attribute by ID' })
@@ -71,7 +117,7 @@ export class AttributesController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin) // Доступ для пользователей и админов
+  @Roles(Role.User, Role.Admin)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Attribute> {
     return this.attributesService.findOne(id);
   }
@@ -91,7 +137,7 @@ export class AttributesController {
     example: 1,
   })
   @Patch(':id')
-  @Roles(Role.Admin, Role.User) // Ограничиваем обновление только для админов
+  @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAttributeDto: UpdateAttributeDto,
@@ -110,7 +156,7 @@ export class AttributesController {
     example: 1,
   })
   @Delete(':id')
-  @Roles(Role.Admin) // Только админ может удалять атрибуты
+  @Roles(Role.Admin)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.attributesService.remove(id);
   }
