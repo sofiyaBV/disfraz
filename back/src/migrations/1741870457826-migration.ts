@@ -123,9 +123,52 @@ export class Migration1741870457826 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "cart" ADD CONSTRAINT "FK_756f53ab9466eb52a52619ee019" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
     );
+
+    // Создание функции update_cart_price
+    await queryRunner.query(`
+      CREATE OR REPLACE FUNCTION update_cart_price()
+      RETURNS TRIGGER AS $$
+      BEGIN
+          -- Получаем базовую цену из product через product_attribute
+          SELECT p.price INTO NEW.price
+          FROM public.product p
+          JOIN public.product_attribute pa ON p.id = pa."productId"
+          WHERE pa.id = NEW."productAttributeId";
+
+          -- Если цена не найдена, устанавливаем price = 0
+          IF NEW.price IS NULL THEN
+              NEW.price = 0.0;
+          END IF;
+
+          -- Умножаем базовую цену на quantity
+          NEW.price = NEW.price * NEW.quantity;
+
+          RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `);
+
+    // Создание триггера trigger_update_cart_price
+    await queryRunner.query(`
+      CREATE TRIGGER trigger_update_cart_price
+      BEFORE INSERT OR UPDATE OF quantity ON public.cart
+      FOR EACH ROW
+      EXECUTE FUNCTION update_cart_price();
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Удаление триггера
+    await queryRunner.query(`
+      DROP TRIGGER IF EXISTS trigger_update_cart_price ON public.cart;
+    `);
+
+    // Удаление функции
+    await queryRunner.query(`
+      DROP FUNCTION IF EXISTS update_cart_price;
+    `);
+
+    // Удаление внешних ключей и таблиц
     await queryRunner.query(
       `ALTER TABLE "cart" DROP CONSTRAINT "FK_756f53ab9466eb52a52619ee019"`,
     );
