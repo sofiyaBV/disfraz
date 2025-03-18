@@ -28,7 +28,6 @@ export class UserController {
   })
   @ApiBody({ type: CreateUserDto })
   @Post()
-  @Roles(Role.Admin) // ✅ Только админ может создавать пользователей
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
@@ -38,7 +37,7 @@ export class UserController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
-  @Roles(Role.Admin, Role.User)
+  @Roles(Role.Admin)
   findAll() {
     return this.userService.findAll();
   }
@@ -50,7 +49,7 @@ export class UserController {
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard) // ✅ Сначала AuthGuard, потом RolesGuard
-  @Roles(Role.User, Role.Admin)
+  @Roles(Role.Admin)
   findOne(@Param('id') id: number) {
     return this.userService.findOne(id);
   }

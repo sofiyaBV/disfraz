@@ -13,46 +13,72 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'; // Імпорт для Swagger
 import { Role } from '../../auth/enums/role.enum';
-import { Cart } from '../../cart/entities/cart.entity'; // Імпортуємо сутність Cart
+import { Cart } from '../../cart/entities/cart.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { Order } from '../../order/entities/order.entity';
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
+  @ApiProperty({
+    example: 1,
+    description: 'Унікальний ідентифікатор користувача',
+  })
   id: number;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   @IsNotEmpty()
   @IsEmail()
-  email: string; // Email для авторизації (замість username, оскільки ТЗ вказує email/google/phone)
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Електронна пошта користувача',
+  })
+  email: string;
 
   @Column({ type: 'varchar', length: 255 })
   @MinLength(6)
-  password: string; // Пароль для login+password
+  @ApiProperty({ example: 'password123', description: 'Пароль користувача' })
+  password: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   @IsOptional()
-  @IsPhoneNumber('UA') // Номер телефону для авторизації (Україна за замовчуванням)
-  phone: string; // Номер телефону (додано за вашим запитом)
+  @IsPhoneNumber('UA')
+  @ApiPropertyOptional({
+    example: '+380991234567',
+    description: 'Номер телефону користувача (Україна)',
+  })
+  phone: string;
 
   @CreateDateColumn()
+  @ApiProperty({
+    example: '2023-01-01T12:00:00Z',
+    description: 'Дата створення користувача',
+  })
   createdAt: Date;
 
   @UpdateDateColumn()
+  @ApiProperty({
+    example: '2023-01-02T12:00:00Z',
+    description: 'Дата оновлення користувача',
+  })
   updatedAt: Date;
 
   @Column({
-    type: 'varchar', // Змінено з enum на varchar для кращої сумісності
+    type: 'varchar',
     array: true,
-    default: ['user'], // Значення за замовчуванням як масив рядків
+    default: ['user'],
   })
+  @ApiProperty({ example: ['user', 'admin'], description: 'Ролі користувача' })
   roles: Role[];
 
-  @OneToMany(() => Cart, (cart) => cart.user) // Додаємо зв’язок із Cart
-  carts: Cart[]; // Список кошиків користувача
-  @OneToMany(() => Comment, (comment) => comment.user) // Обратное отношение к комментариям
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
 }
