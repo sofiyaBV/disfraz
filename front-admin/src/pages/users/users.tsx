@@ -1,16 +1,13 @@
-import { Create, Datagrid, Edit, EditButton, EmailField, List, ReferenceInput, Show, SimpleForm, TextField, TextInput } from "react-admin";
+import { Create, Datagrid, Edit, EditButton, EmailField, List, Show, SimpleForm, TextField, TextInput } from "react-admin";
 
 const userFilters = [
     <TextInput source="q" label="Search" alwaysOn />,//Поле для поиска
-    // <ReferenceInput source="userId" label="User" reference="users" />,
 ]
 
 export const UserList = () => (
     <List filters={userFilters}>
         <Datagrid rowClick = "show">
             <TextField source="id" />
-            <TextField source="name" />
-            <TextField source="username" />
             <EmailField source="email" />
             <TextField source="phone" />
             <EditButton />

@@ -1,12 +1,12 @@
 const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
 
 export const authProvider = {
-    async login({ username, password }: { username: string; password: string }) {
+    async login({ email, password }: { email: string; password: string }) {
 
 
         const request = new Request(`${apiUrl}/auth/signin`, {
             method: 'POST',
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ email, password }),
             headers: new Headers({ 'Content-Type': 'application/json' }),
         });
         const response = await fetch(request);
@@ -15,7 +15,7 @@ export const authProvider = {
         }
         const {access_token} = await response.json();
         localStorage.setItem('token', access_token);
-        localStorage.setItem('username', username);
+        localStorage.setItem('email', email);
     },
     async checkError(error: { status: any; }) {
         const status = error.status;
@@ -48,3 +48,4 @@ export const authProvider = {
         return { id, fullName };
     },
 };
+
