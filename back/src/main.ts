@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   // Включаем валидацию
   app.useGlobalPipes(
     new ValidationPipe({
@@ -13,6 +14,7 @@ async function bootstrap() {
       transform: true, // Преобразует входные данные в типы, указанные в DTO
     }),
   );
+
   app.enableCors({
     origin: [/^http:\/\/localhost:\d+$/],
   });

@@ -20,6 +20,7 @@ export class AuthGuard implements CanActivate {
     { method: 'POST', path: '/auth/signin' },
     { method: 'POST', path: '/auth/register' },
     { method: 'POST', path: '/user' },
+    { method: 'GET', path: '/user' },
   ];
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

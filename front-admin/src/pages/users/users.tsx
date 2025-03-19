@@ -44,10 +44,8 @@ export const UserShow = () => (
 export const UserCreate = () => (
     <Create>
         <SimpleForm>
-            <TextInput source="name" />
-            <TextInput source="username" />
             <TextInput source="email" />
-            <TextInput source="phone" />
+            <TextInput source="password" />
         </SimpleForm>
     </Create>
 );
