@@ -1,9 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // Включаем валидацию
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Удаляет поля, которых нет в DTO
+      forbidNonWhitelisted: true, // Выбрасывает ошибку, если есть лишние поля
+      transform: true, // Преобразует входные данные в типы, указанные в DTO
+    }),
+  );
   app.enableCors();
   dotenv.config();
   // Конфигурация Swagger
