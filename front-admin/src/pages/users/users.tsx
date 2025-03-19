@@ -2,7 +2,6 @@ import { Create, Datagrid, Edit, EditButton, EmailField, List, ReferenceInput, S
 
 const userFilters = [
     <TextInput source="q" label="Search" alwaysOn />,//Поле для поиска
-    // <ReferenceInput source="userId" label="User" reference="users" />,
 ]
 
 export const UserList = () => (
@@ -15,7 +14,7 @@ export const UserList = () => (
             <TextField source="phone" />
             <EditButton />
         </Datagrid>
-    </List>
+     </List>
 );
 
 export const UserEdit = () => (
