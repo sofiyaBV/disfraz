@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  MinLength,
-  IsEmail,
-  IsOptional,
-  IsPhoneNumber,
-} from 'class-validator';
+import { IsNotEmpty, MinLength, IsEmail } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -29,8 +23,8 @@ export class User {
   id: number;
 
   @Column({ type: 'varchar', length: 255, unique: true })
-  @IsNotEmpty()
-  @IsEmail()
+  @IsNotEmpty({ message: 'Електронна пошта не може бути порожньою' })
+  @IsEmail({}, { message: 'Некоректний формат електронної пошти' })
   @ApiProperty({
     example: 'user@example.com',
     description: 'Електронна пошта користувача',
@@ -38,13 +32,12 @@ export class User {
   email: string;
 
   @Column({ type: 'varchar', length: 255 })
-  @MinLength(6)
+  @IsNotEmpty({ message: 'Пароль не може бути порожнім' })
+  @MinLength(6, { message: 'Пароль повинен містити щонайменше 6 символів' })
   @ApiProperty({ example: 'password123', description: 'Пароль користувача' })
   password: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  @IsOptional()
-  @IsPhoneNumber('UA')
   @ApiPropertyOptional({
     example: '+380991234567',
     description: 'Номер телефону користувача (Україна)',
