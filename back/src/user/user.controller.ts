@@ -20,7 +20,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
@@ -32,35 +32,42 @@ interface PaginationResponse<T> {
 }
 
 @ApiTags('User')
-@Controller('users')
+@Controller('user')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: 'Create a new user' })
+  @ApiOperation({ summary: 'Create a new admin' })
   @ApiResponse({
     status: 201,
     description: 'User successfully created',
     type: User,
   })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: CreateAdminDto })
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Roles(Role.Admin) // Только администратор может создавать пользователей
+  create(@Body() CreateAdminDto: CreateAdminDto): Promise<User> {
+    return this.userService.createAdmin(CreateAdminDto);
   }
 
-  @ApiOperation({ summary: 'Get all users ' })
+  @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({
     status: 200,
-    description: 'List of all users ',
+    description: 'List of all users',
     schema: {
       properties: {
         data: { type: 'array', items: { $ref: '#/components/schemas/User' } },
         total: {
           type: 'number',
-          description: 'Загальна кількість користувачів',
+          description: 'Общее количество пользователей',
         },
-        page: { type: 'number', description: 'Поточна сторінка' },
-        limit: { type: 'number', description: 'Кількість записів на сторінку' },
+        page: { type: 'number', description: 'Текущая страница' },
+        limit: {
+          type: 'number',
+          description: 'Количество записей на страницу',
+        },
       },
     },
   })
@@ -69,16 +76,19 @@ export class UserController {
     required: false,
     type: Number,
     example: 1,
-    description: 'Номер сторінки',
+    description: 'Номер страницы',
   })
   @ApiQuery({
     name: 'limit',
     required: false,
     type: Number,
     example: 10,
-    description: 'Кількість записів на сторінку',
+    description: 'Количество записей на страницу',
   })
   @Get()
+
+  @Roles(Role.Admin)
+
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -97,10 +107,8 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
   @Get(':id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<User | null> {
     return this.userService.findOne(id);
   }
 }
