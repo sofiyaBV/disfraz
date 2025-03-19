@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { Role } from '../auth/enums/role.enum';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -13,17 +13,43 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async createAdmin(CreateAdminDto: CreateAdminDto): Promise<User> {
+    const { email, password } = CreateAdminDto;
+
+    // Хешируем пароль перед сохранением
     const salt = await bcrypt.genSalt();
-    const userCount = await this.userRepository.count();
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = new User();
-    user.email = createUserDto.email;
-    user.password = await bcrypt.hash(createUserDto.password, salt);
-    user.phone = createUserDto.phone;
+    // Создаем нового пользователя с ролью admin
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      roles: [Role.Admin], // Всегда устанавливаем роль admin
+    });
 
-    user.roles =
-      userCount === 0 ? [Role.Admin] : createUserDto.roles || [Role.User];
+    return this.userRepository.save(user);
+  }
+
+  // Универсальный метод для создания пользователя с любой ролью
+  async createUser(userData: {
+    email: string;
+    password: string;
+    phone?: string;
+    roles: Role[];
+  }): Promise<User> {
+    const { email, password, phone, roles } = userData;
+
+    // Хешируем пароль перед сохранением
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Создаем нового пользователя с переданными ролями
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      phone,
+      roles,
+    });
 
     return this.userRepository.save(user);
   }
