@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   dotenv.config();
   // Конфигурация Swagger
   const config = new DocumentBuilder()
@@ -15,7 +16,8 @@ async function bootstrap() {
 
   // Дополнительные настройки Swagger
   const documentOptions = {
-    operationIdFactory: (_controllerKey: string, methodKey: string) => methodKey, // Убираем `Controller_` из названий операций
+    operationIdFactory: (_controllerKey: string, methodKey: string) =>
+      methodKey, // Убираем `Controller_` из названий операций
     autoTagControllers: true, // Использует название контроллера в качестве тега
   };
 
@@ -37,8 +39,7 @@ async function bootstrap() {
 }
 bootstrap();
 
-
 // Адреса документации:
-  // Swagger UI: http://localhost:3000/doc
-  // JSON: http://localhost:3000/swagger/json
-  // YAML: http://localhost:3000/swagger/yaml
+// Swagger UI: http://localhost:3000/doc
+// JSON: http://localhost:3000/swagger/json
+// YAML: http://localhost:3000/swagger/yaml

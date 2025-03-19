@@ -25,11 +25,4 @@ export class CreateUserDto {
   })
   @MinLength(6)
   password: string;
-
-  @ApiProperty({
-    example: [Role.User],
-    description: 'Роли пользователя',
-    isArray: true,
-  })
-  roles?: Role[]; // Опціональне поле
 }
