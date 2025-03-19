@@ -13,7 +13,9 @@ async function bootstrap() {
       transform: true, // Преобразует входные данные в типы, указанные в DTO
     }),
   );
-  app.enableCors();
+  app.enableCors({
+    origin: [/^http:\/\/localhost:\d+$/],
+  });
   dotenv.config();
   // Конфигурация Swagger
   const config = new DocumentBuilder()
