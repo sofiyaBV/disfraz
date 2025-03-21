@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto): Promise<void> {
-    const { email, password } = createUserDto;
+    const { email, password, phone } = createUserDto;
 
     // Проверяем, существует ли пользователь с таким email
     const existingUser = await this.usersService.findByEmail(email);
@@ -42,7 +42,8 @@ export class AuthService {
     // Передаем пароль в исходном виде, хеширование будет в UserService
     const newUser = {
       email,
-      password, // Пароль передается без хеширования
+      password,
+      phone, // Пароль передается без хеширования
       roles: [Role.User],
     };
 
