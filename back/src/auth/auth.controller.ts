@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
-import { CreateAuthUserDto } from './dto/create-auth-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 
@@ -46,16 +46,16 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
   @ApiOperation({ summary: 'Регистрация нового пользователя' })
-  @ApiBody({ type: CreateAuthUserDto })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
     description: 'Пользователь успешно зарегистрирован',
   })
   @ApiResponse({ status: 400, description: 'Некорректные данные' })
   async register(
-    @Body() createAuthUserDto: CreateAuthUserDto,
+    @Body() CreateUserDto: CreateUserDto,
   ): Promise<{ message: string }> {
-    await this.authService.register(createAuthUserDto);
+    await this.authService.register(CreateUserDto);
     return { message: 'Пользователь успешно зарегистрирован' };
   }
 
