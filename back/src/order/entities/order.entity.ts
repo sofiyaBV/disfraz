@@ -6,9 +6,10 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'; // Імпорт для Swagger
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Cart } from '../../cart/entities/cart.entity';
 import { User } from '../../user/entities/user.entity';
+import { DeliveryMethod } from '../dto/create-order.dto'; // Импортируем enum
 
 @Entity()
 export class Order {
@@ -50,6 +51,14 @@ export class Order {
     description: 'Адреса доставки',
   })
   deliveryAddress: string;
+
+  @Column({ type: 'enum', enum: DeliveryMethod })
+  @ApiProperty({
+    example: 'Нова Пошта - відділення',
+    description: 'Спосіб доставки',
+    enum: DeliveryMethod,
+  })
+  deliveryMethod: DeliveryMethod;
 
   @Column({ type: 'text', nullable: true })
   @ApiPropertyOptional({
