@@ -53,6 +53,7 @@ export class Migration1741870457826 implements MigrationInterface {
         "customerEmail" character varying(255) NOT NULL,
         "customerPhone" character varying(20) NOT NULL,
         "deliveryAddress" text NOT NULL,
+        "deliveryMethod" "public"."order_deliverymethod_enum" NOT NULL DEFAULT 'Самовивіз',
         "notes" text,
         "status" character varying(50) NOT NULL DEFAULT 'Pending',
         "cartId" integer,
@@ -104,6 +105,16 @@ export class Migration1741870457826 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_5134aa627db96cdfb1bf0be522" ON "product_attribute" ("attributeId")`,
     );
+
+    // Создаем перечисляемый тип для deliveryMethod
+    await queryRunner.query(`
+      CREATE TYPE "public"."order_deliverymethod_enum" AS ENUM(
+        'Самовивіз',
+        'Нова Пошта - відділення',
+        'Нова Пошта - кур’єр',
+        'УкрПошта - відділення'
+      );
+    `);
 
     await queryRunner.query(
       `ALTER TABLE "comment" ADD CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e" FOREIGN KEY ("productAttributeId") REFERENCES "product_attribute"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
@@ -168,7 +179,7 @@ export class Migration1741870457826 implements MigrationInterface {
       DROP FUNCTION IF EXISTS update_cart_price;
     `);
 
-    // Удаление внешних ключей и таблиц
+    // Удаление внешних ключей
     await queryRunner.query(
       `ALTER TABLE "cart" DROP CONSTRAINT "FK_756f53ab9466eb52a52619ee019"`,
     );
@@ -187,12 +198,21 @@ export class Migration1741870457826 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "comment" DROP CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e"`,
     );
+
+    // Удаление индексов
     await queryRunner.query(
       `DROP INDEX "public"."IDX_c0d597555330c0a972122bf467"`,
     );
     await queryRunner.query(
       `DROP INDEX "public"."IDX_5134aa627db96cdfb1bf0be522"`,
     );
+
+    // Удаление перечисляемого типа
+    await queryRunner.query(`
+      DROP TYPE IF EXISTS "public"."order_deliverymethod_enum";
+    `);
+
+    // Удаление таблиц
     await queryRunner.query(`DROP TABLE "product_attribute"`);
     await queryRunner.query(`DROP TABLE "cart"`);
     await queryRunner.query(`DROP TABLE "user"`);

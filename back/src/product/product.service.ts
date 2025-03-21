@@ -26,7 +26,7 @@ export class ProductService {
     const [data, total] = await this.productRepository.findAndCount({
       skip,
       take: limit,
-      relations: ['attributes'], // Завантажуємо пов’язані сутності
+      relations: ['attributes'],
     });
 
     return { data, total };
@@ -61,8 +61,10 @@ export class ProductService {
         throw new NotFoundException(`Продукт с ID ${id} не найден`);
       }
 
+      // Обновляем основные поля продукта
       manager.merge(Product, product, updateProductDto);
 
+      // Обновляем связанные атрибуты, если переданы attributeIds
       if (updateProductDto.attributeIds) {
         const existingAttributes = await manager.findByIds(
           Attribute,
@@ -75,6 +77,7 @@ export class ProductService {
         }
       }
 
+      // Сохраняем обновленный продукт
       await manager.save(product);
       return product;
     });
