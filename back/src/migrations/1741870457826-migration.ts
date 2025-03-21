@@ -27,7 +27,7 @@ export class Migration1741870457826 implements MigrationInterface {
         "name" character varying(255) NOT NULL,
         "price" numeric(10,2) NOT NULL,
         "description" text,
-        "images" text array,
+        "images" jsonb, -- Изменено с text array на jsonb
         "similarproducts" integer array,
         CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id")
       )`,
