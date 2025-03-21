@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { CreateAuthUserDto } from './dto/create-auth-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 
 @Injectable()
@@ -28,8 +28,8 @@ export class AuthService {
     };
   }
 
-  async register(createAuthUserDto: CreateAuthUserDto): Promise<void> {
-    const { email, password, phone } = createAuthUserDto;
+  async register(createUserDto: CreateUserDto): Promise<void> {
+    const { email, password } = createUserDto;
 
     // Проверяем, существует ли пользователь с таким email
     const existingUser = await this.usersService.findByEmail(email);
@@ -39,16 +39,11 @@ export class AuthService {
       );
     }
 
-    // Хешируем пароль
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Создаем нового пользователя с ролью user по умолчанию
+    // Передаем пароль в исходном виде, хеширование будет в UserService
     const newUser = {
       email,
-      password: hashedPassword,
-      phone,
-      roles: [Role.User], // Всегда устанавливаем роль user
+      password, // Пароль передается без хеширования
+      roles: [Role.User],
     };
 
     // Сохраняем пользователя через UserService

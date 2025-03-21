@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { Role } from '../auth/enums/role.enum';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -30,25 +31,18 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  // Универсальный метод для создания пользователя с любой ролью
-  async createUser(userData: {
-    email: string;
-    password: string;
-    phone?: string;
-    roles: Role[];
-  }): Promise<User> {
-    const { email, password, phone, roles } = userData;
+  async createUser(CreateUserDto: CreateUserDto): Promise<User> {
+    const { email, password } = CreateUserDto;
 
     // Хешируем пароль перед сохранением
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Создаем нового пользователя с переданными ролями
+    // Создаем нового пользователя с ролью admin
     const user = this.userRepository.create({
       email,
       password: hashedPassword,
-      phone,
-      roles,
+      roles: [Role.User], // Всегда устанавливаем роль admin
     });
 
     return this.userRepository.save(user);
