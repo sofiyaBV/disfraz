@@ -37,8 +37,8 @@ interface PaginationResponse<T> {
 
 @ApiTags('User')
 @Controller('user')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -50,7 +50,7 @@ export class UserController {
   })
   @ApiBody({ type: CreateAdminDto })
   @Post()
-  @Roles(Role.Admin)
+  // @Roles(Role.Admin)
   create(@Body() createAdminDto: CreateAdminDto): Promise<User> {
     return this.userService.createAdmin(createAdminDto);
   }

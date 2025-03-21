@@ -45,6 +45,16 @@ export class Migration1741870457826 implements MigrationInterface {
       )`,
     );
 
+    // Создаем перечисляемый тип для deliveryMethod **до** создания таблицы order
+    await queryRunner.query(`
+      CREATE TYPE "public"."order_deliverymethod_enum" AS ENUM(
+        'Самовивіз',
+        'Нова Пошта - відділення',
+        'Нова Пошта - кур’єр',
+        'УкрПошта - відділення'
+      );
+    `);
+
     await queryRunner.query(
       `CREATE TABLE "order" (
         "id" SERIAL NOT NULL,
@@ -105,16 +115,6 @@ export class Migration1741870457826 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_5134aa627db96cdfb1bf0be522" ON "product_attribute" ("attributeId")`,
     );
-
-    // Создаем перечисляемый тип для deliveryMethod
-    await queryRunner.query(`
-      CREATE TYPE "public"."order_deliverymethod_enum" AS ENUM(
-        'Самовивіз',
-        'Нова Пошта - відділення',
-        'Нова Пошта - кур’єр',
-        'УкрПошта - відділення'
-      );
-    `);
 
     await queryRunner.query(
       `ALTER TABLE "comment" ADD CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e" FOREIGN KEY ("productAttributeId") REFERENCES "product_attribute"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
@@ -207,16 +207,17 @@ export class Migration1741870457826 implements MigrationInterface {
       `DROP INDEX "public"."IDX_5134aa627db96cdfb1bf0be522"`,
     );
 
-    // Удаление перечисляемого типа
-    await queryRunner.query(`
-      DROP TYPE IF EXISTS "public"."order_deliverymethod_enum";
-    `);
-
     // Удаление таблиц
     await queryRunner.query(`DROP TABLE "product_attribute"`);
     await queryRunner.query(`DROP TABLE "cart"`);
     await queryRunner.query(`DROP TABLE "user"`);
     await queryRunner.query(`DROP TABLE "order"`);
+
+    // Удаление перечисляемого типа **после** удаления таблицы order
+    await queryRunner.query(`
+      DROP TYPE IF EXISTS "public"."order_deliverymethod_enum";
+    `);
+
     await queryRunner.query(`DROP TABLE "comment"`);
     await queryRunner.query(`DROP TABLE "product"`);
     await queryRunner.query(`DROP TABLE "attribute"`);
