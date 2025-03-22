@@ -97,7 +97,7 @@ export class ProductService {
     createProductDto: CreateProductDto,
     files: Express.Multer.File[] = [],
   ): Promise<Product> {
-    console.log('Transformed createProductDto:', createProductDto); // Для отладки
+    console.log('Transformed createProductDto:', createProductDto);
     const imageData: { url: string; deleteHash: string }[] = [];
 
     try {
@@ -107,29 +107,31 @@ export class ProductService {
         imageData.push({ url, deleteHash });
       }
 
-      // Создаем продукт
-      const product = this.productRepository.create({
+      // Убедимся, что similarProducts - это массив
+      const productData = {
         ...createProductDto,
+        similarProducts: Array.isArray(createProductDto.similarProducts)
+          ? createProductDto.similarProducts
+          : [], // Если не массив, передаем пустой массив
         images: imageData,
-      });
+      };
+
+      // Создаем продукт
+      const product = this.productRepository.create(productData);
 
       // Сохраняем продукт в базе данных
       const savedProduct = await this.productRepository.save(product);
-      console.log('Created product:', savedProduct); // Для отладки
+      console.log('Created product:', savedProduct);
       return savedProduct;
     } catch (err) {
-      // Логируем ошибку
       console.error('Ошибка при создании продукта:', err);
-
-      // Поскольку удаление через API ImgBB не работает, просто логируем попытку
       if (imageData.length > 0) {
         console.warn(
           'Изображения не будут удалены из ImgBB, так как API не поддерживает удаление. Вы можете удалить их вручную:',
           imageData,
         );
       }
-
-      throw err; // Пробрасываем ошибку дальше для обработки на уровне контроллера
+      throw err;
     }
   }
 
@@ -201,19 +203,6 @@ export class ProductService {
         ...updateProductDto,
         images: newImageData.length > 0 ? newImageData : product.images,
       });
-
-      if (updateProductDto.attributeIds) {
-        const existingAttributes = await manager.findByIds(
-          Attribute,
-          updateProductDto.attributeIds,
-        );
-        if (existingAttributes.length > 0) {
-          product.attributes = existingAttributes;
-        } else {
-          console.warn('Ни один атрибут не найден для productId:', id);
-        }
-      }
-
       const updatedProduct = await manager.save(product);
       console.log(`Updated product with ID ${id}:`, updatedProduct); // Для отладки
       return updatedProduct;

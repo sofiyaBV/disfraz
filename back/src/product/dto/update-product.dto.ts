@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsArray,
-  IsInt,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
   @ApiProperty({
@@ -24,6 +19,7 @@ export class UpdateProductDto {
   })
   @IsOptional()
   @IsNumber({}, { message: 'Ціна товару повинна бути числом' })
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   price?: number;
 
   @ApiProperty({
@@ -34,40 +30,4 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString({ message: 'Опис товару повинен бути рядком' })
   description?: string;
-
-  @ApiProperty({
-    example: ['url1.jpg', 'url2.jpg'],
-    description: 'Список зображень (опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Список зображень повинен бути масивом' })
-  @IsString({
-    each: true,
-    message: 'Кожен елемент списку зображень повинен бути рядком',
-  })
-  images?: string[];
-
-  @ApiProperty({
-    example: [5, 7],
-    description: 'Список ID схожих товарів (опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Список схожих товарів повинен бути масивом' })
-  @IsInt({
-    each: true,
-    message: 'Кожен ID схожого товару повинен бути цілим числом',
-  })
-  similarProducts?: number[];
-
-  @ApiProperty({
-    example: [1, 2],
-    description: 'Список ID атрибутів товару (опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Список ID атрибутів повинен бути масивом' })
-  @IsInt({ each: true, message: 'Кожен ID атрибуту повинен бути цілим числом' })
-  attributeIds?: number[];
 }

@@ -9,6 +9,9 @@ export class CreateProductDto {
 
   @ApiProperty({ example: 199.99, description: 'Ціна товару' })
   @IsNumber({}, { message: 'Ціна товару повинна бути числом' })
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined), {
+    toClassOnly: true,
+  })
   price: number;
 
   @ApiProperty({ example: 'Костюм для косплею', description: 'Опис товару' })
@@ -24,11 +27,10 @@ export class CreateProductDto {
     each: true,
     message: 'Кожен ID схожого товару повинен бути цілим числом',
   })
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value.split(',').map(Number);
-    }
-    return value;
-  })
+  @Transform(
+    ({ value }) =>
+      typeof value === 'string' ? value.split(',').map(Number) : value,
+    { toClassOnly: true },
+  )
   similarProducts: number[];
 }
