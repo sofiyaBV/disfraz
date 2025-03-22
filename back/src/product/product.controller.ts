@@ -182,75 +182,17 @@ export class ProductController {
   })
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Update product with images',
-    schema: {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          example: 'Костюм супергероя',
-          description: 'Назва товару (опціонально)',
-        },
-        price: {
-          type: 'number',
-          example: 199.99,
-          description: 'Ціна товару (опціонально)',
-        },
-        description: {
-          type: 'string',
-          example: 'Костюм для косплею',
-          description: 'Опис товару (опціонально)',
-        },
-        similarProducts: {
-          type: 'array',
-          items: { type: 'integer' },
-          example: [5, 7],
-          description: 'Список ID схожих товарів (опціонально)',
-        },
-        attributeIds: {
-          type: 'array',
-          items: { type: 'integer' },
-          example: [1, 2],
-          description: 'Список ID атрибутів товару (опціонально)',
-        },
-        images: {
-          type: 'array',
-          items: { type: 'string', format: 'binary' },
-          description: 'Файли зображень (до 10 файлів, опціонально)',
-        },
-      },
-    },
-  })
   @UseInterceptors(FilesInterceptor('images', 10))
   @Patch(':id')
   @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: any, // Принимаем body как any, так как это multipart/form-data
+    @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
-    console.log(`Received body for update: ${id}, body:`, body);
+    console.log(`Received body for update: ${id}, body:`, updateProductDto);
     console.log('Uploaded files:', files);
 
-    // Преобразуем body в UpdateProductDto
-    const updateProductDto = plainToClass(UpdateProductDto, {
-      ...body,
-      price: body.price ? parseFloat(body.price) : undefined, // Преобразуем price в число
-      attributeIds: body.attributeIds
-        ? body.attributeIds.split(',').map(Number)
-        : undefined, // Преобразуем attributeIds в массив чисел
-    });
-
-    // Валидируем DTO
-    const errors = await validate(updateProductDto);
-    if (errors.length > 0) {
-      throw new BadRequestException(
-        'Validation failed: ' + JSON.stringify(errors),
-      );
-    }
-
-    console.log('Transformed updateProductDto:', updateProductDto);
     return this.productService.update(id, updateProductDto, files);
   }
 
