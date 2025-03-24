@@ -15,11 +15,17 @@ export class Product {
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  @ApiProperty({ example: 'Костюм супергероя', description: 'Назва товару' })
+  @ApiProperty({
+    example: 'Костюм супергероя',
+    description: 'Назва товару',
+  })
   name: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  @ApiProperty({ example: 199.99, description: 'Ціна товару' })
+  @ApiProperty({
+    example: 199.99,
+    description: 'Ціна товару',
+  })
   price: number;
 
   @Column({ type: 'text', nullable: true })
@@ -39,14 +45,22 @@ export class Product {
   })
   images: { url: string; deleteHash: string }[];
 
-  @Column({
-    type: 'integer',
-    array: true,
-    nullable: true,
-    name: 'similarproducts',
+  // @Column({
+  //   type: 'integer',
+  //   array: true,
+  //   nullable: true,
+  //   name: 'similarproducts',
+  // })
+  // @ApiProperty({ example: [5, 7], description: 'Список ID схожих товарів' })
+  // similarProducts: number[];
+
+  @ManyToMany(() => Product)
+  @JoinTable({
+    name: 'product_similars',
+    joinColumn: { name: 'leftProductId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'rightProductId', referencedColumnName: 'id' },
   })
-  @ApiProperty({ example: [5, 7], description: 'Список ID схожих товарів' })
-  similarProducts: number[];
+  similarProducts: Product[];
 
   @ManyToMany(() => Attribute, (attribute) => attribute.products)
   @JoinTable({
