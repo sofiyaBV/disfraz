@@ -1,4 +1,4 @@
-import { Create, Datagrid, Edit, EditButton, EmailField, List, ReferenceInput, Show, SimpleForm, TextField, TextInput } from "react-admin";
+import { Create, Datagrid, Edit, EditButton, EmailField, List, Show, SimpleForm, TextField, TextInput } from "react-admin";
 
 const userFilters = [
     <TextInput source="q" label="Search" alwaysOn />,//Поле для поиска
@@ -8,13 +8,11 @@ export const UserList = () => (
     <List filters={userFilters}>
         <Datagrid rowClick = "show">
             <TextField source="id" />
-            <TextField source="name" />
-            <TextField source="username" />
             <EmailField source="email" />
             <TextField source="phone" />
             <EditButton />
         </Datagrid>
-     </List>
+    </List>
 );
 
 export const UserEdit = () => (
@@ -41,7 +39,7 @@ export const UserShow = () => (
 );
 
 export const UserCreate = () => (
-    <Create>
+    <Create redirect="list">
         <SimpleForm>
             <TextInput source="email" />
             <TextInput source="password" />
