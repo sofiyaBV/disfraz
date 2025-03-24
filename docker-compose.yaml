@@ -1,10 +1,4 @@
 services:
-#  cosplay.api:
-#    container_name: cosplay.api
-#    build:
-#      context: ./back
-#    ports:
-#      - "3000:3000"
 
   cosplay.db:
     image: postgres:17.3
@@ -14,3 +8,31 @@ services:
       - "5432:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cosplay.admin:
+    container_name: cosplay.admin
+    env_file:
+      - docker.env
+    build:
+      context: ./front-admin
+    ports:
+      - "4173:4173"
+
+  cosplay.api:
+    container_name: cosplay.api
+    env_file:
+      - docker.env
+    depends_on:
+      cosplay.db:
+        condition: service_healthy
+    build:
+      context: ./back
+    ports:
+      - "3000:3000"
+
+
