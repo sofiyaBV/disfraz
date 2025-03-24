@@ -39,7 +39,7 @@ export const UserShow = () => (
 );
 
 export const UserCreate = () => (
-    <Create>
+    <Create redirect="list">
         <SimpleForm>
             <TextInput source="email" />
             <TextInput source="password" />
