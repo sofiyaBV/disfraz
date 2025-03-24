@@ -34,7 +34,7 @@ export const dataProvider = {
 
     console.log("getList URL:", url);
 
-    return httpClient(url).then(({ headers, json }) => {
+    return httpClient(url).then(({json }) => {
       console.log("Response from server:", json);
       return {
         data: json.data,
@@ -55,4 +55,54 @@ export const dataProvider = {
     }).then(({ json }) => ({
       data: { ...params.data, id: json.id },
     })),
-};
+
+    update: (resource: string, params: any) =>
+      httpClient(`${apiUrl}/${resource}/${params.id}`, {
+          method: "PATCH",
+          body: JSON.stringify(params.data),
+      }).then(({ json }) => ({ data: json })),
+
+      delete: (resource: string, params: any) =>
+        httpClient(`${apiUrl}/${resource}/${params.id}`, {
+            method: "DELETE",
+        }).then(({ json }) => ({ data: json })),
+
+        /////////////////////////////
+      // getMany: (resource: string, params: any) => {
+      //     const query = {
+      //         filter: JSON.stringify({ id: params.ids }),
+      //     };
+      //     const url = `${apiUrl}/${resource}?${stringify(query)}`;
+      //     return httpClient(url).then(({ json }) => ({ data: json }));
+      // },
+  
+      // getManyReference: (resource: string, params: any) => {
+      //     const { target, id } = params;
+      //     const query = {
+      //         filter: JSON.stringify({ [target]: id }),
+      //     };
+      //     const url = `${apiUrl}/${resource}?${stringify(query)}`;
+      //     return httpClient(url).then(({ json }) => ({ data: json, total: json.length }));
+      // },
+  
+      // updateMany: (resource: string, params: any) => {
+      //     return Promise.all(
+      //         params.ids.map((id: any) =>
+      //             httpClient(`${apiUrl}/${resource}/${id}`, {
+      //                 method: "PATCH",
+      //                 body: JSON.stringify(params.data),
+      //             }).then(({ json }) => json)
+      //         )
+      //     ).then(responses => ({ data: responses }));
+      // },
+  
+      // deleteMany: (resource: string, params: any) => {
+      //     return Promise.all(
+      //         params.ids.map((id: any) =>
+      //             httpClient(`${apiUrl}/${resource}/${id}`, {
+      //                 method: "DELETE",
+      //             }).then(({ json }) => json)
+      //         )
+      //     ).then(responses => ({ data: responses }));
+      // },
+      };
