@@ -11,13 +11,15 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
+
   @ApiProperty({
     example: '+380123456789',
     description: 'Номер телефона пользователя (Украина)',
   })
   @IsNotEmpty() // Робимо поле обов’язковим
-  @IsPhoneNumber('UA')
+  @IsPhoneNumber()
   phone: string; // Прибираємо ? (опціональність)
+
 
   @ApiProperty({
     example: 'password123',
