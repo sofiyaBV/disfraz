@@ -17,13 +17,11 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# Build the NestJS application
+# Build
 RUN npm run build
 
-RUN npm run migration:run
-
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 4173
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "serve"]

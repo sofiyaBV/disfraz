@@ -26,10 +26,14 @@ export const dataProvider = {
     const { page, perPage } = params.pagination;
     const { field, order } = params.sort;
     const query = {
-      sort: JSON.stringify([field, order]),
-      range: JSON.stringify([(page - 1) * perPage, page * perPage - 1]),
-      filter: JSON.stringify(params.filter),
+      sortBy: field + ":" + order,
+      // search: params.filter.q,
+      limit: JSON.stringify(perPage),
+      page: JSON.stringify(page),
+      // range: JSON.stringify([(page - 1) * perPage, page * perPage - 1]),
+      //filter: JSON.stringify(params.filter),
     };
+    // http://localhost:3000/cats?limit=5&page=2&sortBy=color:DESC&search=i&filter.age=$gte:3&select=id,name,color,age
     const url = `${apiUrl}/${resource}?${stringify(query)}`;
 
     console.log("getList URL:", url);
