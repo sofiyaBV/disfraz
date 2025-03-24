@@ -47,7 +47,7 @@ export class OrderService {
         cartId: cart.id,
         user,
         createdAt: new Date(),
-        status: 'Pending',
+        status: createOrderDto.status || 'Pending', // Устанавливаем статус из DTO или по умолчанию
       });
 
       const savedOrder = await this.orderRepository.save(order);
@@ -62,7 +62,7 @@ export class OrderService {
     const [data, total] = await this.orderRepository.findAndCount({
       skip,
       take: limit,
-      relations: ['cart', 'user'], // Завантажуємо пов’язані сутності
+      relations: ['cart', 'user'],
     });
 
     return { data, total };
@@ -84,9 +84,22 @@ export class OrderService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    await this.orderRepository.update(id, {
-      ...updateOrderDto,
-    });
+    // Проверяем, существует ли заказ
+    const order = await this.findOne(id);
+
+    // Если обновляется cartId, проверяем, существует ли корзина
+    if (updateOrderDto.cartId) {
+      const cart = await this.cartRepository.findOne({
+        where: { id: updateOrderDto.cartId },
+      });
+      if (!cart) {
+        throw new NotFoundException(
+          `Корзина с ID ${updateOrderDto.cartId} не найдена`,
+        );
+      }
+    }
+
+    await this.orderRepository.update(id, updateOrderDto);
     return this.findOne(id);
   }
 

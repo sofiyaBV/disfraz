@@ -4,8 +4,8 @@ import {
   Column,
   ManyToMany,
   JoinTable,
-} from 'typeorm'; // Лише декоратори TypeORM
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'; // Імпорт для Swagger
+} from 'typeorm';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Attribute } from '../../attribute/entities/attribute.entity';
 
 @Entity()
@@ -29,12 +29,15 @@ export class Product {
   })
   description: string;
 
-  @Column({ type: 'text', array: true, nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   @ApiProperty({
-    example: ['url1.jpg', 'url2.jpg'],
-    description: 'Список зображень',
+    example: [
+      { url: 'url1.jpg', deleteHash: 'hash1' },
+      { url: 'url2.jpg', deleteHash: 'hash2' },
+    ],
+    description: 'Список зображень с URL и deleteHash',
   })
-  images: string[];
+  images: { url: string; deleteHash: string }[];
 
   @Column({
     type: 'integer',

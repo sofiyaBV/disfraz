@@ -9,6 +9,8 @@ import {
   UseGuards,
   ParseIntPipe,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,6 +20,7 @@ import {
   ApiTags,
   ApiBearerAuth,
   ApiQuery,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -27,6 +30,10 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
+import { BadRequestException } from '@nestjs/common';
 
 interface PaginationResponse<T> {
   data: T[];
@@ -48,15 +55,66 @@ export class ProductController {
     description: 'Product successfully created',
     type: Product,
   })
-  @ApiBody({ type: CreateProductDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create product with images',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'Костюм супергероя',
+          description: 'Назва товару',
+        },
+        price: { type: 'number', example: 199.99, description: 'Ціна товару' },
+        description: {
+          type: 'string',
+          example: 'Костюм для косплею',
+          description: 'Опис товару',
+        },
+        similarProducts: {
+          type: 'array',
+          items: { type: 'integer' },
+          example: [5, 7],
+          description: 'Список ID схожих товарів',
+        },
+        images: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+          description: 'Файли зображень (до 10 файлів)',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FilesInterceptor('images', 10))
   @Post()
   @Roles(Role.Admin)
-  async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
-    console.log('Creating product with body:', createProductDto);
-    return this.productService.create(createProductDto);
+  async create(
+    @Body() body: any, // Принимаем body как any, так как это multipart/form-data
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<Product> {
+    console.log('Received body:', body);
+    console.log('Uploaded files:', files);
+
+    // Преобразуем body в CreateProductDto
+    const createProductDto = plainToClass(CreateProductDto, {
+      ...body,
+      price: body.price ? parseFloat(body.price) : undefined, // Преобразуем price в число
+    });
+
+    // Валидируем DTO
+    const errors = await validate(createProductDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(
+        'Validation failed: ' + JSON.stringify(errors),
+      );
+    }
+
+    console.log('Transformed createProductDto:', createProductDto);
+    return this.productService.create(createProductDto, files);
   }
 
-  @ApiOperation({ summary: 'Get all products ' })
+  @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({
     status: 200,
     description: 'List of all products',
@@ -123,21 +181,19 @@ export class ProductController {
     type: Product,
   })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  @ApiBody({ type: UpdateProductDto })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Product ID',
-    example: 1,
-  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('images', 10))
   @Patch(':id')
   @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
-    console.log(`Updating product with id: ${id}, body:`, updateProductDto);
-    return this.productService.update(id, updateProductDto);
+    console.log(`Received body for update: ${id}, body:`, updateProductDto);
+    console.log('Uploaded files:', files);
+
+    return this.productService.update(id, updateProductDto, files);
   }
 
   @ApiOperation({ summary: 'Delete a product by ID' })

@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete, // Добавляем Delete
   Get,
   Param,
+  Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -21,6 +24,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
@@ -31,10 +35,10 @@ interface PaginationResponse<T> {
   limit: number;
 }
 
-@ApiTags('user')
+@ApiTags('User')
 @Controller('user')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -46,9 +50,41 @@ export class UserController {
   })
   @ApiBody({ type: CreateAdminDto })
   @Post()
-  @Roles(Role.Admin) // Только администратор может создавать пользователей
-  create(@Body() CreateAdminDto: CreateAdminDto): Promise<User> {
-    return this.userService.createAdmin(CreateAdminDto);
+  // @Roles(Role.Admin)
+  create(@Body() createAdminDto: CreateAdminDto): Promise<User> {
+    return this.userService.createAdmin(createAdminDto);
+  }
+
+  @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully updated',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
+  @ApiBody({ type: UpdateUserDto })
+  @Patch(':id')
+  @Roles(Role.Admin)
+  update(
+    @Param('id') id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    return this.userService.updateUser(id, updateUserDto);
+  }
+
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully deleted',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
+  @Delete(':id')
+  @Roles(Role.Admin)
+  async delete(@Param('id') id: number): Promise<{ message: string }> {
+    await this.userService.deleteUser(id);
+    return { message: 'Пользователь успешно удален' };
   }
 
   @ApiOperation({ summary: 'Get all users' })

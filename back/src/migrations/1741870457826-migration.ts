@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 export class Migration1741870457826 implements MigrationInterface {
   name = 'Migration1741870457826';
@@ -27,7 +28,7 @@ export class Migration1741870457826 implements MigrationInterface {
         "name" character varying(255) NOT NULL,
         "price" numeric(10,2) NOT NULL,
         "description" text,
-        "images" text array,
+        "images" jsonb,
         "similarproducts" integer array,
         CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id")
       )`,
@@ -45,6 +46,15 @@ export class Migration1741870457826 implements MigrationInterface {
       )`,
     );
 
+    await queryRunner.query(`
+      CREATE TYPE "public"."order_deliverymethod_enum" AS ENUM(
+        'Самовивіз',
+        'Нова Пошта - відділення',
+        'Нова Пошта - кур’єр',
+        'УкрПошта - відділення'
+      );
+    `);
+
     await queryRunner.query(
       `CREATE TABLE "order" (
         "id" SERIAL NOT NULL,
@@ -53,6 +63,7 @@ export class Migration1741870457826 implements MigrationInterface {
         "customerEmail" character varying(255) NOT NULL,
         "customerPhone" character varying(20) NOT NULL,
         "deliveryAddress" text NOT NULL,
+        "deliveryMethod" "public"."order_deliverymethod_enum" NOT NULL DEFAULT 'Самовивіз',
         "notes" text,
         "status" character varying(50) NOT NULL DEFAULT 'Pending',
         "cartId" integer,
@@ -73,6 +84,17 @@ export class Migration1741870457826 implements MigrationInterface {
         CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"),
         CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id")
       )`,
+    );
+
+    // Генерируем хешированный пароль для "admin"
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash('admin', salt);
+
+    // Вставляем запись администратора
+    await queryRunner.query(
+      `INSERT INTO "user" ("email", "password", "roles", "createdAt", "updatedAt") 
+       VALUES ($1, $2, $3, NOW(), NOW())`,
+      ['admin', hashedPassword, ['admin']],
     );
 
     await queryRunner.query(
@@ -124,23 +146,19 @@ export class Migration1741870457826 implements MigrationInterface {
       `ALTER TABLE "cart" ADD CONSTRAINT "FK_756f53ab9466eb52a52619ee019" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
     );
 
-    // Создание функции update_cart_price
     await queryRunner.query(`
       CREATE OR REPLACE FUNCTION update_cart_price()
       RETURNS TRIGGER AS $$
       BEGIN
-          -- Получаем базовую цену из product через product_attribute
           SELECT p.price INTO NEW.price
           FROM public.product p
           JOIN public.product_attribute pa ON p.id = pa."productId"
           WHERE pa.id = NEW."productAttributeId";
 
-          -- Если цена не найдена, устанавливаем price = 0
           IF NEW.price IS NULL THEN
               NEW.price = 0.0;
           END IF;
 
-          -- Умножаем базовую цену на quantity
           NEW.price = NEW.price * NEW.quantity;
 
           RETURN NEW;
@@ -148,7 +166,6 @@ export class Migration1741870457826 implements MigrationInterface {
       $$ LANGUAGE plpgsql;
     `);
 
-    // Создание триггера trigger_update_cart_price
     await queryRunner.query(`
       CREATE TRIGGER trigger_update_cart_price
       BEFORE INSERT OR UPDATE OF quantity ON public.cart
@@ -158,17 +175,14 @@ export class Migration1741870457826 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Удаление триггера
     await queryRunner.query(`
       DROP TRIGGER IF EXISTS trigger_update_cart_price ON public.cart;
     `);
 
-    // Удаление функции
     await queryRunner.query(`
       DROP FUNCTION IF EXISTS update_cart_price;
     `);
 
-    // Удаление внешних ключей и таблиц
     await queryRunner.query(
       `ALTER TABLE "cart" DROP CONSTRAINT "FK_756f53ab9466eb52a52619ee019"`,
     );
@@ -187,16 +201,23 @@ export class Migration1741870457826 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "comment" DROP CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e"`,
     );
+
     await queryRunner.query(
       `DROP INDEX "public"."IDX_c0d597555330c0a972122bf467"`,
     );
     await queryRunner.query(
       `DROP INDEX "public"."IDX_5134aa627db96cdfb1bf0be522"`,
     );
+
     await queryRunner.query(`DROP TABLE "product_attribute"`);
     await queryRunner.query(`DROP TABLE "cart"`);
     await queryRunner.query(`DROP TABLE "user"`);
     await queryRunner.query(`DROP TABLE "order"`);
+
+    await queryRunner.query(`
+      DROP TYPE IF EXISTS "public"."order_deliverymethod_enum";
+    `);
+
     await queryRunner.query(`DROP TABLE "comment"`);
     await queryRunner.query(`DROP TABLE "product"`);
     await queryRunner.query(`DROP TABLE "attribute"`);
