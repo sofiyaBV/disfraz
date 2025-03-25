@@ -8,6 +8,8 @@ import { Attribute } from '../attribute/entities/attribute.entity';
 import axios, { AxiosError } from 'axios';
 import * as sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate'; // Импортируем необходимые утилиты
+import { productPaginateConfig } from '../config/pagination.config'; // Импортируем конфигурацию
 
 // Интерфейс для ответа от ImgBB API
 interface ImgBBResponse {
@@ -41,10 +43,9 @@ export class ProductService {
   async uploadToImgBB(
     file: Express.Multer.File,
   ): Promise<{ url: string; deleteHash: string }> {
-    // Сжимаем изображение
     const compressedBuffer = await sharp(file.buffer)
-      .resize({ width: 1200 }) // Уменьшаем ширину до 1200 пикселей
-      .jpeg({ quality: 80 }) // Сжимаем JPEG с качеством 80%
+      .resize({ width: 1200 })
+      .jpeg({ quality: 80 })
       .toBuffer();
 
     const formData = new FormData();
@@ -89,7 +90,6 @@ export class ProductService {
       console.warn(
         `Не удалось удалить изображение с deleteHash ${deleteHash}: ${errorMessage}`,
       );
-      // Не бросаем ошибку, чтобы не прерывать выполнение
     }
   }
 
@@ -101,25 +101,20 @@ export class ProductService {
     const imageData: { url: string; deleteHash: string }[] = [];
 
     try {
-      // Загружаем изображения в ImgBB
       for (const file of files) {
         const { url, deleteHash } = await this.uploadToImgBB(file);
         imageData.push({ url, deleteHash });
       }
 
-      // Убедимся, что similarProducts - это массив
       const productData = {
         ...createProductDto,
         similarProducts: Array.isArray(createProductDto.similarProducts)
           ? createProductDto.similarProducts
-          : [], // Если не массив, передаем пустой массив
+          : [],
         images: imageData,
       };
 
-      // Создаем продукт
       const product = this.productRepository.create(productData);
-
-      // Сохраняем продукт в базе данных
       const savedProduct = await this.productRepository.save(product);
       console.log('Created product:', savedProduct);
       return savedProduct;
@@ -135,23 +130,20 @@ export class ProductService {
     }
   }
 
-  async findAllPag(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.productRepository.findAndCount({
-      skip,
-      take: limit,
-      relations: ['attributes'],
-    });
-
-    console.log(`Found ${total} products, page ${page}, limit ${limit}`); // Для отладки
-    return { data, total };
+  // Обновляем метод findAllPag для использования nestjs-paginate
+  async findAllPag(query: PaginateQuery): Promise<Paginated<Product>> {
+    return paginate<Product>(
+      query,
+      this.productRepository,
+      productPaginateConfig,
+    );
   }
 
   async findAll(): Promise<Product[]> {
     const products = await this.productRepository.find({
       relations: ['attributes'],
     });
-    console.log(`Found ${products.length} products`); // Для отладки
+    console.log(`Found ${products.length} products`);
     return products;
   }
 
@@ -163,7 +155,7 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException(`Продукт с ID ${id} не найден`);
     }
-    console.log(`Found product with ID ${id}:`, product); // Для отладки
+    console.log(`Found product with ID ${id}:`, product);
     return product;
   }
 
@@ -182,14 +174,12 @@ export class ProductService {
         throw new NotFoundException(`Продукт с ID ${id} не найден`);
       }
 
-      // Удаляем старые изображения из ImgBB, если загружены новые
       if (files.length > 0 && product.images && product.images.length > 0) {
         for (const image of product.images) {
           await this.deleteFromImgBB(image.deleteHash);
         }
       }
 
-      // Загружаем новые изображения в ImgBB
       const newImageData: { url: string; deleteHash: string }[] = [];
       if (files.length > 0) {
         for (const file of files) {
@@ -198,13 +188,12 @@ export class ProductService {
         }
       }
 
-      // Обновляем продукт
       manager.merge(Product, product, {
         ...updateProductDto,
         images: newImageData.length > 0 ? newImageData : product.images,
       });
       const updatedProduct = await manager.save(product);
-      console.log(`Updated product with ID ${id}:`, updatedProduct); // Для отладки
+      console.log(`Updated product with ID ${id}:`, updatedProduct);
       return updatedProduct;
     });
   }
@@ -215,7 +204,6 @@ export class ProductService {
       throw new NotFoundException(`Продукт с ID ${id} не найден`);
     }
 
-    // Удаляем связанные изображения из ImgBB
     if (product.images && product.images.length > 0) {
       for (const image of product.images) {
         await this.deleteFromImgBB(image.deleteHash);
@@ -226,6 +214,6 @@ export class ProductService {
     if (result.affected === 0) {
       throw new NotFoundException(`Продукт с ID ${id} не найден`);
     }
-    console.log(`Deleted product with ID ${id}`); // Для отладки
+    console.log(`Deleted product with ID ${id}`);
   }
 }
