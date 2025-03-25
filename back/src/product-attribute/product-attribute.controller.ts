@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ProductAttributeService } from './product-attribute.service';
@@ -19,20 +18,16 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { ProductAttribute } from './entities/product-attribute.entity';
-
-interface PaginationResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { PaginatedSwaggerDocs } from 'nestjs-paginate';
+import { productAttributePaginateConfig } from '../config/pagination.config';
+import { ProductAttributeDto } from './dto/product-attribute.dto';
 
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
@@ -56,52 +51,18 @@ export class ProductAttributeController {
     return this.productAttributeService.create(createProductAttributeDto);
   }
 
-  @ApiOperation({ summary: 'Get all product-attribute links ' })
+  @ApiOperation({ summary: 'Get all product-attribute links' })
   @ApiResponse({
     status: 200,
-    description: 'List of all product-attribute links ',
-    schema: {
-      properties: {
-        data: {
-          type: 'array',
-          items: { $ref: '#/components/schemas/ProductAttribute' },
-        },
-        total: { type: 'number', description: 'Загальна кількість зв’язків' },
-        page: { type: 'number', description: 'Поточна сторінка' },
-        limit: { type: 'number', description: 'Кількість записів на сторінку' },
-      },
-    },
+    description: 'List of all product-attribute links',
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Номер сторінки',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Кількість записів на сторінку',
-  })
+  @PaginatedSwaggerDocs(ProductAttributeDto, productAttributePaginateConfig)
   @Get()
   @Roles(Role.User, Role.Admin)
   async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<PaginationResponse<ProductAttribute>> {
-    const { data, total } = await this.productAttributeService.findAllPag(
-      page,
-      limit,
-    );
-    return {
-      data,
-      total,
-      page,
-      limit,
-    };
+    @Paginate() query: PaginateQuery,
+  ): Promise<Paginated<ProductAttribute>> {
+    return this.productAttributeService.findAllPag(query);
   }
 
   @ApiOperation({ summary: 'Get a product-attribute link by ID' })
