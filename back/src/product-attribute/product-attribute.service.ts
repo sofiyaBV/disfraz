@@ -5,6 +5,8 @@ import { CreateProductAttributeDto } from './dto/create-product-attribute.dto';
 import { ProductAttribute } from './entities/product-attribute.entity';
 import { Product } from '../product/entities/product.entity';
 import { Attribute } from '../attribute/entities/attribute.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { productAttributePaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class ProductAttributeService {
@@ -37,15 +39,12 @@ export class ProductAttributeService {
     return this.productAttributeRepository.save(productAttribute);
   }
 
-  async findAllPag(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.productAttributeRepository.findAndCount({
-      skip,
-      take: limit,
-      relations: ['product', 'attribute'], // Завантажуємо пов’язані сутності
-    });
-
-    return { data, total };
+  async findAllPag(query: PaginateQuery): Promise<Paginated<ProductAttribute>> {
+    return paginate<ProductAttribute>(
+      query,
+      this.productAttributeRepository,
+      productAttributePaginateConfig,
+    );
   }
 
   async findAll(): Promise<ProductAttribute[]> {

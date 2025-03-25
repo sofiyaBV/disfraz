@@ -5,6 +5,8 @@ import { CreateCartDto } from './dto/create-cart.dto';
 import { Cart } from './entities/cart.entity';
 import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
 import { User } from '../user/entities/user.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { cartPaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class CartService {
@@ -39,20 +41,8 @@ export class CartService {
     return this.cartRepository.save(cart);
   }
 
-  async findAllPag(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.cartRepository.findAndCount({
-      skip,
-      take: limit,
-      relations: [
-        'productAttribute',
-        'productAttribute.product',
-        'productAttribute.attribute',
-        'user',
-      ], // Завантажуємо пов’язані сутності
-    });
-
-    return { data, total };
+  async findAllPag(query: PaginateQuery): Promise<Paginated<Cart>> {
+    return paginate<Cart>(query, this.cartRepository, cartPaginateConfig);
   }
 
   async findAll(): Promise<Cart[]> {

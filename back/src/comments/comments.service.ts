@@ -6,6 +6,8 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
 import { User } from '../user/entities/user.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { commentPaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class CommentsService {
@@ -24,9 +26,10 @@ export class CommentsService {
   ): Promise<Comment> {
     const { productAttributeId, content } = createCommentDto;
 
-    const productAttribute = await this.productAttributeRepository.findOneOrFail({
-      where: { id: productAttributeId },
-    });
+    const productAttribute =
+      await this.productAttributeRepository.findOneOrFail({
+        where: { id: productAttributeId },
+      });
 
     const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
@@ -42,15 +45,12 @@ export class CommentsService {
     return await this.commentRepository.save(comment);
   }
 
-  async findAllPag(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.commentRepository.findAndCount({
-      skip,
-      take: limit,
-      relations: ['productAttribute', 'user'], // Завантажуємо пов’язані сутності
-    });
-
-    return { data, total };
+  async findAllPag(query: PaginateQuery): Promise<Paginated<Comment>> {
+    return paginate<Comment>(
+      query,
+      this.commentRepository,
+      commentPaginateConfig,
+    );
   }
 
   async findAll(): Promise<Comment[]> {

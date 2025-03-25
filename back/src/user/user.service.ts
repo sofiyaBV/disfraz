@@ -7,6 +7,8 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { userPaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class UserService {
@@ -87,14 +89,8 @@ export class UserService {
     await this.userRepository.delete(id);
   }
 
-  async findAllPag(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.userRepository.findAndCount({
-      skip,
-      take: limit,
-    });
-
-    return { data, total };
+  async findAllPag(query: PaginateQuery): Promise<Paginated<User>> {
+    return paginate<User>(query, this.userRepository, userPaginateConfig);
   }
 
   findAll(): Promise<User[]> {

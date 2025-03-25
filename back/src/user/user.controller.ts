@@ -1,13 +1,11 @@
 import {
   Body,
   Controller,
-  Delete, // Добавляем Delete
+  Delete,
   Get,
   Param,
   Patch,
   Post,
-  Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -15,7 +13,6 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -27,18 +24,15 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
-
-interface PaginationResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { PaginatedSwaggerDocs } from 'nestjs-paginate';
+import { userPaginateConfig } from '../config/pagination.config';
+import { UserDto } from './dto/user.dto';
 
 @ApiTags('User')
 @Controller('user')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard('jwt'), RolesGuard)
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -50,7 +44,7 @@ export class UserController {
   })
   @ApiBody({ type: CreateAdminDto })
   @Post()
-  // @Roles(Role.Admin)
+  @Roles(Role.Admin)
   create(@Body() createAdminDto: CreateAdminDto): Promise<User> {
     return this.userService.createAdmin(createAdminDto);
   }
@@ -91,48 +85,12 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'List of all users',
-    schema: {
-      properties: {
-        data: { type: 'array', items: { $ref: '#/components/schemas/User' } },
-        total: {
-          type: 'number',
-          description: 'Общее количество пользователей',
-        },
-        page: { type: 'number', description: 'Текущая страница' },
-        limit: {
-          type: 'number',
-          description: 'Количество записей на страницу',
-        },
-      },
-    },
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Номер страницы',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Количество записей на страницу',
-  })
+  @PaginatedSwaggerDocs(UserDto, userPaginateConfig)
   @Get()
   @Roles(Role.Admin)
-  async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<PaginationResponse<User>> {
-    const { data, total } = await this.userService.findAllPag(page, limit);
-    return {
-      data,
-      total,
-      page,
-      limit,
-    };
+  async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<User>> {
+    return this.userService.findAllPag(query);
   }
 
   @ApiOperation({ summary: 'Get a user by ID' })

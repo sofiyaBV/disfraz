@@ -19,8 +19,8 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
-  ApiQuery,
   ApiConsumes,
+  ApiOkResponse, // Для Swagger-документации
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -34,13 +34,9 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
-
-interface PaginationResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate'; // Импортируем для пагинации
+import { PaginatedSwaggerDocs } from 'nestjs-paginate'; // Для Swagger-документации
+import { productPaginateConfig } from '../config/pagination.config'; // Импортируем конфигурацию
 
 @ApiTags('Products')
 @Controller('products')
@@ -90,19 +86,17 @@ export class ProductController {
   @Post()
   @Roles(Role.Admin)
   async create(
-    @Body() body: any, // Принимаем body как any, так как это multipart/form-data
+    @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
     console.log('Received body:', body);
     console.log('Uploaded files:', files);
 
-    // Преобразуем body в CreateProductDto
     const createProductDto = plainToClass(CreateProductDto, {
       ...body,
-      price: body.price ? parseFloat(body.price) : undefined, // Преобразуем price в число
+      price: body.price ? parseFloat(body.price) : undefined,
     });
 
-    // Валидируем DTO
     const errors = await validate(createProductDto);
     if (errors.length > 0) {
       throw new BadRequestException(
@@ -118,45 +112,14 @@ export class ProductController {
   @ApiResponse({
     status: 200,
     description: 'List of all products',
-    schema: {
-      properties: {
-        data: {
-          type: 'array',
-          items: { $ref: '#/components/schemas/Product' },
-        },
-        total: { type: 'number', description: 'Загальна кількість продуктів' },
-        page: { type: 'number', description: 'Поточна сторінка' },
-        limit: { type: 'number', description: 'Кількість записів на сторінку' },
-      },
-    },
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Номер сторінки',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Кількість записів на сторінку',
-  })
+  @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig) // Добавляем Swagger-документацию для пагинации
   @Get()
   @Roles(Role.User, Role.Admin)
   async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<PaginationResponse<Product>> {
-    const { data, total } = await this.productService.findAllPag(page, limit);
-    return {
-      data,
-      total,
-      page,
-      limit,
-    };
+    @Paginate() query: PaginateQuery, // Используем декоратор Paginate для получения параметров пагинации
+  ): Promise<Paginated<Product>> {
+    return this.productService.findAllPag(query); // Вызываем обновленный метод
   }
 
   @ApiOperation({ summary: 'Get a product by ID' })
