@@ -7,7 +7,6 @@ import {
   Patch,
   Delete,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -16,7 +15,6 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -27,13 +25,9 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 import { User } from '../auth/decorators/user.decorator';
-
-interface PaginationResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { PaginatedSwaggerDocs } from 'nestjs-paginate';
+import { commentPaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -55,49 +49,16 @@ export class CommentsController {
     return this.commentsService.create(createCommentDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все комментарии ' })
+  @ApiOperation({ summary: 'Получить все комментарии' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех комментариев ',
-    schema: {
-      properties: {
-        data: {
-          type: 'array',
-          items: { $ref: '#/components/schemas/Comment' },
-        },
-        total: { type: 'number', description: 'Загальна кількість коментарів' },
-        page: { type: 'number', description: 'Поточна сторінка' },
-        limit: { type: 'number', description: 'Кількість записів на сторінку' },
-      },
-    },
+    description: 'Список всех комментариев',
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Номер сторінки',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Кількість записів на сторінку',
-  })
+  @PaginatedSwaggerDocs(CreateCommentDto, commentPaginateConfig)
   @Get()
   @Roles(Role.Admin)
-  async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<PaginationResponse<Comment>> {
-    const { data, total } = await this.commentsService.findAllPag(page, limit);
-    return {
-      data,
-      total,
-      page,
-      limit,
-    };
+  async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Comment>> {
+    return this.commentsService.findAllPag(query);
   }
 
   @ApiOperation({ summary: 'Получить комментарий по ID' })

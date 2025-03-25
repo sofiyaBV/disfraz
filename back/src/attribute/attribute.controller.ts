@@ -8,7 +8,6 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
-  Query,
 } from '@nestjs/common';
 import { AttributesService } from './attribute.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
@@ -20,21 +19,15 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Attribute } from './entities/attribute.entity';
-
-// Додаємо інтерфейс для відповіді з пагинацією
-interface PaginationResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { PaginatedSwaggerDocs } from 'nestjs-paginate';
+import { attributePaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Attributes')
 @Controller('attributes')
@@ -63,48 +56,14 @@ export class AttributesController {
   @ApiResponse({
     status: 200,
     description: 'List of all attributes',
-    schema: {
-      properties: {
-        data: {
-          type: 'array',
-          items: { $ref: '#/components/schemas/Attribute' },
-        },
-        total: { type: 'number', description: 'Загальна кількість атрибутів' },
-        page: { type: 'number', description: 'Поточна сторінка' },
-        limit: { type: 'number', description: 'Кількість записів на сторінку' },
-      },
-    },
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Номер сторінки',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Кількість записів на сторінку',
-  })
+  @PaginatedSwaggerDocs(CreateAttributeDto, attributePaginateConfig)
   @Get()
   @Roles(Role.User, Role.Admin)
   async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<PaginationResponse<Attribute>> {
-    const { data, total } = await this.attributesService.findAllPag(
-      page,
-      limit,
-    );
-    return {
-      data,
-      total,
-      page,
-      limit,
-    };
+    @Paginate() query: PaginateQuery,
+  ): Promise<Paginated<Attribute>> {
+    return this.attributesService.findAllPag(query);
   }
 
   @ApiOperation({ summary: 'Get an attribute by ID' })

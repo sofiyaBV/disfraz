@@ -5,6 +5,8 @@ import { Attribute } from './entities/attribute.entity';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { Product } from '../product/entities/product.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { attributePaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class AttributesService {
@@ -21,15 +23,12 @@ export class AttributesService {
     return this.attributeRepository.save(attribute);
   }
 
-  async findAllPag(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.attributeRepository.findAndCount({
-      skip,
-      take: limit,
-      relations: ['products'],
-    });
-
-    return { data, total };
+  async findAllPag(query: PaginateQuery): Promise<Paginated<Attribute>> {
+    return paginate<Attribute>(
+      query,
+      this.attributeRepository,
+      attributePaginateConfig,
+    );
   }
 
   async findAll(): Promise<Attribute[]> {

@@ -6,6 +6,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { Cart } from '../cart/entities/cart.entity';
 import { User } from '../user/entities/user.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { orderPaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class OrderService {
@@ -47,7 +49,7 @@ export class OrderService {
         cartId: cart.id,
         user,
         createdAt: new Date(),
-        status: createOrderDto.status || 'Pending', // Устанавливаем статус из DTO или по умолчанию
+        status: createOrderDto.status || 'Pending',
       });
 
       const savedOrder = await this.orderRepository.save(order);
@@ -57,15 +59,8 @@ export class OrderService {
     return createdOrders;
   }
 
-  async findAllWithPagination(page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await this.orderRepository.findAndCount({
-      skip,
-      take: limit,
-      relations: ['cart', 'user'],
-    });
-
-    return { data, total };
+  async findAllWithPagination(query: PaginateQuery): Promise<Paginated<Order>> {
+    return paginate<Order>(query, this.orderRepository, orderPaginateConfig);
   }
 
   async findAll(): Promise<Order[]> {
@@ -84,10 +79,8 @@ export class OrderService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    // Проверяем, существует ли заказ
     const order = await this.findOne(id);
 
-    // Если обновляется cartId, проверяем, существует ли корзина
     if (updateOrderDto.cartId) {
       const cart = await this.cartRepository.findOne({
         where: { id: updateOrderDto.cartId },
