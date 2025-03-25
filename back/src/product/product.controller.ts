@@ -113,7 +113,7 @@ export class ProductController {
     status: 200,
     description: 'List of all products',
   })
-  @PaginatedSwaggerDocs(Product, productPaginateConfig) // Добавляем Swagger-документацию для пагинации
+  @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig) // Добавляем Swagger-документацию для пагинации
   @Get()
   @Roles(Role.User, Role.Admin)
   async findAll(
