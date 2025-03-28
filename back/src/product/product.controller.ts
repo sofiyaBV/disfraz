@@ -68,7 +68,7 @@ export class ProductController {
           example: 'Костюм для косплею',
           description: 'Опис товару',
         },
-        similarProducts: {
+        similarProductIds: {
           type: 'array',
           items: { type: 'integer' },
           example: [5, 7],
