@@ -8,8 +8,8 @@ import { Attribute } from '../attribute/entities/attribute.entity';
 import axios, { AxiosError } from 'axios';
 import * as sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
-import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate'; // Импортируем необходимые утилиты
-import { productPaginateConfig } from '../config/pagination.config'; // Импортируем конфигурацию
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { productPaginateConfig } from '../config/pagination.config';
 
 // Интерфейс для ответа от ImgBB API
 interface ImgBBResponse {
@@ -39,7 +39,6 @@ export class ProductService {
     }
   }
 
-  // Метод для сжатия и загрузки изображения в ImgBB
   async uploadToImgBB(
     file: Express.Multer.File,
   ): Promise<{ url: string; deleteHash: string }> {
@@ -78,7 +77,6 @@ export class ProductService {
     }
   }
 
-  // Метод для удаления изображения из ImgBB
   async deleteFromImgBB(deleteHash: string): Promise<void> {
     try {
       await axios.get(`https://api.imgbb.com/1/delete/${deleteHash}`);
@@ -101,17 +99,38 @@ export class ProductService {
     const imageData: { url: string; deleteHash: string }[] = [];
 
     try {
+      // Загружаем изображения
       for (const file of files) {
         const { url, deleteHash } = await this.uploadToImgBB(file);
         imageData.push({ url, deleteHash });
       }
 
+      // Находим похожие продукты по их ID, если они указаны
+      let similarProducts: Product[] = [];
+      if (createProductDto.similarProductIds?.length > 0) {
+        similarProducts = await this.productRepository.find({
+          where: createProductDto.similarProductIds.map((id) => ({ id })),
+        });
+
+        // Проверяем, что все указанные ID существуют
+        const foundIds = similarProducts.map((p) => p.id);
+        const missingIds = createProductDto.similarProductIds.filter(
+          (id) => !foundIds.includes(id),
+        );
+        if (missingIds.length > 0) {
+          throw new NotFoundException(
+            `Продукты с ID ${missingIds.join(', ')} не найдены`,
+          );
+        }
+      }
+
+      // Создаем продукт
       const productData = {
-        ...createProductDto,
-        similarProducts: Array.isArray(createProductDto.similarProducts)
-          ? createProductDto.similarProducts
-          : [],
+        name: createProductDto.name,
+        price: createProductDto.price,
+        description: createProductDto.description,
         images: imageData,
+        similarProducts, // Если similarProductIds не указано, будет пустой массив
       };
 
       const product = this.productRepository.create(productData);
@@ -130,7 +149,6 @@ export class ProductService {
     }
   }
 
-  // Обновляем метод findAllPag для использования nestjs-paginate
   async findAllPag(query: PaginateQuery): Promise<Paginated<Product>> {
     return paginate<Product>(
       query,
@@ -141,7 +159,7 @@ export class ProductService {
 
   async findAll(): Promise<Product[]> {
     const products = await this.productRepository.find({
-      relations: ['attributes'],
+      relations: ['attributes', 'similarProducts'],
     });
     console.log(`Found ${products.length} products`);
     return products;
@@ -150,7 +168,7 @@ export class ProductService {
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['attributes'],
+      relations: ['attributes', 'similarProducts'],
     });
     if (!product) {
       throw new NotFoundException(`Продукт с ID ${id} не найден`);
@@ -167,7 +185,7 @@ export class ProductService {
     return this.entityManager.transaction(async (manager) => {
       const product = await manager.findOne(Product, {
         where: { id },
-        relations: ['attributes'],
+        relations: ['attributes', 'similarProducts'],
       });
 
       if (!product) {
@@ -188,10 +206,30 @@ export class ProductService {
         }
       }
 
+      // Обновляем похожие продукты, если переданы новые ID
+      if (updateProductDto.similarProductIds) {
+        const similarProducts = await this.productRepository.find({
+          where: updateProductDto.similarProductIds.map((id) => ({ id })),
+        });
+
+        const foundIds = similarProducts.map((p) => p.id);
+        const missingIds = updateProductDto.similarProductIds.filter(
+          (id) => !foundIds.includes(id),
+        );
+        if (missingIds.length > 0) {
+          throw new NotFoundException(
+            `Продукты с ID ${missingIds.join(', ')} не найдены`,
+          );
+        }
+
+        product.similarProducts = similarProducts;
+      }
+
       manager.merge(Product, product, {
         ...updateProductDto,
         images: newImageData.length > 0 ? newImageData : product.images,
       });
+
       const updatedProduct = await manager.save(product);
       console.log(`Updated product with ID ${id}:`, updatedProduct);
       return updatedProduct;
