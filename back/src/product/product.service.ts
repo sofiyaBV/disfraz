@@ -106,11 +106,21 @@ export class ProductService {
         imageData.push({ url, deleteHash });
       }
 
+      const similarProducts = Array.isArray(createProductDto.similarProducts)
+        ? await Promise.all(
+            createProductDto.similarProducts.map(async (id) => {
+              const product = await this.productRepository.findOne({ where: { id } });
+              if (!product) {
+                throw new NotFoundException(`Продукт с ID ${id} не найден`);
+              }
+              return product;
+            }),
+          )
+        : [];
+
       const productData = {
         ...createProductDto,
-        similarProducts: Array.isArray(createProductDto.similarProducts)
-          ? createProductDto.similarProducts
-          : [],
+        similarProducts,
         images: imageData,
       };
 

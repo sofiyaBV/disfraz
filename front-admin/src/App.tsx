@@ -7,12 +7,20 @@ import { dataProvider } from "./dataProvider";
 import { UserCreate, UserEdit, UserList, UserShow } from "./pages/users/users";
 import {authProvider} from "./authProvider.ts";
 import { ProductCreate, ProductEdit, ProductList, ProductShow } from "./pages/products/product.tsx";
+import { AttributeCreate, AttributeEdit, AttributeList, AttributeShow } from "./pages/attribute/attribute.tsx";
+import { OrderList, OrderEdit, OrderShow } from "./pages/order/order.tsx";
+import { CommentList, CommentEdit, CommentShow } from "./pages/comment/comment.tsx";
+import { ProductAttributeList, ProductAttributeEdit, ProductAttributeShow, ProductAttributeCreate } from "./pages/product_attribute/product-attribute.tsx";
 
 
 export const App = () => (
   <Admin layout={Layout} dataProvider={dataProvider} authProvider={authProvider}>
         <Resource name="user" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} />
         <Resource name="products" list={ProductList} edit={ProductEdit} show={ProductShow} create={ProductCreate}  />
+        <Resource name="attribute" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate}  />
+        <Resource name="comment" list={CommentList} edit={CommentEdit} show={CommentShow} />
+        <Resource name="order" list={OrderList} edit={OrderEdit} show={OrderShow} />
+        <Resource name="product_attribute" list={ProductAttributeList} edit={ProductAttributeEdit} show={ProductAttributeShow} create={ProductAttributeCreate}/>
 
   </Admin>
   
