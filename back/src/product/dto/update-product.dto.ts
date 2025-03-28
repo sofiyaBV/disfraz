@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsInt,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
@@ -30,4 +36,22 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString({ message: 'Опис товару повинен бути рядком' })
   description?: string;
+
+  @ApiProperty({
+    example: [5, 7],
+    description: 'Список ID схожих товарів (опціонально)',
+    required: false,
+  })
+  @IsOptional()
+  @IsArray({ message: 'Список схожих товарів повинен бути масивом' })
+  @IsInt({
+    each: true,
+    message: 'Кожен ID схожого товару повинен бути цілим числом',
+  })
+  @Transform(
+    ({ value }) =>
+      typeof value === 'string' ? value.split(',').map(Number) : value,
+    { toClassOnly: true },
+  )
+  similarProductIds?: number[];
 }
