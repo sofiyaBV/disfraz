@@ -1,36 +1,52 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsArray, IsInt } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsArray } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
-  @ApiProperty({ example: 'Костюм супергероя', description: 'Назва товару' })
-  @IsString({ message: 'Назва товару повинна бути рядком' })
+  @IsString()
+  @ApiProperty({
+    example: 'Костюм супергероя',
+    description: 'Назва товару',
+  })
   name: string;
 
-  @ApiProperty({ example: 199.99, description: 'Ціна товару' })
-  @IsNumber({}, { message: 'Ціна товару повинна бути числом' })
-  @Transform(({ value }) => (value ? parseFloat(value) : undefined), {
-    toClassOnly: true,
+  @IsNumber()
+  @ApiProperty({
+    example: 199.99,
+    description: 'Ціна товару',
   })
   price: number;
 
-  @ApiProperty({ example: 'Костюм для косплею', description: 'Опис товару' })
-  @IsString({ message: 'Опис товару повинен бути рядком' })
-  description: string;
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({
+    example: 'Костюм для косплею',
+    description: 'Опис товару',
+  })
+  description?: string;
 
-  @ApiProperty({
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  @Transform(({ value }) => {
+    // Если значение - строка, преобразуем её в массив чисел
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => parseInt(item.trim(), 10))
+        .filter((item) => !isNaN(item));
+    }
+    // Если значение уже массив, преобразуем элементы в числа
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => parseInt(item, 10))
+        .filter((item) => !isNaN(item));
+    }
+    return value;
+  })
+  @ApiPropertyOptional({
     example: [5, 7],
     description: 'Список ID схожих товарів',
   })
-  @IsArray({ message: 'Список схожих товарів повинен бути масивом' })
-  @IsInt({
-    each: true,
-    message: 'Кожен ID схожого товару повинен бути цілим числом',
-  })
-  @Transform(
-    ({ value }) =>
-      typeof value === 'string' ? value.split(',').map(Number) : value,
-    { toClassOnly: true },
-  )
-  similarProducts: number[];
+  similarProductIds?: number[];
 }

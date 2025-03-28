@@ -15,14 +15,13 @@ export const productPaginateConfig: PaginateConfig<Product> = {
   filterableColumns: {
     price: [FilterOperator.GTE, FilterOperator.LTE],
     name: [FilterOperator.EQ, FilterOperator.ILIKE],
-    similarProducts: [FilterOperator.CONTAINS],
     'attributes.name': [FilterOperator.EQ],
   },
-  relations: ['attributes'],
+  relations: ['attributes', 'similarProducts'], // Добавляем similarProducts
   defaultSortBy: [['id', 'DESC']],
   maxLimit: 100,
   defaultLimit: 10,
-  select: ['id', 'name', 'price', 'description', 'similarProducts'],
+  select: ['id', 'name', 'price', 'description', 'images'],
   nullSort: 'last',
 };
 
