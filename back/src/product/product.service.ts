@@ -10,8 +10,6 @@ import * as sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
 import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
-import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
-import { productPaginateConfig } from '../config/pagination.config';
 
 // Интерфейс для ответа от ImgBB API
 interface ImgBBResponse {
@@ -132,11 +130,7 @@ export class ProductService {
         name: createProductDto.name,
         price: createProductDto.price,
         description: createProductDto.description,
-        name: createProductDto.name,
-        price: createProductDto.price,
-        description: createProductDto.description,
         images: imageData,
-        similarProducts, // Если similarProductIds не указано, будет пустой массив
         similarProducts, // Если similarProductIds не указано, будет пустой массив
       };
 
@@ -167,7 +161,6 @@ export class ProductService {
   async findAll(): Promise<Product[]> {
     const products = await this.productRepository.find({
       relations: ['attributes', 'similarProducts'],
-      relations: ['attributes', 'similarProducts'],
     });
     console.log(`Found ${products.length} products`);
     return products;
@@ -176,7 +169,6 @@ export class ProductService {
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
-      relations: ['attributes', 'similarProducts'],
       relations: ['attributes', 'similarProducts'],
     });
     if (!product) {
@@ -194,7 +186,6 @@ export class ProductService {
     return this.entityManager.transaction(async (manager) => {
       const product = await manager.findOne(Product, {
         where: { id },
-        relations: ['attributes', 'similarProducts'],
         relations: ['attributes', 'similarProducts'],
       });
 
