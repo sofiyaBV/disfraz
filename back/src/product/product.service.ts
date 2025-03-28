@@ -10,6 +10,8 @@ import * as sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
 import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { productPaginateConfig } from '../config/pagination.config';
 
 // Интерфейс для ответа от ImgBB API
 interface ImgBBResponse {
@@ -100,6 +102,7 @@ export class ProductService {
 
     try {
       // Загружаем изображения
+      // Загружаем изображения
       for (const file of files) {
         const { url, deleteHash } = await this.uploadToImgBB(file);
         imageData.push({ url, deleteHash });
@@ -129,7 +132,11 @@ export class ProductService {
         name: createProductDto.name,
         price: createProductDto.price,
         description: createProductDto.description,
+        name: createProductDto.name,
+        price: createProductDto.price,
+        description: createProductDto.description,
         images: imageData,
+        similarProducts, // Если similarProductIds не указано, будет пустой массив
         similarProducts, // Если similarProductIds не указано, будет пустой массив
       };
 
@@ -160,6 +167,7 @@ export class ProductService {
   async findAll(): Promise<Product[]> {
     const products = await this.productRepository.find({
       relations: ['attributes', 'similarProducts'],
+      relations: ['attributes', 'similarProducts'],
     });
     console.log(`Found ${products.length} products`);
     return products;
@@ -168,6 +176,7 @@ export class ProductService {
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { id },
+      relations: ['attributes', 'similarProducts'],
       relations: ['attributes', 'similarProducts'],
     });
     if (!product) {
@@ -185,6 +194,7 @@ export class ProductService {
     return this.entityManager.transaction(async (manager) => {
       const product = await manager.findOne(Product, {
         where: { id },
+        relations: ['attributes', 'similarProducts'],
         relations: ['attributes', 'similarProducts'],
       });
 
@@ -225,10 +235,30 @@ export class ProductService {
         product.similarProducts = similarProducts;
       }
 
+      // Обновляем похожие продукты, если переданы новые ID
+      if (updateProductDto.similarProductIds) {
+        const similarProducts = await this.productRepository.find({
+          where: updateProductDto.similarProductIds.map((id) => ({ id })),
+        });
+
+        const foundIds = similarProducts.map((p) => p.id);
+        const missingIds = updateProductDto.similarProductIds.filter(
+          (id) => !foundIds.includes(id),
+        );
+        if (missingIds.length > 0) {
+          throw new NotFoundException(
+            `Продукты с ID ${missingIds.join(', ')} не найдены`,
+          );
+        }
+
+        product.similarProducts = similarProducts;
+      }
+
       manager.merge(Product, product, {
         ...updateProductDto,
         images: newImageData.length > 0 ? newImageData : product.images,
       });
+
 
       const updatedProduct = await manager.save(product);
       console.log(`Updated product with ID ${id}:`, updatedProduct);
