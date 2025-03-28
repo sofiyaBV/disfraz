@@ -104,7 +104,6 @@ export class ProductService {
         const { url, deleteHash } = await this.uploadToImgBB(file);
         imageData.push({ url, deleteHash });
       }
-
       // Находим похожие продукты по их ID, если они указаны
       let similarProducts: Product[] = [];
       if (createProductDto.similarProductIds?.length > 0) {
