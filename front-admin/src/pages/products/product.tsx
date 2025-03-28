@@ -28,13 +28,13 @@ export const ProductEdit = () => (
                     <TextInput source="price" />
                     <TextInput source="description" />
                     <ImageInput source="images" multiple />
-                    <SelectInput
+                    <SelectInput  // выбор похожих товаров из выпадающего списка
                         source="similarProducts"
                         label="Похожие товары"
-                        // choices={productChoices}
+                        // choices={productChoices} //список товаров
                         optionValue="id"
                         multiline
-                        // filter={(value, choice) => choice.id.toString().includes(value)}
+                        // filter={(value, choice) => choice.id.toString().includes(value)} //фильтр
                     />
                 </SimpleForm>
             </Edit>
@@ -59,12 +59,12 @@ export const ProductCreate = () => (
                     <TextInput source="price" />
                     <TextInput source="description" />
                     <ImageInput source="images" multiple />
-                    <AutocompleteInput
+                    <AutocompleteInput // выбор похожих товаров из выпадающего списка
                         source="similarProducts"
                         label="Похожие товары"
-                        // choices={productChoices}
+                        // choices={productChoices} //список товаров
                         optionValue="id"
-                        // filter={(value, choice) => choice.id.toString().includes(value)}
+                        // filter={(value, choice) => choice.id.toString().includes(value)} //фильтр
                         multiple
                     />
                 </SimpleForm>
