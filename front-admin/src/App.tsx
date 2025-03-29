@@ -17,10 +17,10 @@ export const App = () => (
   <Admin layout={Layout} dataProvider={dataProvider} authProvider={authProvider}>
         <Resource name="user" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} />
         <Resource name="products" list={ProductList} edit={ProductEdit} show={ProductShow} create={ProductCreate}  />
-        <Resource name="attribute" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate}  />
-        <Resource name="comment" list={CommentList} edit={CommentEdit} show={CommentShow} />
-        <Resource name="order" list={OrderList} edit={OrderEdit} show={OrderShow} />
-        <Resource name="product_attribute" list={ProductAttributeList} edit={ProductAttributeEdit} show={ProductAttributeShow} create={ProductAttributeCreate}/>
+        <Resource name="attributes" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate}  />
+        <Resource name="comments" list={CommentList} edit={CommentEdit} show={CommentShow} />
+        <Resource name="orders" list={OrderList} edit={OrderEdit} show={OrderShow} />
+        <Resource name="product-attribute" list={ProductAttributeList} edit={ProductAttributeEdit} show={ProductAttributeShow} create={ProductAttributeCreate}/>
 
   </Admin>
   
