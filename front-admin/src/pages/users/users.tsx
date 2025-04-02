@@ -1,4 +1,4 @@
-import { Create, Datagrid, Edit, EditButton, EmailField, List, Show, SimpleForm, TextField, TextInput } from "react-admin";
+import { Create, Datagrid, DateField, Edit, EditButton, EmailField, List, PasswordInput, required, Show, SimpleForm, SimpleShowLayout, TextField, TextInput } from "react-admin";
 
 const userFilters = [
     <TextInput source="q" label="Search" alwaysOn />,//Поле для поиска
@@ -8,8 +8,8 @@ export const UserList = () => (
     <List filters={userFilters}>
         <Datagrid rowClick = "show">
             <TextField source="id" />
-            <EmailField source="email" />
-            <TextField source="phone" />
+            <EmailField label="Пошта" source="email" />
+            <TextField label="Номер телефону" source="phone" />
             <EditButton />
         </Datagrid>
     </List>
@@ -18,31 +18,82 @@ export const UserList = () => (
 export const UserEdit = () => (
     <Edit>
         <SimpleForm>
-            <TextInput source="name" />
-            <TextInput source="username" />
-            <TextInput source="email" />
-            <TextInput source="phone" />
+        <TextInput
+                label="Пошта"
+                source="email"
+                validate={[
+                    (value) =>
+                        value && !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
+                        ? 'Невірний формат пошти'
+                        : undefined,
+                ]}
+            />
+
+        <TextInput
+            label="Номер телефону"
+            source="phone"
+            validate={[
+                (value) =>
+                value && value.length < 10 && value.length > 18
+                    ? 'Номер телефону повинен містити від 10 до 18 символів'
+                    : undefined,
+                (value) =>
+                value && !/^\+?[0-9]+$/.test(value)
+                    ? 'Невірний формат номера телефону'
+                    : undefined,
+            ]}
+        />
         </SimpleForm>
     </Edit>
 );
 
 export const UserShow = () => (
     <Show>
-        <SimpleForm>
-            <TextField source="id" />
-            <TextField source="name" />
-            <TextField source="username" />
-            <EmailField source="email" />
-            <TextField source="phone" />
-        </SimpleForm>
+        <SimpleShowLayout>
+            <TextField source="id" label="Ідентифікатор" />
+            <EmailField source="email" label="Електронна пошта" />
+            <TextField source="phone" label="Номер телефону" />
+            <DateField source="createdAt" label="Дата створення" showTime />
+            <DateField source="updatedAt" label="Дата оновлення" showTime />
+            <TextField source="roles" label="Роль" />
+        </SimpleShowLayout>
     </Show>
 );
 
 export const UserCreate = () => (
     <Create redirect="list">
         <SimpleForm>
-            <TextInput source="email" />
-            <TextInput source="password" />
+        <TextInput
+                label="Пошта"
+                source="email"
+                validate={[
+                    required('Пошта обов\'язкова'),
+                    (value) =>
+                        value && !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value)
+                        ? 'Невірний формат пошти'
+                        : undefined,
+                ]}
+            />
+
+        <TextInput
+            label="Номер телефону"
+            source="phone"
+            validate={[
+                (value) =>
+                value && value.length < 10 && value.length > 18
+                    ? 'Номер телефону повинен містити від 10 до 18 символів'
+                    : undefined,
+                (value) =>
+                value && !/^\+?[0-9]+$/.test(value)
+                    ? 'Невірний формат номера телефону'
+                    : undefined,
+            ]}
+        />
+        <PasswordInput
+            source="password"
+            validate={[required('Пароль обов\'язковий')]}
+        />
+        
         </SimpleForm>
     </Create>
 );
