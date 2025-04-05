@@ -1,12 +1,13 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-export class Migration1743186583163 implements MigrationInterface {
-  name = 'Migration1743186583163';
+
+export class Migration1743868231694 implements MigrationInterface {
+  name = 'Migration1743868231694';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Создание таблиц
     await queryRunner.query(
-      `CREATE TABLE "attribute" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "material" character varying(255), "size" character varying(255), "theme" character varying(255), "bodyPart" character varying(255), "isSet" boolean NOT NULL DEFAULT false, "additionalInfo" character varying(255), "inStock" character varying(255), "valueText" text, "valueNumber" numeric(10,2), CONSTRAINT "PK_b13fb7c5c9e9dff62b60e0de729" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "attribute" ("id" SERIAL NOT NULL, "material" character varying(255), "size" character varying(255), "theme" character varying(255), "bodyPart" character varying(255), "isSet" boolean NOT NULL DEFAULT false, "description" character varying(255), "inStock" character varying(255), CONSTRAINT "PK_b13fb7c5c9e9dff62b60e0de729" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "product" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "price" numeric(10,2) NOT NULL, "description" text, "images" jsonb, CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`,
@@ -32,6 +33,8 @@ export class Migration1743186583163 implements MigrationInterface {
     await queryRunner.query(
       `CREATE TABLE "product_similars" ("leftProductId" integer NOT NULL, "rightProductId" integer NOT NULL, CONSTRAINT "PK_c04f978d6b856f6ae68d9e88031" PRIMARY KEY ("leftProductId", "rightProductId"))`,
     );
+
+    // Создание индексов для product_similars
     await queryRunner.query(
       `CREATE INDEX "IDX_21f7cdbe36e1efaed64fe0d8ea" ON "product_similars" ("leftProductId")`,
     );
@@ -62,7 +65,6 @@ export class Migration1743186583163 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "comment" ADD CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e" FOREIGN KEY ("productAttributeId") REFERENCES "product_attribute"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
-
     await queryRunner.query(
       `ALTER TABLE "comment" ADD CONSTRAINT "FK_c0354a9a009d3bb45a08655ce3b" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
@@ -78,7 +80,6 @@ export class Migration1743186583163 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "cart" ADD CONSTRAINT "FK_756f53ab9466eb52a52619ee019" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
-
     await queryRunner.query(
       `ALTER TABLE "product_attribute" ADD CONSTRAINT "FK_c0d597555330c0a972122bf4673" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
@@ -91,40 +92,46 @@ export class Migration1743186583163 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "product_similars" ADD CONSTRAINT "FK_c08bfa57cca9873f9dba24d5bb7" FOREIGN KEY ("rightProductId") REFERENCES "product"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
     );
+
+    // Создание функции и триггера для обновления цены в корзине
     await queryRunner.query(`
-        CREATE OR REPLACE FUNCTION update_cart_price()
-        RETURNS TRIGGER AS $$
-        BEGIN
-            SELECT p.price INTO NEW.price
-            FROM public.product p
-            JOIN public.product_attribute pa ON p.id = pa."productId"
-            WHERE pa.id = NEW."productAttributeId";
-  
-            IF NEW.price IS NULL THEN
-                NEW.price = 0.0;
-            END IF;
-  
-            NEW.price = NEW.price * NEW.quantity;
-  
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-      `);
+      CREATE OR REPLACE FUNCTION update_cart_price()
+      RETURNS TRIGGER AS $$
+      BEGIN
+          SELECT p.price INTO NEW.price
+          FROM public.product p
+          JOIN public.product_attribute pa ON p.id = pa."productId"
+          WHERE pa.id = NEW."productAttributeId";
+
+          IF NEW.price IS NULL THEN
+              NEW.price = 0.0;
+          END IF;
+
+          NEW.price = NEW.price * NEW.quantity;
+
+          RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `);
 
     await queryRunner.query(`
-        CREATE TRIGGER trigger_update_cart_price
-        BEFORE INSERT OR UPDATE OF quantity ON public.cart
-        FOR EACH ROW
-        EXECUTE FUNCTION update_cart_price();
-      `);
+      CREATE TRIGGER trigger_update_cart_price
+      BEFORE INSERT OR UPDATE OF quantity ON public.cart
+      FOR EACH ROW
+      EXECUTE FUNCTION update_cart_price();
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Удаление внешних ключей
-
+    // Удаление триггера и функции
     await queryRunner.query(`
-        DROP TRIGGER IF EXISTS trigger_update_cart_price ON public.cart;
-      `);
+      DROP TRIGGER IF EXISTS trigger_update_cart_price ON public.cart;
+    `);
+    await queryRunner.query(`
+      DROP FUNCTION IF EXISTS update_cart_price;
+    `);
+
+    // Удаление внешних ключей
     await queryRunner.query(
       `ALTER TABLE "product_similars" DROP CONSTRAINT "FK_c08bfa57cca9873f9dba24d5bb7"`,
     );

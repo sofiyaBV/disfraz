@@ -45,15 +45,6 @@ export class Product {
   })
   images: { url: string; deleteHash: string }[];
 
-  // @Column({
-  //   type: 'integer',
-  //   array: true,
-  //   nullable: true,
-  //   name: 'similarproducts',
-  // })
-  // @ApiProperty({ example: [5, 7], description: 'Список ID схожих товарів' })
-  // similarProducts: number[];
-
   @ManyToMany(() => Product)
   @JoinTable({
     name: 'product_similars',
