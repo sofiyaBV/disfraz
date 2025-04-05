@@ -15,13 +15,12 @@ import { ProductAttributeList, ProductAttributeEdit, ProductAttributeShow, Produ
 
 export const App = () => (
   <Admin layout={Layout} dataProvider={dataProvider} authProvider={authProvider}>
-        <Resource name="user" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} />
-        <Resource name="products" list={ProductList} edit={ProductEdit} show={ProductShow} create={ProductCreate}  />
-        <Resource name="attributes" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate}  />
-        <Resource name="comments" list={CommentList} edit={CommentEdit} show={CommentShow} />
-        <Resource name="orders" list={OrderList} edit={OrderEdit} show={OrderShow} />
+        <Resource name="user" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} options={{label:"Користувачі"}}/>
+        <Resource name="products" list={ProductList} edit={ProductEdit} show={ProductShow} create={ProductCreate}  options={{label:"Продукти"}}/>
+        <Resource name="attributes" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate} options={{label:"Атрибути"}} />
+        <Resource name="comments" list={CommentList} edit={CommentEdit} show={CommentShow} options={{label:"Усі коментарі"}} />
+        <Resource name="orders" list={OrderList} edit={OrderEdit} show={OrderShow} options={{label:"Усі замовлення"}}/>
         <Resource name="product-attribute" list={ProductAttributeList} edit={ProductAttributeEdit} show={ProductAttributeShow} create={ProductAttributeCreate}/>
-
   </Admin>
   
 );
