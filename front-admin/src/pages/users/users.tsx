@@ -10,6 +10,7 @@ export const UserList = () => (
             <TextField source="id" />
             <EmailField label="Пошта" source="email" />
             <TextField label="Номер телефону" source="phone" />
+            <TextField label="Роль" source="roles" />
             <EditButton />
         </Datagrid>
     </List>
@@ -75,21 +76,8 @@ export const UserCreate = () => (
                 ]}
             />
 
-        <TextInput
-            label="Номер телефону"
-            source="phone"
-            validate={[
-                (value) =>
-                value && value.length < 10 && value.length > 18
-                    ? 'Номер телефону повинен містити від 10 до 18 символів'
-                    : undefined,
-                (value) =>
-                value && !/^\+?[0-9]+$/.test(value)
-                    ? 'Невірний формат номера телефону'
-                    : undefined,
-            ]}
-        />
         <PasswordInput
+            label="Пароль"
             source="password"
             validate={[required('Пароль обов\'язковий')]}
         />
