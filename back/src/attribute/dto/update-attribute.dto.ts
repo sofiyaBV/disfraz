@@ -11,15 +11,6 @@ import {
 export class UpdateAttributeDto {
   @ApiProperty({
     example: 'Шкіра',
-    description: 'Назва атрибута (опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsString({ message: 'Назва атрибута повинна бути рядком' })
-  name?: string;
-
-  @ApiProperty({
-    example: 'Шкіра',
     description: 'Значення для матеріалу (наприклад, «Шкіра», опціонально)',
     required: false,
   })
@@ -73,7 +64,7 @@ export class UpdateAttributeDto {
   })
   @IsOptional()
   @IsString({ message: 'Додаткова інформація повинна бути рядком' })
-  additionalInfo?: string;
+  description?: string;
 
   @ApiProperty({
     example: 'Доступний на складі',
@@ -84,34 +75,4 @@ export class UpdateAttributeDto {
   @IsOptional()
   @IsString({ message: 'Наявність повинна бути рядком' })
   inStock?: string;
-
-  @ApiProperty({
-    example: 'Матеріал шкіри високої якості, стійкий до зносу',
-    description:
-      'Текстове значення (наприклад, для матеріалу, розміру, тематики, додаткової інформації, опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsString({ message: 'Текстове значення повинно бути рядком' })
-  valueText?: string;
-
-  @ApiProperty({
-    example: 45.0,
-    description:
-      'Числове значення (наприклад, для ціни чи розміру, наприклад, розмір у см, опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber({}, { message: 'Числове значення повинно бути числом' })
-  valueNumber?: number;
-
-  @ApiProperty({
-    example: [1, 2],
-    description: 'Список ID продуктів, пов’язаних з атрибутом (опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsArray({ message: 'Список ID продуктів повинен бути масивом' })
-  @IsInt({ each: true, message: 'Кожен ID продукту повинен бути цілим числом' })
-  productIds?: number[];
 }

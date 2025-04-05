@@ -14,13 +14,6 @@ export class Attribute {
   @ApiProperty({ example: 1, description: 'Унікальний ідентифікатор атрибута' })
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  @ApiProperty({
-    example: 'Розмір',
-    description: 'Назва атрибута (наприклад, "Розмір", "Матеріал")',
-  })
-  name: string;
-
   @Column({ type: 'varchar', length: 255, nullable: true })
   @ApiPropertyOptional({ example: 'Шкіра', description: 'Матеріал атрибута' })
   material: string;
@@ -52,7 +45,7 @@ export class Attribute {
     example: 'Вага 1.5 кг',
     description: 'Додаткова інформація про атрибут',
   })
-  additionalInfo: string;
+  description: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   @ApiPropertyOptional({
@@ -60,20 +53,6 @@ export class Attribute {
     description: 'Наявність атрибута',
   })
   inStock: string;
-
-  @Column({ type: 'text', nullable: true })
-  @ApiPropertyOptional({
-    example: 'Додатковий опис',
-    description: 'Текстовий опис атрибута',
-  })
-  valueText?: string;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  @ApiPropertyOptional({
-    example: 1.5,
-    description: 'Числове значення атрибута (наприклад, вага чи ціна)',
-  })
-  valueNumber?: number;
 
   @ManyToMany(() => Product, (product) => product.attributes)
   @JoinTable({
