@@ -42,10 +42,22 @@ export class OrderService {
       (cart) => cart.productAttribute.id,
     );
 
+    // Суммируем quantity и price из всех записей корзины
+    const totalQuantity = cartItems.reduce(
+      (sum, cart) => sum + cart.quantity,
+      0,
+    );
+    const totalPrice = cartItems.reduce(
+      (sum, cart) => sum + Number(cart.price),
+      0,
+    );
+
     // Создаем один заказ
     const order = this.orderRepository.create({
       ...createOrderDto,
       productAttributeIds, // Массив ID атрибутов продуктов
+      quantity: totalQuantity, // Суммарное количество
+      price: totalPrice, // Суммарная стоимость
       user,
       createdAt: new Date(),
       status: createOrderDto.status || 'Pending',
