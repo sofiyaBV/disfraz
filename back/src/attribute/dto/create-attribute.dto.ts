@@ -4,13 +4,6 @@ import { IsString, IsBoolean, IsOptional, IsNumber } from 'class-validator';
 export class CreateAttributeDto {
   @ApiProperty({
     example: 'Шкіра',
-    description: 'Назва атрибута',
-  })
-  @IsString()
-  name: string;
-
-  @ApiProperty({
-    example: 'Шкіра',
     description: 'Значення для матеріалу (наприклад, «Шкіра»)',
     required: false,
   })
@@ -64,7 +57,7 @@ export class CreateAttributeDto {
   })
   @IsString()
   @IsOptional()
-  additionalInfo?: string;
+  description?: string;
 
   @ApiProperty({
     example: 'Доступний на складі',
@@ -74,22 +67,4 @@ export class CreateAttributeDto {
   @IsString()
   @IsOptional()
   inStock?: string;
-
-  @ApiProperty({
-    example: 'Матеріал шкіри високої якості, стійкий до зносу',
-    description:
-      'Текстове значення (наприклад, для матеріалу, розміру, тематики, додаткової інформації)',
-  })
-  @IsString()
-  @IsOptional()
-  valueText?: string;
-
-  @ApiProperty({
-    example: 45.0,
-    description:
-      'Числове значення (наприклад, для ціни чи розміру, наприклад, розмір у см)',
-  })
-  @IsNumber()
-  @IsOptional()
-  valueNumber?: number;
 }

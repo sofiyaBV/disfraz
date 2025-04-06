@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
@@ -9,38 +9,33 @@ import {
 import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Костюм супергероя',
     description: 'Назва товару (опціонально)',
-    required: false,
   })
   @IsOptional()
   @IsString({ message: 'Назва товару повинна бути рядком' })
   name?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 199.99,
     description: 'Ціна товару (опціонально)',
-    required: false,
   })
   @IsOptional()
   @IsNumber({}, { message: 'Ціна товару повинна бути числом' })
-  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   price?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Костюм для косплею',
     description: 'Опис товару (опціонально)',
-    required: false,
   })
   @IsOptional()
   @IsString({ message: 'Опис товару повинен бути рядком' })
   description?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: [5, 7],
     description: 'Список ID схожих товарів (опціонально)',
-    required: false,
   })
   @IsOptional()
   @IsArray({ message: 'Список схожих товарів повинен бути масивом' })
@@ -48,10 +43,21 @@ export class UpdateProductDto {
     each: true,
     message: 'Кожен ID схожого товару повинен бути цілим числом',
   })
-  @Transform(
-    ({ value }) =>
-      typeof value === 'string' ? value.split(',').map(Number) : value,
-    { toClassOnly: true },
-  )
+  @Transform(({ value }) => {
+    // Если значение - строка, преобразуем её в массив чисел
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => parseInt(item.trim(), 10))
+        .filter((item) => !isNaN(item));
+    }
+    // Если значение уже массив, преобразуем элементы в числа
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => parseInt(item, 10))
+        .filter((item) => !isNaN(item));
+    }
+    return value;
+  })
   similarProductIds?: number[];
 }

@@ -2,83 +2,95 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Cart } from '../../cart/entities/cart.entity';
 import { User } from '../../user/entities/user.entity';
-import { DeliveryMethod } from '../dto/create-order.dto'; // Импортируем enum
+import { DeliveryMethod } from '../dto/create-order.dto';
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
   @ApiProperty({
     example: 1,
-    description: 'Унікальний ідентифікатор замовлення',
+    description: 'Уникальный идентификатор заказа',
   })
   id: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     example: '2023-01-01T12:00:00Z',
-    description: 'Дата створення замовлення',
+    description: 'Дата создания заказа',
   })
   createdAt: Date;
 
   @Column({ type: 'varchar', length: 255 })
-  @ApiProperty({ example: 'Іван Іванов', description: 'Ім’я клієнта' })
+  @ApiProperty({ example: 'Иван Иванов', description: 'Имя клиента' })
   customerName: string;
 
   @Column({ type: 'varchar', length: 255 })
   @ApiProperty({
     example: 'ivan@example.com',
-    description: 'Електронна пошта клієнта',
+    description: 'Электронная почта клиента',
   })
   customerEmail: string;
 
   @Column({ type: 'varchar', length: 20 })
   @ApiProperty({
     example: '+380991234567',
-    description: 'Номер телефону клієнта',
+    description: 'Номер телефона клиента',
   })
   customerPhone: string;
 
   @Column({ type: 'text' })
   @ApiProperty({
-    example: 'вул. Центральна, 1, Київ',
-    description: 'Адреса доставки',
+    example: 'ул. Центральная, 1, Киев',
+    description: 'Адрес доставки',
   })
   deliveryAddress: string;
 
   @Column({ type: 'enum', enum: DeliveryMethod })
   @ApiProperty({
-    example: 'Нова Пошта - відділення',
-    description: 'Спосіб доставки',
+    example: 'Новая Почта - отделение',
+    description: 'Способ доставки',
     enum: DeliveryMethod,
   })
   deliveryMethod: DeliveryMethod;
 
   @Column({ type: 'text', nullable: true })
   @ApiPropertyOptional({
-    example: 'Залиште біля дверей',
-    description: 'Додаткові примітки до замовлення',
+    example: 'Оставьте у двери',
+    description: 'Дополнительные заметки к заказу',
   })
   notes: string;
 
   @Column({ type: 'varchar', length: 50, default: 'Pending' })
-  @ApiProperty({ example: 'Pending', description: 'Статус замовлення' })
+  @ApiProperty({ example: 'Pending', description: 'Статус заказа' })
   status: string;
 
-  @ManyToOne(() => Cart, (cart) => cart.id, { nullable: true })
-  @JoinColumn({ name: 'cartId' })
-  cart: Cart;
+  @Column('integer', { array: true, default: [] })
+  @ApiProperty({
+    example: [1, 2],
+    description: 'Массив ID продуктов (или атрибутов продуктов) в заказе',
+  })
+  productAttributeIds: number[];
+
+  @Column({ type: 'int', default: 0 })
+  @ApiProperty({
+    example: 3,
+    description: 'Общее количество товаров в заказе',
+  })
+  quantity: number; // Новое поле quantity
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
+  @ApiProperty({
+    example: 999.0,
+    description: 'Общая стоимость заказа',
+  })
+  price: number; // Новое поле price
 
   @ManyToOne(() => User, (user) => user.orders, { nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
-
-  @Column({ type: 'int', nullable: true })
-  cartId: number;
 }

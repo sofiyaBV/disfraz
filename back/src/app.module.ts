@@ -11,6 +11,7 @@ import { AttributesModule } from './attribute/attribute.module';
 import { ProductAttributeModule } from './product-attribute/product-attribute.module';
 import { CartModule } from './cart/cart.module';
 import { CommentsModule } from './comments/comments.module';
+import { PaymentModule } from './payment/payment.module';
 
 import databaseConfig from './config/database.config';
 
@@ -35,6 +36,7 @@ import databaseConfig from './config/database.config';
     ProductAttributeModule,
     CartModule,
     CommentsModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

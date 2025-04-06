@@ -63,19 +63,6 @@ export class AttributesService {
       // Обновляем основные поля атрибута
       manager.merge(Attribute, attribute, updateAttributeDto);
 
-      // Обновляем связанные продукты, если переданы productIds
-      if (updateAttributeDto.productIds) {
-        const existingProducts = await manager.findByIds(
-          Product,
-          updateAttributeDto.productIds,
-        );
-        if (existingProducts.length > 0) {
-          attribute.products = existingProducts;
-        } else {
-          console.warn(`Ни один продукт не найден для attributeId: ${id}`);
-        }
-      }
-
       // Сохраняем обновленный атрибут
       await manager.save(attribute);
       return attribute;
@@ -96,7 +83,7 @@ export class AttributesService {
       | 'theme'
       | 'bodyPart'
       | 'isSet'
-      | 'additionalInfo'
+      | 'description'
       | 'inStock',
   ): Promise<Attribute[]> {
     if (
@@ -106,7 +93,7 @@ export class AttributesService {
         'theme',
         'bodyPart',
         'isSet',
-        'additionalInfo',
+        'description',
         'inStock',
       ].includes(type)
     ) {
@@ -118,15 +105,5 @@ export class AttributesService {
       return this.attributeRepository.find({ where: { [field]: true } });
     }
     return this.attributeRepository.find({ where: { [field]: Not(IsNull()) } });
-  }
-
-  async findByName(name: string): Promise<Attribute> {
-    const attribute = await this.attributeRepository.findOne({
-      where: { name },
-    });
-    if (!attribute) {
-      throw new NotFoundException(`Атрибут с названием ${name} не найден`);
-    }
-    return attribute;
   }
 }
