@@ -27,16 +27,14 @@ export const productPaginateConfig: PaginateConfig<Product> = {
 
 // Конфигурация для Attribute
 export const attributePaginateConfig: PaginateConfig<Attribute> = {
-  sortableColumns: ['id', 'name', 'material', 'size', 'theme', 'valueNumber'],
+  sortableColumns: ['id', 'material', 'size', 'theme'],
   searchableColumns: [
-    'name',
     'material',
     'size',
     'theme',
     'bodyPart',
-    'additionalInfo',
+    'description',
     'inStock',
-    'valueText',
   ],
   filterableColumns: {
     name: [FilterOperator.EQ, FilterOperator.ILIKE],
@@ -54,16 +52,13 @@ export const attributePaginateConfig: PaginateConfig<Attribute> = {
   defaultLimit: 10,
   select: [
     'id',
-    'name',
     'material',
     'size',
     'theme',
     'bodyPart',
     'isSet',
-    'additionalInfo',
+    'description',
     'inStock',
-    'valueText',
-    'valueNumber',
   ],
   nullSort: 'last',
 };
@@ -76,6 +71,8 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     'customerName',
     'customerEmail',
     'status',
+    'quantity', // Добавляем quantity для сортировки
+    'price',
   ],
   searchableColumns: [
     'customerName',
@@ -93,9 +90,10 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     status: [FilterOperator.EQ, FilterOperator.ILIKE],
     createdAt: [FilterOperator.GTE, FilterOperator.LTE],
     'user.id': [FilterOperator.EQ],
-    'cart.id': [FilterOperator.EQ],
+    quantity: [FilterOperator.EQ, FilterOperator.GTE, FilterOperator.LTE], // Добавляем фильтрацию по quantity
+    price: [FilterOperator.GTE, FilterOperator.LTE],
   },
-  relations: ['cart', 'user'],
+  relations: ['user'],
   defaultSortBy: [['createdAt', 'DESC']],
   maxLimit: 100,
   defaultLimit: 10,
@@ -109,7 +107,9 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     'deliveryMethod',
     'notes',
     'status',
-    'cartId',
+    'quantity',
+    'price',
+    'productAttributeIds',
   ],
   nullSort: 'last',
 };
@@ -132,7 +132,6 @@ export const cartPaginateConfig: PaginateConfig<Cart> = {
     'productAttribute.product',
     'productAttribute.attribute',
     'user',
-    'orders',
   ],
   defaultSortBy: [['addedAt', 'DESC']],
   maxLimit: 100,
