@@ -20,10 +20,7 @@ export class OrderService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(
-    createOrderDto: CreateOrderDto,
-    userId: number,
-  ): Promise<Order[]> {
+  async create(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
@@ -31,7 +28,7 @@ export class OrderService {
 
     const cartItems = await this.cartRepository.find({
       where: { user: { id: userId } },
-      relations: ['user'],
+      relations: ['user', 'productAttribute'],
     });
 
     if (!cartItems || cartItems.length === 0) {
@@ -40,23 +37,26 @@ export class OrderService {
       );
     }
 
-    const createdOrders: Order[] = [];
+    // Собираем все productAttributeIds из корзины в массив
+    const productAttributeIds = cartItems.map(
+      (cart) => cart.productAttribute.id,
+    );
 
-    for (const cart of cartItems) {
-      const order = this.orderRepository.create({
-        ...createOrderDto,
-        cart,
-        cartId: cart.id,
-        user,
-        createdAt: new Date(),
-        status: createOrderDto.status || 'Pending',
-      });
+    // Создаем один заказ
+    const order = this.orderRepository.create({
+      ...createOrderDto,
+      productAttributeIds, // Массив ID атрибутов продуктов
+      user,
+      createdAt: new Date(),
+      status: createOrderDto.status || 'Pending',
+    });
 
-      const savedOrder = await this.orderRepository.save(order);
-      createdOrders.push(savedOrder);
-    }
+    const savedOrder = await this.orderRepository.save(order);
 
-    return createdOrders;
+    // Опционально: очищаем корзину после создания заказа
+    await this.cartRepository.delete({ user: { id: userId } });
+
+    return savedOrder;
   }
 
   async findAllWithPagination(query: PaginateQuery): Promise<Paginated<Order>> {
@@ -64,13 +64,13 @@ export class OrderService {
   }
 
   async findAll(): Promise<Order[]> {
-    return await this.orderRepository.find({ relations: ['cart', 'user'] });
+    return await this.orderRepository.find({ relations: ['user'] });
   }
 
   async findOne(id: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['cart', 'user'],
+      relations: ['user'],
     });
     if (!order) {
       throw new NotFoundException(`Заказ с ID ${id} не найден`);
@@ -80,18 +80,6 @@ export class OrderService {
 
   async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
     const order = await this.findOne(id);
-
-    if (updateOrderDto.cartId) {
-      const cart = await this.cartRepository.findOne({
-        where: { id: updateOrderDto.cartId },
-      });
-      if (!cart) {
-        throw new NotFoundException(
-          `Корзина с ID ${updateOrderDto.cartId} не найдена`,
-        );
-      }
-    }
-
     await this.orderRepository.update(id, updateOrderDto);
     return this.findOne(id);
   }
