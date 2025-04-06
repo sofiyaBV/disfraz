@@ -1,26 +1,22 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsEmail,
   IsPhoneNumber,
   IsOptional,
   IsEnum,
-  IsInt,
 } from 'class-validator';
-import { DeliveryMethod } from './create-order.dto'; // Импортируем enum из create-order.dto
+import { DeliveryMethod } from './create-order.dto';
 
 export class UpdateOrderDto {
-  @ApiPropertyOptional({
-    example: 'Іван Петренко',
-    description: "Ім'я клієнта",
-  })
+  @ApiPropertyOptional({ example: 'Иван Петренко', description: 'Имя клиента' })
   @IsString()
   @IsOptional()
   customerName?: string;
 
   @ApiPropertyOptional({
     example: 'ivan@example.com',
-    description: 'Email клієнта',
+    description: 'Email клиента',
   })
   @IsEmail()
   @IsOptional()
@@ -28,23 +24,23 @@ export class UpdateOrderDto {
 
   @ApiPropertyOptional({
     example: '+380971234567',
-    description: 'Телефон клієнта',
+    description: 'Телефон клиента',
   })
   @IsPhoneNumber('UA')
   @IsOptional()
   customerPhone?: string;
 
   @ApiPropertyOptional({
-    example: 'вул. Хрещатик, 10, Київ, Україна',
-    description: 'Адреса доставки (включая номер отделения, если применимо)',
+    example: 'ул. Хрещатик, 10, Киев, Украина',
+    description: 'Адрес доставки',
   })
   @IsString()
   @IsOptional()
   deliveryAddress?: string;
 
   @ApiPropertyOptional({
-    example: 'Нова Пошта - відділення',
-    description: 'Спосіб доставки',
+    example: 'Новая Почта - отделение',
+    description: 'Способ доставки',
     enum: DeliveryMethod,
   })
   @IsEnum(DeliveryMethod)
@@ -52,8 +48,8 @@ export class UpdateOrderDto {
   deliveryMethod?: DeliveryMethod;
 
   @ApiPropertyOptional({
-    example: 'Будь ласка, зателефонуйте перед доставкою',
-    description: 'Примітки до замовлення',
+    example: 'Пожалуйста, позвоните перед доставкой',
+    description: 'Заметки к заказу',
   })
   @IsString()
   @IsOptional()
@@ -61,17 +57,9 @@ export class UpdateOrderDto {
 
   @ApiPropertyOptional({
     example: 'Pending',
-    description: 'Статус замовлення',
+    description: 'Статус заказа',
   })
   @IsString()
   @IsOptional()
   status?: string;
-
-  @ApiPropertyOptional({
-    example: 1,
-    description: 'ID корзины, связанной с заказом',
-  })
-  @IsInt()
-  @IsOptional()
-  cartId?: number;
 }

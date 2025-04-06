@@ -38,12 +38,12 @@ export class OrderController {
 
   @ApiOperation({
     summary:
-      'Создать новые заказы для авторизованного пользователя на основе корзины',
+      'Создать новый заказ для авторизованного пользователя на основе корзины',
   })
   @ApiResponse({
     status: 201,
-    description: 'Заказы успешно созданы',
-    type: [Order],
+    description: 'Заказ успешно создан',
+    type: Order, // Изменили на один Order
   })
   @ApiBody({
     type: CreateOrderDto,
@@ -58,7 +58,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Получить все заказы' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех заказов с их корзинами и пользователями',
+    description: 'Список всех заказов с пользователями',
   })
   @PaginatedSwaggerDocs(CreateOrderDto, orderPaginateConfig)
   @Get()
@@ -70,7 +70,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Получить заказ по ID' })
   @ApiResponse({
     status: 200,
-    description: 'Заказ найден с его корзиной и пользователем',
+    description: 'Заказ найден с пользователем',
     type: Order,
   })
   @ApiResponse({ status: 404, description: 'Заказ не найден' })
@@ -95,8 +95,7 @@ export class OrderController {
   @ApiResponse({ status: 404, description: 'Заказ не найден' })
   @ApiBody({
     type: UpdateOrderDto,
-    description:
-      'Включает опциональный cartId для обновления связанной корзины',
+    description: 'Данные для обновления заказа',
   })
   @ApiParam({
     name: 'id',

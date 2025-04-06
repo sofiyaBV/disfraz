@@ -4,19 +4,17 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger'; // Імпорт для Swagger
+import { ApiProperty } from '@nestjs/swagger';
 import { ProductAttribute } from '../../product-attribute/entities/product-attribute.entity';
 import { User } from '../../user/entities/user.entity';
-import { Order } from '../../order/entities/order.entity';
 
 @Entity()
 export class Cart {
   @PrimaryGeneratedColumn()
   @ApiProperty({
     example: 1,
-    description: 'Унікальний ідентифікатор елемента кошика',
+    description: 'Уникальный идентификатор элемента корзины',
   })
   id: number;
 
@@ -27,7 +25,7 @@ export class Cart {
   @JoinColumn({ name: 'productAttributeId' })
   @ApiProperty({
     type: () => ProductAttribute,
-    description: 'Зв’язок із продуктом та атрибутом',
+    description: 'Связь с продуктом и атрибутом',
   })
   productAttribute: ProductAttribute;
 
@@ -35,32 +33,25 @@ export class Cart {
   @JoinColumn({ name: 'userId' })
   @ApiProperty({
     type: () => User,
-    description: 'Користувач, який додав товар до кошика',
+    description: 'Пользователь, который добавил товар в корзину',
   })
   user: User;
 
   @Column({ type: 'int', default: 1 })
   @ApiProperty({
     example: 1,
-    description: 'Кількість даного продукту в кошику',
+    description: 'Количество данного продукта в корзине',
   })
   quantity: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
-  @ApiProperty({ example: 199.99, description: 'Ціна за одиницю товару' })
+  @ApiProperty({ example: 199.99, description: 'Цена за единицу товара' })
   price: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     example: '2023-01-01T12:00:00Z',
-    description: 'Дата додавання до кошика',
+    description: 'Дата добавления в корзину',
   })
   addedAt: Date;
-
-  @OneToMany(() => Order, (order) => order.cart)
-  @ApiProperty({
-    type: () => [Order],
-    description: 'Список замовлень, пов’язаних із кошиком',
-  })
-  orders: Order[];
 }
