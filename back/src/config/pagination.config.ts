@@ -71,6 +71,8 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     'customerName',
     'customerEmail',
     'status',
+    'quantity', // Добавляем quantity для сортировки
+    'price',
   ],
   searchableColumns: [
     'customerName',
@@ -88,6 +90,8 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     status: [FilterOperator.EQ, FilterOperator.ILIKE],
     createdAt: [FilterOperator.GTE, FilterOperator.LTE],
     'user.id': [FilterOperator.EQ],
+    quantity: [FilterOperator.EQ, FilterOperator.GTE, FilterOperator.LTE], // Добавляем фильтрацию по quantity
+    price: [FilterOperator.GTE, FilterOperator.LTE],
   },
   relations: ['user'],
   defaultSortBy: [['createdAt', 'DESC']],
@@ -103,7 +107,8 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     'deliveryMethod',
     'notes',
     'status',
-
+    'quantity',
+    'price',
     'productAttributeIds',
   ],
   nullSort: 'last',

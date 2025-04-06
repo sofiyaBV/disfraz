@@ -76,6 +76,20 @@ export class Order {
   })
   productAttributeIds: number[];
 
+  @Column({ type: 'int', default: 0 })
+  @ApiProperty({
+    example: 3,
+    description: 'Общее количество товаров в заказе',
+  })
+  quantity: number; // Новое поле quantity
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
+  @ApiProperty({
+    example: 999.0,
+    description: 'Общая стоимость заказа',
+  })
+  price: number; // Новое поле price
+
   @ManyToOne(() => User, (user) => user.orders, { nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
