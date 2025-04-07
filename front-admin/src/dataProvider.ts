@@ -50,6 +50,31 @@ export const dataProvider = {
       data: json,
     })),
 
+  createFormData: (resource: string, params: any) => {
+    const formData = new FormData();
+    for (const key in params.data) {
+      if (params.data.hasOwnProperty(key)) {
+        if (Array.isArray(params.data[key])) {
+          params.data[key].forEach((item: any, index: number) => {
+            formData.append(`${key}[${index}]`, item);
+          });
+        } else {
+          formData.append(key, params.data[key]);
+        }
+      }
+    }
+
+    console.log("ServerSend")
+    console.log(formData)
+
+    return httpClient(`${apiUrl}/${resource}`, {
+      method: "POST",
+      body: formData,
+    }).then(({ json }) => ({
+      data: { ...params.data, id: json.id },
+    }));
+  },
+
   create: (resource: string, params: any) =>
     httpClient(`${apiUrl}/${resource}`, {
       method: "POST",

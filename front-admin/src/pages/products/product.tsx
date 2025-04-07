@@ -17,7 +17,11 @@ export const ProductList = () => (
             <TextField label="Назва товару" source="name" />
             <TextField label="Ціна" source="price" />
             <TextField label="Опис товару" source="description" />
-            <ImageField label="Фотографії" source="images" />
+            <ArrayField label="Фотографії" source="images">
+                <Datagrid>
+                    <ImageField label="Фотографії" source="url" />
+                </Datagrid>
+            </ArrayField>
         </Datagrid>
     </List>
 );
@@ -64,8 +68,12 @@ export const ProductShow = () => (
             <TextField  source="name" label="Назва товару" />
             <TextField label="Ціна товару" source="price" />
             <TextField label="Опис товару" source="description" />
-            <ImageField label="Фотографії" source="images" />
-            <ArrayField label="Схожі товари" source="similarProducts">//список походих товаров
+            <ArrayField label="Фотографії" source="images">
+                <Datagrid>
+                    <ImageField label="Фотографії" source="url" />
+                </Datagrid>
+            </ArrayField>
+            <ArrayField label="Схожі товари" source="similarProducts">
                 <Datagrid>
                     <TextField source="name" label="Назва товару" />
                     <ImageField label="Фотографії" source="images" />
@@ -90,7 +98,12 @@ export const ProductCreate = (props: CreateProps) => {
     }, [dataProvider]);
 
     return (
-        <Create {...props}>
+        <Create {...props} save={async (values: any) => {
+            alert("Save in Create")
+            return await dataProvider.createFormData("products", {
+              data: values,
+            });
+        }}>
             <SimpleForm>
                 <TextInput label="Назва товару" source="name" />
                 <TextInput label="Ціна товару" source="price" />

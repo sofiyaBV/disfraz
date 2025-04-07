@@ -178,7 +178,7 @@ export const productAttributePaginateConfig: PaginateConfig<ProductAttribute> =
     defaultSortBy: [['id', 'DESC']],
     maxLimit: 100,
     defaultLimit: 10,
-    select: ['id'],
+    // select: ['id'],
     nullSort: 'last',
   };
 
