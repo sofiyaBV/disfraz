@@ -65,7 +65,7 @@ export class OrderService {
 
     const savedOrder = await this.orderRepository.save(order);
 
-    // Опционально: очищаем корзину после создания заказа
+    //  очищаем корзину после создания заказа
     await this.cartRepository.delete({ user: { id: userId } });
 
     return savedOrder;
