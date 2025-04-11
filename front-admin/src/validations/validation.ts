@@ -13,4 +13,22 @@ export const phoneValidationFormat = (value: string) => {
     return undefined;
 };
 
-    
+export const productNameValidationFormat = (value: string) => {
+    if (value && value.length < 3) {
+        return "Назва продукту повинна містити принаймні 3 символи";
+    }
+    if (value && value.length > 50) {
+        return "Назва продукту не повинна перевищувати 50 символів";
+    }
+    return undefined;
+}
+
+export const productPriceValidationFormat = (value: string) => {
+    if (value && isNaN(Number(value))) {
+        return "Ціна повинна бути числом";
+    }
+    if (value && Number(value) <= 0) {
+        return "Ціна повинна бути більшою за 0";
+    }
+    return undefined;
+};

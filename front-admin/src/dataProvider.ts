@@ -81,7 +81,9 @@ export const dataProvider = {
       body: JSON.stringify(params.data),
     }).then(({ json }) => ({
       data: { ...params.data, id: json.id },
+
     })),
+    
 
     update: (resource: string, params: any) =>
       httpClient(`${apiUrl}/${resource}/${params.id}`, {
@@ -94,6 +96,7 @@ export const dataProvider = {
             method: "DELETE",
         }).then(({ json }) => ({ data: json })),
 
+      
         /////////////////////////////
       // getMany: (resource: string, params: any) => {
       //     const query = {
