@@ -31,23 +31,19 @@ export class AuthService {
   async register(createUserDto: CreateUserDto): Promise<void> {
     const { email, password, phone } = createUserDto;
 
-    // Проверяем, существует ли пользователь с таким email
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new UnauthorizedException(
-        'Пользователь с таким email уже существует',
-      );
+      throw new UnauthorizedException('Користувач з таким email вже існує');
     }
 
-    // Передаем пароль в исходном виде, хеширование будет в UserService
+    // Передаємо пароль у вихідному вигляді, хешування буде в UserService
     const newUser = {
       email,
       password,
-      phone, // Пароль передается без хеширования
+      phone,
       roles: [Role.User],
     };
 
-    // Сохраняем пользователя через UserService
     await this.usersService.createUser(newUser);
   }
 }

@@ -34,11 +34,11 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @ApiOperation({
-    summary: 'Создать новую корзину для авторизованного пользователя',
+    summary: 'Створити новий кошик для авторизованого користувача',
   })
   @ApiResponse({
     status: 201,
-    description: 'Корзина успешно создана',
+    description: 'Кошик успішно створений',
     type: Cart,
   })
   @ApiBody({ type: CreateCartDto })
@@ -47,10 +47,10 @@ export class CartController {
     return this.cartService.create(createCartDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все корзины' })
+  @ApiOperation({ summary: 'Отримати всі кошики' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех корзин',
+    description: 'Список усіх кошиків',
   })
   @PaginatedSwaggerDocs(CreateCartDto, cartPaginateConfig)
   @Get()
@@ -58,13 +58,13 @@ export class CartController {
     return this.cartService.findAllPag(query);
   }
 
-  @ApiOperation({ summary: 'Получить корзину по ID' })
-  @ApiResponse({ status: 200, description: 'Корзина найдена', type: Cart })
-  @ApiResponse({ status: 404, description: 'Корзина не найдена' })
+  @ApiOperation({ summary: 'Отримати кошик за ID' })
+  @ApiResponse({ status: 200, description: 'Кошик знайдений', type: Cart })
+  @ApiResponse({ status: 404, description: 'Кошик не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID корзины',
+    description: 'ID кошика',
     example: 1,
   })
   @Get(':id')
@@ -72,18 +72,18 @@ export class CartController {
     return this.cartService.findOne(+id);
   }
 
-  @ApiOperation({ summary: 'Обновить корзину по ID' })
+  @ApiOperation({ summary: 'Оновити кошик за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Корзина успешно обновлена',
+    description: 'Кошик успішно оновлений',
     type: Cart,
   })
-  @ApiResponse({ status: 404, description: 'Корзина не найдена' })
+  @ApiResponse({ status: 404, description: 'Кошик не знайдений' })
   @ApiBody({ type: UpdateCartDto })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID корзины',
+    description: 'ID кошика',
     example: 1,
   })
   @Patch(':id')
@@ -91,13 +91,13 @@ export class CartController {
     return this.cartService.update(+id, updateCartDto);
   }
 
-  @ApiOperation({ summary: 'Удалить корзину по ID' })
-  @ApiResponse({ status: 200, description: 'Корзина успешно удалена' })
-  @ApiResponse({ status: 404, description: 'Корзина не найдена' })
+  @ApiOperation({ summary: 'Видалити кошик за ID' })
+  @ApiResponse({ status: 200, description: 'Кошик успішно видалений' })
+  @ApiResponse({ status: 404, description: 'Кошик не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID корзины',
+    description: 'ID кошика',
     example: 1,
   })
   @Delete(':id')

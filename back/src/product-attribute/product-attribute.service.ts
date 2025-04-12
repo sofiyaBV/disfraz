@@ -22,7 +22,7 @@ export class ProductAttributeService {
   async create(
     createProductAttributeDto: CreateProductAttributeDto,
   ): Promise<ProductAttribute> {
-    const { productId, attributeId } = createProductAttributeDto;
+    const { productId, attributeId, inStock } = createProductAttributeDto;
 
     const product = await this.productRepository.findOneOrFail({
       where: { id: productId },
@@ -34,6 +34,7 @@ export class ProductAttributeService {
     const productAttribute = this.productAttributeRepository.create({
       product,
       attribute,
+      inStock,
     });
 
     return this.productAttributeRepository.save(productAttribute);
@@ -65,7 +66,7 @@ export class ProductAttributeService {
     updateProductAttributeDto: Partial<CreateProductAttributeDto>,
   ): Promise<ProductAttribute> {
     const productAttribute = await this.findOne(id);
-    const { productId, attributeId } = updateProductAttributeDto;
+    const { productId, attributeId, inStock } = updateProductAttributeDto;
 
     if (productId) {
       const product = await this.productRepository.findOneOrFail({
@@ -79,6 +80,10 @@ export class ProductAttributeService {
         where: { id: attributeId },
       });
       productAttribute.attribute = attribute;
+    }
+
+    if (inStock !== undefined) {
+      productAttribute.inStock = inStock;
     }
 
     return this.productAttributeRepository.save(productAttribute);

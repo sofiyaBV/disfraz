@@ -12,7 +12,7 @@ import { extname } from 'path';
   imports: [
     TypeOrmModule.forFeature([Product, Attribute]),
     MulterModule.register({
-      storage: multer.memoryStorage(), // Храним файлы в памяти перед отправкой в ImgBB
+      storage: multer.memoryStorage(), // Зберігаємо файли в пам'яті перед відправленням в ImgBB
       fileFilter: (req, file, callback) => {
         const allowedTypes = /jpeg|jpg|png|gif/;
         const ext = extname(file.originalname).toLowerCase();
@@ -22,7 +22,7 @@ import { extname } from 'path';
           callback(null, true);
         } else {
           callback(
-            new Error('Только изображения (jpeg, jpg, png, gif) разрешены!'),
+            new Error('Тільки зображення (jpeg, jpg, png, gif) дозволені!'),
             false,
           );
         }

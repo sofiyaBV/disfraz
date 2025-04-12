@@ -5,28 +5,29 @@ export class UpdateCartDto {
   @IsInt()
   @IsOptional()
   @ApiProperty({
-    description: 'ID связи продукта и атрибута (из таблицы product_attribute)',
+    description:
+      'ID зв’язку продукту та атрибуту (з таблиці product_attribute)',
     example: 1,
     required: false,
   })
-  productAttributeId?: number; // ID связи продукт-атрибут
+  productAttributeId?: number;
 
   @IsInt()
   @IsPositive()
   @IsOptional()
   @ApiProperty({
-    description: 'Количество данного продукта/атрибута в корзине',
+    description: 'Кількість даного продукту/атрибуту в кошику',
     example: 2,
     required: false,
   })
-  quantity?: number; // Количество
+  quantity?: number;
 
   @IsOptional()
   @IsNumber()
   @ApiProperty({
-    description: 'Цена за единицу (опционально, может быть вычислена сервером)',
+    description: 'Ціна за одиницю (опціонально, може бути обчислена сервером)',
     example: 199.99,
     required: false,
   })
-  price?: number; // Цена (опционально, может быть вычислена сервером)
+  price?: number;
 }

@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // // Включаем валидацию
+  // Валідація
   // app.useGlobalPipes(
   //   new ValidationPipe({
   //     whitelist: true, // Удаляет поля, которых нет в DTO
@@ -20,19 +20,19 @@ async function bootstrap() {
   });
 
   dotenv.config();
-  // Конфигурация Swagger
+  // Конфігурація Swagger
   const config = new DocumentBuilder()
     .setTitle('User API')
     .setDescription('Документация API для работы с пользователями')
     .setVersion('1.0')
-    .addBearerAuth() // JWT поддержка
+    .addBearerAuth() // JWT підтримка
     .build();
 
   // Дополнительные настройки Swagger
   const documentOptions = {
     operationIdFactory: (_controllerKey: string, methodKey: string) =>
-      methodKey, // Убираем `Controller_` из названий операций
-    autoTagControllers: true, // Использует название контроллера в качестве тега
+      methodKey,
+    autoTagControllers: true,
   };
 
   const document = SwaggerModule.createDocument(app, config, documentOptions);
@@ -46,14 +46,14 @@ async function bootstrap() {
     customSiteTitle: 'User API Docs', // Кастомное название страницы
   };
 
-  // Открываем Swagger UI по `/api`
+  // Відкриваємо Swagger UI за `/api`
   SwaggerModule.setup('doc', app, document, swaggerCustomOptions);
 
   await app.listen(3000);
 }
 bootstrap();
 
-// Адреса документации:
+// Адреси документації:
 // Swagger UI: http://localhost:3000/doc
 // JSON: http://localhost:3000/swagger/json
 // YAML: http://localhost:3000/swagger/yaml
