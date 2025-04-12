@@ -166,6 +166,7 @@ export const productAttributePaginateConfig: PaginateConfig<ProductAttribute> =
     filterableColumns: {
       'product.id': [FilterOperator.EQ],
       'attribute.id': [FilterOperator.EQ],
+      'inStock': [FilterOperator.EQ],
     },
     relations: ['product', 'attribute', 'carts', 'comments'],
     defaultSortBy: [['id', 'DESC']],

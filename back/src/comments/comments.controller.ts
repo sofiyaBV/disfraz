@@ -29,7 +29,7 @@ import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { commentPaginateConfig } from '../config/pagination.config';
 
-@ApiTags('Коментарі')
+@ApiTags('Comment')
 @Controller('comments')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
