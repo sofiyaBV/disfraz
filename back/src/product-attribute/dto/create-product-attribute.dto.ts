@@ -1,14 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { IsInt, IsString, IsOptional } from 'class-validator';
 
 export class CreateProductAttributeDto {
-  @ApiProperty({ example: 1, description: 'ID продукта' })
+  @ApiProperty({
+    example: 1,
+    description: 'ID продукту',
+  })
   @IsInt()
-  @IsNotEmpty()
   productId: number;
 
-  @ApiProperty({ example: 1, description: 'ID атрибута' })
+  @ApiProperty({
+    example: 1,
+    description: 'ID атрибуту',
+  })
   @IsInt()
-  @IsNotEmpty()
   attributeId: number;
+
+  @ApiProperty({
+    example: 'Доступний на складі',
+    description: 'Наявність комбінації продукту та атрибуту',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  inStock?: string;
 }

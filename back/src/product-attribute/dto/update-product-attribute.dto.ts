@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProductAttributeDto {
   @ApiProperty({
@@ -19,4 +19,14 @@ export class UpdateProductAttributeDto {
   @IsOptional()
   @IsInt()
   attributeId?: number;
+
+  @ApiProperty({
+    example: 'Доступний на складі',
+    description:
+      'Значення для наявності (наприклад, «Доступний на складі», опціонально)',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'Наявність повинна бути рядком' })
+  inStock?: string;
 }

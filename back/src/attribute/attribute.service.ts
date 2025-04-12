@@ -77,14 +77,7 @@ export class AttributesService {
   }
 
   async findByType(
-    type:
-      | 'material'
-      | 'size'
-      | 'theme'
-      | 'bodyPart'
-      | 'isSet'
-      | 'description'
-      | 'inStock',
+    type: 'material' | 'size' | 'theme' | 'bodyPart' | 'isSet' | 'description',
   ): Promise<Attribute[]> {
     if (
       ![
@@ -94,7 +87,6 @@ export class AttributesService {
         'bodyPart',
         'isSet',
         'description',
-        'inStock',
       ].includes(type)
     ) {
       throw new Error('Недопустимий тип атрибуту');

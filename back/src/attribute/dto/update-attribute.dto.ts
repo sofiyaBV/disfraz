@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsBoolean,
-  IsOptional,
-  IsNumber,
-  IsArray,
-  IsInt,
-} from 'class-validator';
+import { IsString, IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateAttributeDto {
   @ApiProperty({
@@ -65,14 +58,4 @@ export class UpdateAttributeDto {
   @IsOptional()
   @IsString({ message: 'Додаткова інформація повинна бути рядком' })
   description?: string;
-
-  @ApiProperty({
-    example: 'Доступний на складі',
-    description:
-      'Значення для наявності (наприклад, «Доступний на складі», опціонально)',
-    required: false,
-  })
-  @IsOptional()
-  @IsString({ message: 'Наявність повинна бути рядком' })
-  inStock?: string;
 }
