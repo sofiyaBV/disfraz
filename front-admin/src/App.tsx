@@ -20,7 +20,7 @@ export const App = () => (
         <Resource name="attributes" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate} options={{label:"Атрибути"}} />
         <Resource name="comments" list={CommentList} edit={CommentEdit} show={CommentShow} options={{label:"Усі коментарі"}} />
         <Resource name="orders" list={OrderList} edit={OrderEdit} show={OrderShow} options={{label:"Усі замовлення"}}/>
-        <Resource name="product-attribute" list={ProductAttributeList} edit={ProductAttributeEdit} show={ProductAttributeShow} create={ProductAttributeCreate}/>
+        <Resource name="product-attribute" list={ProductAttributeList} edit={ProductAttributeEdit} show={ProductAttributeShow} create={ProductAttributeCreate} options={{label:"Товари"}}/>
   </Admin>
   
 );
