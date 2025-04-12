@@ -18,10 +18,6 @@ export const CommentEdit = () => (
             <TextField source="content" label="Вміст" />
             <DateField source="createdAt" label="Дата створення" />
             <BooleanInput source="isModerated" label="Пройшов перевірку" />
-
-            {/* //!нет атрибутов для вывода */}
-            {/* продукт, до якого належить коментар */}
-            {/* користувач, який залишив коментар */}
         </SimpleForm>
     </Edit>
 );
@@ -33,15 +29,8 @@ export const CommentShow = () => (
             <TextField source="content" label="Вміст" />
             <DateField source="createdAt" label="Дата створення" />
             <BooleanField source="isModerated" label="Пройшов перевірку" />
-
-            {/* //!нет атрибутов для вывода */}
-            {/* продукт, до якого належить коментар */}
-            <TextField source="productAttributeId" label="Продукт" />
-            <TextField source="userId" label="Користувач" />
-            {/* користувач, який залишив коментар */}
             <DeleteButton />
         </SimpleShowLayout>
-        
     </Show>
 );
 
