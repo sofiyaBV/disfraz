@@ -1,4 +1,4 @@
-import { List, Datagrid, TextField, Create, Edit, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, NumberField, useRecordContext, ArrayField, BooleanField, SimpleList } from "react-admin";
+import { List, Datagrid, TextField, Create, Edit, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, NumberField, useRecordContext, ArrayField, BooleanField, SimpleList,required } from "react-admin";
 import { Grid, Typography, Card, CardContent } from "@mui/material";
 
 export const ProductAttributeList = () => (
@@ -7,6 +7,7 @@ export const ProductAttributeList = () => (
             <TextField source="id" />
             <TextField source="product.name" label="Назва продукту" />
             <TextField source="attribute.material" label="Матеріал атрибута" />
+            <TextField source="inStock"/>
         </Datagrid>
     </List>
 );
@@ -39,6 +40,16 @@ export const ProductAttributeEdit = () => (
             <ReferenceInput source="attributeId" reference="attributes" label="Атрибут">
                 <SelectInput optionText="material" />
             </ReferenceInput>
+            <SelectInput
+                source="inStock"
+                label="Чи є в наявності"
+                choices={[
+                    { id: 'Доступний на складі', name: 'Доступний на складі' },
+                    { id: 'Є у наявності', name: 'Є у наявності' },
+                    { id: 'Немає у наявності', name: 'Нкмає у наявності' },
+                ]}
+                validate={[required()]}
+            />
         </SimpleForm>
     </Edit>
 );
@@ -47,6 +58,7 @@ export const ProductAttributeShow = () => (
     <Show>
         <SimpleShowLayout>
             <NumberField source="id" label="ID" />
+            <TextField source="inStock" label="Доступний на складі" />
             <Grid container spacing={2}>
                 <Grid item xs={6}>
                     <Card>
@@ -88,8 +100,7 @@ export const ProductAttributeShow = () => (
                             <BooleanField source="attribute.isSet" />
                             <Typography variant="subtitle2">Описание атрибута</Typography>
                             <TextField source="attribute.description" fullWidth />
-                            <Typography variant="subtitle2">В наличии атрибута</Typography>
-                            <TextField source="attribute.inStock" fullWidth />
+                            
                         </CardContent>
                     </Card>
                 </Grid>
@@ -107,6 +118,16 @@ export const ProductAttributeCreate = () => (
             <ReferenceInput source="attributeId" reference="attributes" label="Атрибут">
                 <SelectInput optionText="material" />
             </ReferenceInput>
+            <SelectInput
+                source="inStock"
+                label="Чи є в наявності"
+                choices={[
+                    { id: 'Доступний на складі', name: 'Доступний на складі' },
+                    { id: 'Є у наявності', name: 'Є у наявності' },
+                    { id: 'Немає у наявності', name: 'Нкмає у наявності' },
+                ]}
+                validate={[required()]}
+            />
         </SimpleForm>
     </Create>
 );
