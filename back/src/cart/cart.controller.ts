@@ -26,7 +26,7 @@ import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { cartPaginateConfig } from '../config/pagination.config';
 
-@ApiTags('Кошик')
+@ApiTags('Cart')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('cart')
