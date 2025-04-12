@@ -7,7 +7,7 @@ export class Migration1743868231694 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Створення таблиць
     await queryRunner.query(
-      `CREATE TABLE "attribute" ("id" SERIAL NOT NULL, "material" character varying(255), "size" character varying(255), "theme" character varying(255), "bodyPart" character varying(255), "isSet" boolean NOT NULL DEFAULT false, "description" character varying(255), "inStock" character varying(255), CONSTRAINT "PK_b13fb7c5c9e9dff62b60e0de729" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "attribute" ("id" SERIAL NOT NULL, "material" character varying(255), "size" character varying(255), "theme" character varying(255), "bodyPart" character varying(255), "isSet" boolean NOT NULL DEFAULT false, "description" character varying(255), CONSTRAINT "PK_b13fb7c5c9e9dff62b60e0de729" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "product" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "price" numeric(10,2) NOT NULL, "description" text, "images" jsonb, CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`,
@@ -28,7 +28,7 @@ export class Migration1743868231694 implements MigrationInterface {
       `CREATE TABLE "cart" ("id" SERIAL NOT NULL, "quantity" integer NOT NULL DEFAULT '1', "price" numeric(10,2) NOT NULL DEFAULT '0', "addedAt" TIMESTAMP NOT NULL DEFAULT now(), "productAttributeId" integer, "userId" integer, CONSTRAINT "PK_c524ec48751b9b5bcfbf6e59be7" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "product_attribute" ("id" SERIAL NOT NULL, "productId" integer NOT NULL, "attributeId" integer NOT NULL, CONSTRAINT "PK_f9b91f38df3dbbe481d9e056e5e" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "product_attribute" ("id" SERIAL NOT NULL, "productId" integer NOT NULL, "attributeId" integer NOT NULL,"inStock" character varying(255) ,CONSTRAINT "PK_f9b91f38df3dbbe481d9e056e5e" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "product_similars" ("leftProductId" integer NOT NULL, "rightProductId" integer NOT NULL, CONSTRAINT "PK_c04f978d6b856f6ae68d9e88031" PRIMARY KEY ("leftProductId", "rightProductId"))`,

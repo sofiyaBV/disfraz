@@ -4,8 +4,9 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Column,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger'; // Імпорт для Swagger
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Product } from '../../product/entities/product.entity';
 import { Attribute } from '../../attribute/entities/attribute.entity';
 import { Cart } from '../../cart/entities/cart.entity';
@@ -35,6 +36,13 @@ export class ProductAttribute {
     description: 'Атрибут, пов’язаний із продуктом',
   })
   attribute: Attribute;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  @ApiPropertyOptional({
+    example: 'Доступний на складі',
+    description: 'Наявність комбінації продукту та атрибуту',
+  })
+  inStock: string;
 
   @OneToMany(() => Cart, (cart) => cart.productAttribute)
   carts: Cart[];

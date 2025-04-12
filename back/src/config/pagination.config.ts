@@ -28,14 +28,7 @@ export const productPaginateConfig: PaginateConfig<Product> = {
 // Конфігурація для Attribute
 export const attributePaginateConfig: PaginateConfig<Attribute> = {
   sortableColumns: ['id', 'material', 'size', 'theme'],
-  searchableColumns: [
-    'material',
-    'size',
-    'theme',
-    'bodyPart',
-    'description',
-    'inStock',
-  ],
+  searchableColumns: ['material', 'size', 'theme', 'bodyPart', 'description'],
   filterableColumns: {
     name: [FilterOperator.EQ, FilterOperator.ILIKE],
     material: [FilterOperator.EQ, FilterOperator.ILIKE],
