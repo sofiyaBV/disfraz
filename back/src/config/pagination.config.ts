@@ -8,7 +8,7 @@ import { ProductAttribute } from '../product-attribute/entities/product-attribut
 import { User } from '../user/entities/user.entity';
 import { FilterOperator } from 'nestjs-paginate';
 
-// Конфигурация для Product
+// Конфігурація для Product
 export const productPaginateConfig: PaginateConfig<Product> = {
   sortableColumns: ['id', 'name', 'price'],
   searchableColumns: ['name', 'description'],
@@ -17,7 +17,7 @@ export const productPaginateConfig: PaginateConfig<Product> = {
     name: [FilterOperator.EQ, FilterOperator.ILIKE],
     'attributes.name': [FilterOperator.EQ],
   },
-  relations: ['attributes', 'similarProducts'], // Добавляем similarProducts
+  relations: ['attributes', 'similarProducts'],
   defaultSortBy: [['id', 'DESC']],
   maxLimit: 100,
   defaultLimit: 10,
@@ -25,7 +25,7 @@ export const productPaginateConfig: PaginateConfig<Product> = {
   nullSort: 'last',
 };
 
-// Конфигурация для Attribute
+// Конфігурація для Attribute
 export const attributePaginateConfig: PaginateConfig<Attribute> = {
   sortableColumns: ['id', 'material', 'size', 'theme'],
   searchableColumns: [
@@ -63,7 +63,7 @@ export const attributePaginateConfig: PaginateConfig<Attribute> = {
   nullSort: 'last',
 };
 
-// Конфигурация для Order
+// Конфігурація для Order
 export const orderPaginateConfig: PaginateConfig<Order> = {
   sortableColumns: [
     'id',
@@ -71,7 +71,7 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     'customerName',
     'customerEmail',
     'status',
-    'quantity', // Добавляем quantity для сортировки
+    'quantity',
     'price',
   ],
   searchableColumns: [
@@ -90,7 +90,7 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
     status: [FilterOperator.EQ, FilterOperator.ILIKE],
     createdAt: [FilterOperator.GTE, FilterOperator.LTE],
     'user.id': [FilterOperator.EQ],
-    quantity: [FilterOperator.EQ, FilterOperator.GTE, FilterOperator.LTE], // Добавляем фильтрацию по quantity
+    quantity: [FilterOperator.EQ, FilterOperator.GTE, FilterOperator.LTE],
     price: [FilterOperator.GTE, FilterOperator.LTE],
   },
   relations: ['user'],
@@ -114,7 +114,7 @@ export const orderPaginateConfig: PaginateConfig<Order> = {
   nullSort: 'last',
 };
 
-// Конфигурация для Cart
+// Конфігурація для Cart
 export const cartPaginateConfig: PaginateConfig<Cart> = {
   sortableColumns: ['id', 'addedAt', 'quantity', 'price'],
   searchableColumns: [],
@@ -140,7 +140,7 @@ export const cartPaginateConfig: PaginateConfig<Cart> = {
   nullSort: 'last',
 };
 
-// Конфигурация для Comment
+// Конфігурація для Comment
 export const commentPaginateConfig: PaginateConfig<Comment> = {
   sortableColumns: ['id', 'createdAt', 'isModerated'],
   searchableColumns: ['content'],
@@ -165,7 +165,7 @@ export const commentPaginateConfig: PaginateConfig<Comment> = {
   nullSort: 'last',
 };
 
-// Конфигурация для ProductAttribute
+// Конфігурація для ProductAttribute
 export const productAttributePaginateConfig: PaginateConfig<ProductAttribute> =
   {
     sortableColumns: ['id'],
@@ -178,11 +178,10 @@ export const productAttributePaginateConfig: PaginateConfig<ProductAttribute> =
     defaultSortBy: [['id', 'DESC']],
     maxLimit: 100,
     defaultLimit: 10,
-    select: ['id'],
     nullSort: 'last',
   };
 
-// Конфигурация для User
+// Конфігурація для User
 export const userPaginateConfig: PaginateConfig<User> = {
   sortableColumns: ['id', 'email', 'createdAt', 'updatedAt'],
   searchableColumns: ['email', 'phone'],

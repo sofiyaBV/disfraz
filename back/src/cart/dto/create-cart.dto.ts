@@ -11,21 +11,21 @@ export class CreateCartDto {
   productAttributeId: number;
 
   @ApiPropertyOptional({
-    description: 'Количество товара в корзине',
+    description: 'Кількість товарів у кошику',
     example: 1,
   })
   @IsInt()
   @IsPositive()
   @IsOptional()
-  quantity?: number = 1; // По умолчанию 1, как в сущности
+  quantity?: number = 1;
 
   @ApiPropertyOptional({
-    description: 'Цена за единицу товара',
+    description: 'Ціна за одиницю',
     example: 199.99,
     default: 0.0,
   })
   @IsNumber()
   @Min(0)
   @IsOptional()
-  price?: number = 0.0; // По умолчанию 0.00, как в сущности
+  price?: number = 0.0;
 }

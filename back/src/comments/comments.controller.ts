@@ -29,17 +29,17 @@ import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { commentPaginateConfig } from '../config/pagination.config';
 
-@ApiTags('Comments')
+@ApiTags('Коментарі')
 @Controller('comments')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @ApiOperation({ summary: 'Создать новый комментарий к продукту' })
+  @ApiOperation({ summary: 'Створити новий коментар до продукту' })
   @ApiResponse({
     status: 201,
-    description: 'Комментарий успешно создан',
+    description: 'Коментар успішно створений',
     type: Comment,
   })
   @ApiBody({ type: CreateCommentDto })
@@ -49,10 +49,10 @@ export class CommentsController {
     return this.commentsService.create(createCommentDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все комментарии' })
+  @ApiOperation({ summary: 'Отримати всі коментарі' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех комментариев',
+    description: 'Список усіх коментарів',
   })
   @PaginatedSwaggerDocs(CreateCommentDto, commentPaginateConfig)
   @Get()
@@ -61,17 +61,17 @@ export class CommentsController {
     return this.commentsService.findAllPag(query);
   }
 
-  @ApiOperation({ summary: 'Получить комментарий по ID' })
+  @ApiOperation({ summary: 'Отримати коментар за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Комментарий найден',
+    description: 'Коментар знайдений',
     type: Comment,
   })
-  @ApiResponse({ status: 404, description: 'Комментарий не найден' })
+  @ApiResponse({ status: 404, description: 'Коментар не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID комментария',
+    description: 'ID коментаря',
     example: 1,
   })
   @Get(':id')
@@ -80,18 +80,18 @@ export class CommentsController {
     return this.commentsService.findOne(+id);
   }
 
-  @ApiOperation({ summary: 'Обновить комментарий по ID' })
+  @ApiOperation({ summary: 'Оновити коментар за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Комментарий успешно обновлен',
+    description: 'Коментар успішно оновлений',
     type: Comment,
   })
-  @ApiResponse({ status: 404, description: 'Комментарий не найден' })
+  @ApiResponse({ status: 404, description: 'Коментар не знайдений' })
   @ApiBody({ type: UpdateCommentDto })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID комментария',
+    description: 'ID коментаря',
     example: 1,
   })
   @Patch(':id')
@@ -100,13 +100,13 @@ export class CommentsController {
     return this.commentsService.update(+id, updateCommentDto);
   }
 
-  @ApiOperation({ summary: 'Удалить комментарий по ID' })
-  @ApiResponse({ status: 200, description: 'Комментарий успешно удален' })
-  @ApiResponse({ status: 404, description: 'Комментарий не найден' })
+  @ApiOperation({ summary: 'Видалити коментар за ID' })
+  @ApiResponse({ status: 200, description: 'Коментар успішно видалений' })
+  @ApiResponse({ status: 404, description: 'Коментар не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID комментария',
+    description: 'ID коментаря',
     example: 1,
   })
   @Delete(':id')

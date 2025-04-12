@@ -9,11 +9,4 @@ export class UpdateCommentDto {
   @IsString()
   @IsOptional()
   content?: string;
-
-  // @ApiPropertyOptional({
-  //   description: 'Статус модерации',
-  //   example: true,
-  // })
-  // @IsOptional()
-  // isModerated?: boolean;
 }

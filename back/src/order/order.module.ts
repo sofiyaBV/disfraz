@@ -7,9 +7,9 @@ import { Cart } from 'src/cart/entities/cart.entity';
 import { User } from 'src/user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, Cart, User])], // Подключаем модель Order
+  imports: [TypeOrmModule.forFeature([Order, Cart, User])],
   controllers: [OrderController],
   providers: [OrderService],
-  exports: [OrderService], // Для использования в других модулях
+  exports: [OrderService],
 })
 export class OrderModule {}

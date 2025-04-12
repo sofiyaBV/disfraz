@@ -29,14 +29,14 @@ export class CreateProductDto {
   @IsNumber({}, { each: true })
   @IsOptional()
   @Transform(({ value }) => {
-    // Если значение - строка, преобразуем её в массив чисел
+    // Якщо значення - рядок, перетворимо його на масив чисел
     if (typeof value === 'string') {
       return value
         .split(',')
         .map((item) => parseInt(item.trim(), 10))
         .filter((item) => !isNaN(item));
     }
-    // Если значение уже массив, преобразуем элементы в числа
+    // Якщо значення вже масив, перетворюємо елементи в числа
     if (Array.isArray(value)) {
       return value
         .map((item) => parseInt(item, 10))
