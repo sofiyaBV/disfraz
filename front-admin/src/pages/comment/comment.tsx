@@ -29,6 +29,7 @@ export const CommentShow = () => (
             <TextField source="content" label="Вміст" />
             <DateField source="createdAt" label="Дата створення" />
             <BooleanField source="isModerated" label="Пройшов перевірку" />
+            <TextField source="productAttributeId"/>
             <DeleteButton />
         </SimpleShowLayout>
     </Show>

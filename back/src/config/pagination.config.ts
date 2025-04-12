@@ -51,7 +51,6 @@ export const attributePaginateConfig: PaginateConfig<Attribute> = {
     'bodyPart',
     'isSet',
     'description',
-    'inStock',
   ],
   nullSort: 'last',
 };
@@ -154,7 +153,6 @@ export const commentPaginateConfig: PaginateConfig<Comment> = {
   defaultSortBy: [['createdAt', 'DESC']],
   maxLimit: 100,
   defaultLimit: 10,
-  select: ['id', 'content', 'createdAt', 'isModerated'],
   nullSort: 'last',
 };
 

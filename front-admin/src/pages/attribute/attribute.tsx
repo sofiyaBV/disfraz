@@ -16,7 +16,6 @@ export const AttributeList = () => (
             <TextField source="theme" label="Тема" />
             <TextField source="bodyPart" label="Частина тіла" />
             <BooleanField source="isSet" label="Набір" />
-            <TextField source="inStock" label="В наявності" />
             <EditButton />
             <DeleteButton />
         </Datagrid>
@@ -51,18 +50,9 @@ export const AttributeEdit = () => (
                     { id: 'все тіло', name: 'Все тіло' },
                 ]}
                 validate={[required()]}
-            />            <BooleanInput source="isSet" label="Набір" />
-            <TextInput source="description" label="Додаткова інформація" />
-            <SelectInput
-                source="inStock"
-                label="В наявності"
-                choices={[
-                    { id: 'на складі', name: 'на складі' },
-                    { id: 'у наявності', name: 'у наявності' },
-                    { id: 'не в наявності', name: 'не в наявності' },
-                ]}
-                validate={[required()]}
             />
+            <BooleanInput source="isSet" label="Набір" />
+            <TextInput source="description" label="Додаткова інформація" />
         </SimpleForm>
     </Edit>
 );
@@ -77,7 +67,6 @@ export const AttributeShow = () => (
                 <TextField source="bodyPart" label="Частина тіла" />
                 <BooleanField source="isSet" label="Набір" />
                 <TextField source="description" label="Додаткова інформація" />
-                <TextField source="inStock" label="В наявності" />
             </SimpleShowLayout>
         </Show>
 );
@@ -112,16 +101,6 @@ export const AttributeCreate = () => (
                 validate={[required()]}
             />            <BooleanInput source="isSet" label="Набір" />
             <TextInput source="description" label="Додаткова інформація" />
-            <SelectInput
-                source="inStock"
-                label="В наявності"
-                choices={[
-                    { id: 'на складі', name: 'на складі' },
-                    { id: 'у наявності', name: 'у наявності' },
-                    { id: 'не в наявності', name: 'не в наявності' },
-                ]}
-                validate={[required()]}
-            />
         </SimpleForm>
     </Create>
 );
