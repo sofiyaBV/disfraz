@@ -9,14 +9,17 @@ import {
 import { DeliveryMethod } from './create-order.dto';
 
 export class UpdateOrderDto {
-  @ApiPropertyOptional({ example: 'Иван Петренко', description: 'Имя клиента' })
+  @ApiPropertyOptional({
+    example: 'Іван Петренко',
+    description: "Ім'я клієнта",
+  })
   @IsString()
   @IsOptional()
   customerName?: string;
 
   @ApiPropertyOptional({
     example: 'ivan@example.com',
-    description: 'Email клиента',
+    description: 'Електронна пошта клієнта',
   })
   @IsEmail()
   @IsOptional()
@@ -24,23 +27,23 @@ export class UpdateOrderDto {
 
   @ApiPropertyOptional({
     example: '+380971234567',
-    description: 'Телефон клиента',
+    description: 'Телефон клієнта',
   })
   @IsPhoneNumber('UA')
   @IsOptional()
   customerPhone?: string;
 
   @ApiPropertyOptional({
-    example: 'ул. Хрещатик, 10, Киев, Украина',
-    description: 'Адрес доставки',
+    example: 'вул. Хрещатик, 10, Київ, Україна',
+    description: 'Адреса доставки',
   })
   @IsString()
   @IsOptional()
   deliveryAddress?: string;
 
   @ApiPropertyOptional({
-    example: 'Новая Почта - отделение',
-    description: 'Способ доставки',
+    example: 'Нова Пошта - відділення',
+    description: 'Спосіб доставки',
     enum: DeliveryMethod,
   })
   @IsEnum(DeliveryMethod)
@@ -48,8 +51,8 @@ export class UpdateOrderDto {
   deliveryMethod?: DeliveryMethod;
 
   @ApiPropertyOptional({
-    example: 'Пожалуйста, позвоните перед доставкой',
-    description: 'Заметки к заказу',
+    example: 'Будь ласка, зателефонуйте перед доставкою',
+    description: 'Примітки до замовлення',
   })
   @IsString()
   @IsOptional()
@@ -57,7 +60,7 @@ export class UpdateOrderDto {
 
   @ApiPropertyOptional({
     example: 'Pending',
-    description: 'Статус заказа',
+    description: 'Статус замовлення',
   })
   @IsString()
   @IsOptional()

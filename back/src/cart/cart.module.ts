@@ -7,7 +7,7 @@ import { ProductAttribute } from '../product-attribute/entities/product-attribut
 import { User } from 'src/user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Cart, ProductAttribute, User])], // Додаємо Cart і ProductAttribute
+  imports: [TypeOrmModule.forFeature([Cart, ProductAttribute, User])],
   controllers: [CartController],
   providers: [CartService],
 })

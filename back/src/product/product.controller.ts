@@ -113,13 +113,13 @@ export class ProductController {
     status: 200,
     description: 'List of all products',
   })
-  @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig) // Добавляем Swagger-документацию для пагинации
+  @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig)
   @Get()
   @Roles(Role.User, Role.Admin)
   async findAll(
-    @Paginate() query: PaginateQuery, // Используем декоратор Paginate для получения параметров пагинации
+    @Paginate() query: PaginateQuery, // Використовуємо декоратор Paginate для отримання параметрів пагінації
   ): Promise<Paginated<Product>> {
-    return this.productService.findAllPag(query); // Вызываем обновленный метод
+    return this.productService.findAllPag(query);
   }
 
   @ApiOperation({ summary: 'Get a product by ID' })

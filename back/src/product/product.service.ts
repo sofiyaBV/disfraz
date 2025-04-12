@@ -11,7 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
 
-// Интерфейс для ответа от ImgBB API
+// Інтерфейс для відповіді від ImgBB API
 interface ImgBBResponse {
   success: boolean;
   data: {
@@ -35,7 +35,7 @@ export class ProductService {
   ) {
     this.imgbbApiKey = this.configService.get<string>('IMGBB_API_KEY');
     if (!this.imgbbApiKey) {
-      throw new Error('IMGBB_API_KEY is not defined in environment variables');
+      throw new Error('IMGBB_API_KEY не визначено у змінних оточення');
     }
   }
 
@@ -66,14 +66,14 @@ export class ProductService {
           deleteHash: response.data.data.delete_url.split('/').pop(),
         };
       } else {
-        throw new Error('Не удалось загрузить изображение в ImgBB');
+        throw new Error('Не вдалося завантажити зображення в ImgBB');
       }
     } catch (err) {
       const error = err as AxiosError;
       const errorMessage = error.response
-        ? `Ошибка ${error.response.status}: ${JSON.stringify(error.response.data)}`
-        : error.message || 'Неизвестная ошибка при загрузке в ImgBB';
-      throw new Error(`Ошибка загрузки в ImgBB: ${errorMessage}`);
+        ? `Помилка ${error.response.status}: ${JSON.stringify(error.response.data)}`
+        : error.message || 'Невідома помилка під час завантаження в ImgBB';
+      throw new Error(`Помилка завантаження в ImgBB: ${errorMessage}`);
     }
   }
 
@@ -84,9 +84,9 @@ export class ProductService {
       const error = err as AxiosError;
       const errorMessage = error.response
         ? `Ошибка ${error.response.status}: ${JSON.stringify(error.response.data)}`
-        : error.message || 'Неизвестная ошибка при удалении из ImgBB';
+        : error.message || 'Невідома помилка під час видалення з ImgBB';
       console.warn(
-        `Не удалось удалить изображение с deleteHash ${deleteHash}: ${errorMessage}`,
+        `Не вдалося видалити зображення зdeleteHash ${deleteHash}: ${errorMessage}`,
       );
     }
   }
@@ -99,21 +99,20 @@ export class ProductService {
     const imageData: { url: string; deleteHash: string }[] = [];
 
     try {
-      // Загружаем изображения
-      // Загружаем изображения
+      // Завантажуємо зображення
       for (const file of files) {
         const { url, deleteHash } = await this.uploadToImgBB(file);
         imageData.push({ url, deleteHash });
       }
 
-      // Находим похожие продукты по их ID, если они указаны
+      // Знаходимо схожі продукти за їхніми ID, якщо вони вказані
       let similarProducts: Product[] = [];
       if (createProductDto.similarProductIds?.length > 0) {
         similarProducts = await this.productRepository.find({
           where: createProductDto.similarProductIds.map((id) => ({ id })),
         });
 
-        // Проверяем, что все указанные ID существуют
+        // Перевіряємо, що всі зазначені ID існують
         const foundIds = similarProducts.map((p) => p.id);
         const missingIds = createProductDto.similarProductIds.filter(
           (id) => !foundIds.includes(id),
@@ -125,13 +124,13 @@ export class ProductService {
         }
       }
 
-      // Создаем продукт
+      // Створюємо продукт
       const productData = {
         name: createProductDto.name,
         price: createProductDto.price,
         description: createProductDto.description,
         images: imageData,
-        similarProducts, // Если similarProductIds не указано, будет пустой массив
+        similarProducts,
       };
 
       const product = this.productRepository.create(productData);
@@ -139,10 +138,10 @@ export class ProductService {
       console.log('Created product:', savedProduct);
       return savedProduct;
     } catch (err) {
-      console.error('Ошибка при создании продукта:', err);
+      console.error('Помилка під час створення продукту:', err);
       if (imageData.length > 0) {
         console.warn(
-          'Изображения не будут удалены из ImgBB, так как API не поддерживает удаление. Вы можете удалить их вручную:',
+          'Зображення не будуть видалені з ImgBB, оскільки API не підтримує видалення. Ви можете видалити їх вручну:',
           imageData,
         );
       }
@@ -172,7 +171,7 @@ export class ProductService {
       relations: ['attributes', 'similarProducts'],
     });
     if (!product) {
-      throw new NotFoundException(`Продукт с ID ${id} не найден`);
+      throw new NotFoundException(`Продукт з ID ${id} не знайдено`);
     }
     console.log(`Found product with ID ${id}:`, product);
     return product;
@@ -190,7 +189,7 @@ export class ProductService {
       });
 
       if (!product) {
-        throw new NotFoundException(`Продукт с ID ${id} не найден`);
+        throw new NotFoundException(`Продукт з ID ${id} не знайдено`);
       }
 
       if (files.length > 0 && product.images && product.images.length > 0) {
@@ -207,26 +206,25 @@ export class ProductService {
         }
       }
 
-      // Обновляем похожие продукты, если переданы новые ID
-      if (updateProductDto.similarProductIds) {
-        const similarProducts = await this.productRepository.find({
-          where: updateProductDto.similarProductIds.map((id) => ({ id })),
-        });
+      // if (updateProductDto.similarProductIds) {
+      //   const similarProducts = await this.productRepository.find({
+      //     where: updateProductDto.similarProductIds.map((id) => ({ id })),
+      //   });
 
-        const foundIds = similarProducts.map((p) => p.id);
-        const missingIds = updateProductDto.similarProductIds.filter(
-          (id) => !foundIds.includes(id),
-        );
-        if (missingIds.length > 0) {
-          throw new NotFoundException(
-            `Продукты с ID ${missingIds.join(', ')} не найдены`,
-          );
-        }
+      //   const foundIds = similarProducts.map((p) => p.id);
+      //   const missingIds = updateProductDto.similarProductIds.filter(
+      //     (id) => !foundIds.includes(id),
+      //   );
+      //   if (missingIds.length > 0) {
+      //     throw new NotFoundException(
+      //       `Продукты с ID ${missingIds.join(', ')} не найдены`,
+      //     );
+      //   }
 
-        product.similarProducts = similarProducts;
-      }
+      //   product.similarProducts = similarProducts;
+      // }
 
-      // Обновляем похожие продукты, если переданы новые ID
+      // Оновлюємо схожі продукти, якщо передано нові ID
       if (updateProductDto.similarProductIds) {
         const similarProducts = await this.productRepository.find({
           where: updateProductDto.similarProductIds.map((id) => ({ id })),
@@ -249,7 +247,6 @@ export class ProductService {
         ...updateProductDto,
         images: newImageData.length > 0 ? newImageData : product.images,
       });
-
 
       const updatedProduct = await manager.save(product);
       console.log(`Updated product with ID ${id}:`, updatedProduct);

@@ -47,13 +47,6 @@ export class Attribute {
   })
   description: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  @ApiPropertyOptional({
-    example: 'Доступний на складі',
-    description: 'Наявність атрибута',
-  })
-  inStock: string;
-
   @ManyToMany(() => Product, (product) => product.attributes)
   @JoinTable({
     name: 'product_attribute',

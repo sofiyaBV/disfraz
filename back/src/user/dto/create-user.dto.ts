@@ -5,25 +5,23 @@ import { Role } from '../../auth/enums/role.enum';
 export class CreateUserDto {
   @ApiProperty({
     example: 'user@example.com',
-    description: 'Email пользователя для авторизации',
+    description: 'Email користувача для авторизації',
   })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
-
   @ApiProperty({
     example: '+380123456789',
-    description: 'Номер телефона пользователя (Украина)',
+    description: 'Номер телефону користувача',
   })
-  @IsNotEmpty() // Робимо поле обов’язковим
+  @IsNotEmpty()
   @IsPhoneNumber()
-  phone: string; // Прибираємо ? (опціональність)
-
+  phone: string;
 
   @ApiProperty({
     example: 'password123',
-    description: 'Пароль пользователя (минимум 6 символов)',
+    description: 'Пароль користувача (мінімум 6 символів)',
   })
   @MinLength(6)
   password: string;

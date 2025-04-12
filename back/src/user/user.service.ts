@@ -20,11 +20,10 @@ export class UserService {
   async createAdmin(createAdminDto: CreateAdminDto): Promise<User> {
     const { email, password } = createAdminDto;
 
-    // Хешируем пароль перед сохранением
+    // Хешуємо пароль перед збереженням
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Создаем нового пользователя с ролью admin
     const user = this.userRepository.create({
       email,
       password: hashedPassword,
@@ -37,11 +36,9 @@ export class UserService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { email, password, phone } = createUserDto;
 
-    // Хешируем пароль перед сохранением
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Создаем нового пользователя с ролью user
     const user = this.userRepository.create({
       email,
       password: hashedPassword,
@@ -53,13 +50,11 @@ export class UserService {
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    // Находим пользователя по ID
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
-      throw new NotFoundException(`Пользователь с ID ${id} не найден`);
+      throw new NotFoundException(`Користувач з ID ${id} не знайдено`);
     }
 
-    // Обновляем поля, если они переданы
     if (updateUserDto.email) {
       user.email = updateUserDto.email;
     }
@@ -69,23 +64,19 @@ export class UserService {
     }
 
     if (updateUserDto.password) {
-      // Хешируем новый пароль, если он передан
       const salt = await bcrypt.genSalt();
       user.password = await bcrypt.hash(updateUserDto.password, salt);
     }
 
-    // Сохраняем обновленного пользователя
     return this.userRepository.save(user);
   }
 
   async deleteUser(id: number): Promise<void> {
-    // Проверяем, существует ли пользователь
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`Пользователь с ID ${id} не найден`);
     }
 
-    // Удаляем пользователя
     await this.userRepository.delete(id);
   }
 

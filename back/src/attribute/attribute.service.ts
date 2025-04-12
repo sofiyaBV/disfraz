@@ -41,7 +41,7 @@ export class AttributesService {
       relations: ['products'],
     });
     if (!attribute) {
-      throw new NotFoundException(`Атрибут с ID ${id} не найден`);
+      throw new NotFoundException(`Атрибут з ID ${id} не знайдений`);
     }
     return attribute;
   }
@@ -57,13 +57,13 @@ export class AttributesService {
       });
 
       if (!attribute) {
-        throw new NotFoundException(`Атрибут с ID ${id} не найден`);
+        throw new NotFoundException(`Атрибут з ID ${id} не знайдений`);
       }
 
-      // Обновляем основные поля атрибута
+      // Оновлюємо основні поля атрибуту
       manager.merge(Attribute, attribute, updateAttributeDto);
 
-      // Сохраняем обновленный атрибут
+      // Зберігаємо оновлений атрибут
       await manager.save(attribute);
       return attribute;
     });
@@ -72,19 +72,12 @@ export class AttributesService {
   async remove(id: number): Promise<void> {
     const result = await this.attributeRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`Атрибут с ID ${id} не найден`);
+      throw new NotFoundException(`Атрибут з ID ${id} не знайдений`);
     }
   }
 
   async findByType(
-    type:
-      | 'material'
-      | 'size'
-      | 'theme'
-      | 'bodyPart'
-      | 'isSet'
-      | 'description'
-      | 'inStock',
+    type: 'material' | 'size' | 'theme' | 'bodyPart' | 'isSet' | 'description',
   ): Promise<Attribute[]> {
     if (
       ![
@@ -94,10 +87,9 @@ export class AttributesService {
         'bodyPart',
         'isSet',
         'description',
-        'inStock',
       ].includes(type)
     ) {
-      throw new Error('Недопустимый тип атрибута');
+      throw new Error('Недопустимий тип атрибуту');
     }
 
     const field = type === 'isSet' ? 'isSet' : type;

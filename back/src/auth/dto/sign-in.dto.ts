@@ -6,7 +6,7 @@ export class SignInDto {
 
   @ApiProperty({
     example: 'admin',
-    description: 'Пароль пользователя',
+    description: 'Пароль користувача',
     minLength: 6,
   })
   password: string;
@@ -15,7 +15,7 @@ export class SignInDto {
 export class SignInResponseDto {
   @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: 'JWT токен для авторизации',
+    description: 'JWT токен для авторизації',
   })
   access_token: string;
 }

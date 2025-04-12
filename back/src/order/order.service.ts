@@ -23,7 +23,7 @@ export class OrderService {
   async create(createOrderDto: CreateOrderDto, userId: number): Promise<Order> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
+      throw new NotFoundException(`Користувач з ID ${userId} не знайдено`);
     }
 
     const cartItems = await this.cartRepository.find({
@@ -33,16 +33,16 @@ export class OrderService {
 
     if (!cartItems || cartItems.length === 0) {
       throw new NotFoundException(
-        `Корзина для пользователя с ID ${userId} пуста или не найдена`,
+        `Кошик для користувача з ID ${userId} порожньо або не знайдено`,
       );
     }
 
-    // Собираем все productAttributeIds из корзины в массив
+    // Збираємо всі productAttributeIds з кошика в масив
     const productAttributeIds = cartItems.map(
       (cart) => cart.productAttribute.id,
     );
 
-    // Суммируем quantity и price из всех записей корзины
+    // Підсумовуємо quantity і price з усіх записів кошика
     const totalQuantity = cartItems.reduce(
       (sum, cart) => sum + cart.quantity,
       0,
@@ -52,12 +52,11 @@ export class OrderService {
       0,
     );
 
-    // Создаем один заказ
     const order = this.orderRepository.create({
       ...createOrderDto,
-      productAttributeIds, // Массив ID атрибутов продуктов
-      quantity: totalQuantity, // Суммарное количество
-      price: totalPrice, // Суммарная стоимость
+      productAttributeIds,
+      quantity: totalQuantity,
+      price: totalPrice,
       user,
       createdAt: new Date(),
       status: createOrderDto.status || 'Pending',
@@ -65,7 +64,7 @@ export class OrderService {
 
     const savedOrder = await this.orderRepository.save(order);
 
-    //  очищаем корзину после создания заказа
+    //  очищаємо кошик після створення замовлення
     await this.cartRepository.delete({ user: { id: userId } });
 
     return savedOrder;

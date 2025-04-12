@@ -9,7 +9,7 @@ import { User } from '../user/entities/user.entity';
 import { Comment } from '../comments/entities/comment.entity';
 
 export default registerAs('database', () => {
-  // Валидация переменных окружения с разрешением неизвестных ключей
+  // Валідація змінних оточення з дозволом невідомих ключів
   const envVarsSchema = Joi.object({
     POSTGRES_HOST: Joi.string().required(),
     POSTGRES_PORT: Joi.number().port().required(),
@@ -20,14 +20,13 @@ export default registerAs('database', () => {
 
   const { error, value } = envVarsSchema.validate(process.env, {
     abortEarly: false,
-    allowUnknown: true, // Разрешаем неизвестные ключи
+    allowUnknown: true,
   });
 
   if (error) {
     throw new Error(`Config validation error: ${error.message}`);
   }
 
-  // Возвращаем конфигурацию для TypeORM
   return {
     type: 'postgres',
     host: value.POSTGRES_HOST,
@@ -46,6 +45,6 @@ export default registerAs('database', () => {
       __dirname + '/**/*.entity{.ts,.js}',
     ],
     autoLoadEntities: true,
-    synchronize: false, // Вимкнено для використання міграцій (якщо ви використовуєте міграції)
+    synchronize: false,
   };
 });

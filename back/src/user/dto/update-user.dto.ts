@@ -4,7 +4,7 @@ import { IsEmail, IsOptional, MinLength, IsPhoneNumber } from 'class-validator';
 export class UpdateUserDto {
   @ApiProperty({
     example: 'newuser@example.com',
-    description: 'Новый email пользователя (опционально)',
+    description: 'Новий email користувача ',
     required: false,
   })
   @IsOptional()
@@ -13,22 +13,21 @@ export class UpdateUserDto {
 
   @ApiProperty({
     example: 'newpassword123',
-    description: 'Новый пароль пользователя (опционально, минимум 6 символов)',
+    description: 'Новий пароль користувача',
     required: false,
   })
   @IsOptional()
-  @MinLength(6, { message: 'Пароль должен быть не менее 6 символов' })
+  @MinLength(6, { message: 'Пароль повинен бути не менше 6 символів' })
   password?: string;
 
   @ApiProperty({
     example: '+380971234567',
-    description: 'Новый номер телефона пользователя (опционально)',
+    description: 'Новий номер телефону користувача ',
     required: false,
   })
   @IsOptional()
   @IsPhoneNumber('UA', {
-    message:
-      'Некорректный формат номера телефона (должен быть украинский номер)',
+    message: 'Некоректний формат номера телефону',
   })
   phone?: string;
 }

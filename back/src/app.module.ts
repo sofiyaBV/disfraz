@@ -19,13 +19,13 @@ import databaseConfig from './config/database.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig], // Подключаем database.config.ts
+      load: [databaseConfig], // Підключаємо database.config.ts
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        ...configService.get('database'), // Используем всю конфигурацию из databaseConfig
+        ...configService.get('database'),
       }),
     }),
     TypeOrmModule.forFeature([User]),
