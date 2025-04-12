@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
@@ -16,24 +21,24 @@ export class RolesGuard implements CanActivate {
     ]);
 
     if (!requiredRoles) {
-      return true; //  Если у метода нет ограничений по ролям, доступ открыт
+      return true; // Якщо у метода немає обмежень за ролями, доступ відкритий
     }
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || !user.roles) { // ✅ Проверяем, есть ли вообще роли
-      this.logger.warn('Request without user or roles - rejected');
+    if (!user || !user.roles) {
+      // ✅ Перевіряємо, чи є взагалі ролі
+      this.logger.warn('Запит без користувача або ролей - відхилено');
       return false;
     }
 
-
-    this.logger.log(`User ${user.username} role-modelled: ${user.roles}`);
+    this.logger.log(`Користувач ${user.username} з ролями: ${user.roles}`);
 
     const hasRole = requiredRoles.some((role) => user.roles?.includes(role));
 
     if (!hasRole) {
-      this.logger.warn(`Access denied. Required roles: ${requiredRoles}`);
+      this.logger.warn(`Доступ заборонений. Потрібні ролі: ${requiredRoles}`);
     }
 
     return hasRole;

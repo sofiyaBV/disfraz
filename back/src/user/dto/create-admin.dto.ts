@@ -4,16 +4,16 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 export class CreateAdminDto {
   @ApiProperty({
     example: 'Email',
-    description: 'Email пользователя для авторизации',
+    description: 'Email користувача для авторизації',
   })
-  @IsNotEmpty({ message: 'Email не может быть пустым' })
+  @IsNotEmpty({ message: 'Email не може бути порожнім' })
   email: string;
 
   @ApiProperty({
     example: 'password123',
-    description: 'Пароль пользователя (минимум 6 символов)',
+    description: 'Пароль користувача (мінімум 6 символів)',
   })
-  @IsNotEmpty({ message: 'Пароль не может быть пустым' })
-  @MinLength(6, { message: 'Пароль должен быть не менее 6 символов' })
+  @IsNotEmpty({ message: 'Пароль не може бути порожнім' })
+  @MinLength(6, { message: 'Пароль повинен бути не менше 6 символів' })
   password: string;
 }

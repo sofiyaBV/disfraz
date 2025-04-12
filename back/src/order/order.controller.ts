@@ -38,16 +38,16 @@ export class OrderController {
 
   @ApiOperation({
     summary:
-      'Создать новый заказ для авторизованного пользователя на основе корзины',
+      'Створити нове замовлення для авторизованого користувача на основі кошика',
   })
   @ApiResponse({
     status: 201,
-    description: 'Заказ успешно создан',
-    type: Order, // Изменили на один Order
+    description: 'Замовлення успішно створено',
+    type: Order,
   })
   @ApiBody({
     type: CreateOrderDto,
-    description: 'Включает данные для создания заказа',
+    description: 'Включає дані для створення замовлення',
   })
   @Post()
   @Roles(Role.User, Role.Admin)
@@ -55,10 +55,10 @@ export class OrderController {
     return this.orderService.create(createOrderDto, user.id);
   }
 
-  @ApiOperation({ summary: 'Получить все заказы' })
+  @ApiOperation({ summary: 'Отримати всі замовлення' })
   @ApiResponse({
     status: 200,
-    description: 'Список всех заказов с пользователями',
+    description: 'Список усіх замовлень із користувачами',
   })
   @PaginatedSwaggerDocs(CreateOrderDto, orderPaginateConfig)
   @Get()
@@ -67,17 +67,17 @@ export class OrderController {
     return this.orderService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Получить заказ по ID' })
+  @ApiOperation({ summary: 'Отримати замовлення за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Заказ найден с пользователем',
+    description: 'Замовлення знайдено з користувачем',
     type: Order,
   })
-  @ApiResponse({ status: 404, description: 'Заказ не найден' })
+  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID заказа',
+    description: 'ID замовлення',
     example: 1,
   })
   @Get(':id')
@@ -86,21 +86,21 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Обновить заказ по ID' })
+  @ApiOperation({ summary: 'Оновити замовлення за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Заказ успешно обновлен',
+    description: 'Замовлення успішно оновлено',
     type: Order,
   })
-  @ApiResponse({ status: 404, description: 'Заказ не найден' })
+  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
   @ApiBody({
     type: UpdateOrderDto,
-    description: 'Данные для обновления заказа',
+    description: 'Дані для оновлення замовлення',
   })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID заказа',
+    description: 'ID замовлення',
     example: 1,
   })
   @Patch(':id')
@@ -109,13 +109,13 @@ export class OrderController {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @ApiOperation({ summary: 'Удалить заказ по ID' })
-  @ApiResponse({ status: 200, description: 'Заказ успешно удален' })
-  @ApiResponse({ status: 404, description: 'Заказ не найден' })
+  @ApiOperation({ summary: 'Видалити замовлення за ID' })
+  @ApiResponse({ status: 200, description: 'Замовлення успішно видалено' })
+  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'ID заказа',
+    description: 'ID замовлення',
     example: 1,
   })
   @Delete(':id')

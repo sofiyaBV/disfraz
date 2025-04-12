@@ -9,14 +9,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'test', // Используем фиксированный ключ
+      secretOrKey: 'test',
     });
   }
 
   async validate(payload: any) {
-    console.log('JWT Payload:', payload); //  Проверяем, что внутри токена
+    console.log('JWT Payload:', payload); //  Перевіряємо, що всередині токена
     const user = await this.usersService.findOne(payload.sub);
-    console.log('User from DB:', user); //  Проверяем, что user найден
+    console.log('User from DB:', user); // Перевіряємо, що user знайдений
 
     if (!user) {
       throw new UnauthorizedException('User not found');

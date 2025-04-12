@@ -11,15 +11,14 @@ export class AppService {
 
   async checkDatabaseConnection(): Promise<string> {
     try {
-      // Проверяем, инициализирован ли DataSource
       if (this.dataSource.isInitialized) {
-        return 'Подключение к базе данных успешно!';
+        return 'Підключення до бази даних успішно!';
       } else {
-        return 'Подключение не инициализировано.';
+        return 'Підключення не ініціалізовано.';
       }
     } catch (error) {
-      console.error('Ошибка подключения к базе данных:', error);
-      return 'Ошибка подключения к базе данных.';
+      console.error('Помилка підключення до бази даних:', error);
+      return 'Помилка підключення до бази даних.';
     }
   }
 }

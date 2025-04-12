@@ -8,7 +8,6 @@ import { User } from '../user/entities/user.entity';
 import { Comment } from '../comments/entities/comment.entity';
 import * as dotenv from 'dotenv';
 
-// Завантажуємо змінні середовища з .env
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -31,5 +30,5 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   migrations: ['src/migrations/*.ts'],
   migrationsRun: false,
-  logging: true, // Додаємо логування для дебагу
+  logging: true,
 });

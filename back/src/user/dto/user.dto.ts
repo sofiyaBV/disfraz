@@ -16,7 +16,7 @@ export class UserDto {
 
   @ApiPropertyOptional({
     example: '+380991234567',
-    description: 'Номер телефону користувача (Україна)',
+    description: 'Номер телефону користувача ',
   })
   phone?: string;
 
