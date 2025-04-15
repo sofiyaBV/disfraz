@@ -18,18 +18,19 @@ import { SelectInput } from "react-admin";
 export const OrderEdit = () => (
     <Edit>
         <SimpleForm>
-            <TextField source="id" />
-            <DateField source="createdAt" />
-            <TextField source="customerName" />
-            <TextField source="notes" />
+            <TextField source="id" label="Ідентифікатор" />
+            <DateField source="createdAt" label="Дата створення" />
+            <TextField source="customerName" label="Ім'я клієнта" />
+            <TextField source="notes" label="Примітки" />
             <SelectInput 
-                source="status" 
-                choices={[
-                    { id: 'pending', name: 'Pending' },
-                    { id: 'processing', name: 'Processing' },
-                    { id: 'completed', name: 'Completed' },
-                    { id: 'cancelled', name: 'Cancelled' },
-                ]}
+            source="status" 
+            label="Статус"
+            choices={[
+                { id: 'pending', name: 'Очікується' },
+                { id: 'processing', name: 'Обробляється' },
+                { id: 'completed', name: 'Завершено' },
+                { id: 'cancelled', name: 'Скасовано' },
+            ]}
             />
         </SimpleForm>
     </Edit>
