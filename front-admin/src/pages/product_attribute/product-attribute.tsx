@@ -1,4 +1,4 @@
-import { List, Datagrid, TextField, Create, Edit, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, NumberField, useRecordContext, ArrayField, BooleanField, SimpleList,required } from "react-admin";
+import { List, Datagrid, TextField, Create, Edit, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, NumberField, useRecordContext, ArrayField, BooleanField, SimpleList, required } from "react-admin";
 import { Grid, Typography, Card, CardContent } from "@mui/material";
 
 export const ProductAttributeList = () => (
@@ -7,7 +7,7 @@ export const ProductAttributeList = () => (
             <TextField source="id" />
             <TextField source="product.name" label="Назва продукту" />
             <TextField source="attribute.material" label="Матеріал атрибута" />
-            <TextField source="inStock"/>
+            <TextField source="inStock" label="Наявність" />
         </Datagrid>
     </List>
 );
@@ -42,11 +42,11 @@ export const ProductAttributeEdit = () => (
             </ReferenceInput>
             <SelectInput
                 source="inStock"
-                label="Чи є в наявності"
+                label="Наявність"
                 choices={[
                     { id: 'Доступний на складі', name: 'Доступний на складі' },
                     { id: 'Є у наявності', name: 'Є у наявності' },
-                    { id: 'Немає у наявності', name: 'Нкмає у наявності' },
+                    { id: 'Немає у наявності', name: 'Немає у наявності' },
                 ]}
                 validate={[required()]}
             />
@@ -58,24 +58,24 @@ export const ProductAttributeShow = () => (
     <Show>
         <SimpleShowLayout>
             <NumberField source="id" label="ID" />
-            <TextField source="inStock" label="Доступний на складі" />
+            <TextField source="inStock" label="Наявність" />
             <Grid container spacing={2}>
                 <Grid item xs={6}>
                     <Card>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>
-                                Информация о продукте
+                                Інформація про продукт
                             </Typography>
                             <Typography variant="subtitle2">Назва продукту</Typography>
-                            <TextField source="product.name" fullWidth  />
+                            <TextField source="product.name" fullWidth />
                             <Typography variant="subtitle2">Ціна продукту</Typography>
-                            <TextField source="product.price" fullWidth  />
+                            <TextField source="product.price" fullWidth />
                             <Typography variant="subtitle2">Опис продукту</Typography>
-                            <TextField source="product.description" fullWidth  />
+                            <TextField source="product.description" fullWidth />
                             <ArrayField label="Фотографії" source="product.images">
                                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                                     <SimpleList primaryText={(record) => (
-                                        <img key={record.url } src={record.url} alt="Фотографія" style={{ maxWidth: '200px', maxHeight: '200px' }} />
+                                        <img key={record.url} src={record.url} alt="Фотографія" style={{ maxWidth: '200px', maxHeight: '200px' }} />
                                     )} />
                                 </div>
                             </ArrayField>
@@ -86,21 +86,20 @@ export const ProductAttributeShow = () => (
                     <Card>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>
-                                Информация об атрибуте
+                                Інформація про атрибут
                             </Typography>
-                            <Typography variant="subtitle2">Материал атрибута</Typography>
+                            <Typography variant="subtitle2">Матеріал атрибута</Typography>
                             <TextField source="attribute.material" fullWidth />
-                            <Typography variant="subtitle2">Размер атрибута</Typography>
+                            <Typography variant="subtitle2">Розмір атрибута</Typography>
                             <TextField source="attribute.size" fullWidth />
                             <Typography variant="subtitle2">Тема атрибута</Typography>
                             <TextField source="attribute.theme" fullWidth />
-                            <Typography variant="subtitle2">Часть тела атрибута</Typography>
+                            <Typography variant="subtitle2">Частина тіла атрибута</Typography>
                             <TextField source="attribute.bodyPart" fullWidth />
-                            <Typography variant="subtitle2">Набор атрибута</Typography>
+                            <Typography variant="subtitle2">Набір атрибута</Typography>
                             <BooleanField source="attribute.isSet" />
-                            <Typography variant="subtitle2">Описание атрибута</Typography>
+                            <Typography variant="subtitle2">Опис атрибута</Typography>
                             <TextField source="attribute.description" fullWidth />
-                            
                         </CardContent>
                     </Card>
                 </Grid>
@@ -120,11 +119,11 @@ export const ProductAttributeCreate = () => (
             </ReferenceInput>
             <SelectInput
                 source="inStock"
-                label="Чи є в наявності"
+                label="Наявність"
                 choices={[
                     { id: 'Доступний на складі', name: 'Доступний на складі' },
                     { id: 'Є у наявності', name: 'Є у наявності' },
-                    { id: 'Немає у наявності', name: 'Нкмає у наявності' },
+                    { id: 'Немає у наявності', name: 'Немає у наявності' },
                 ]}
                 validate={[required()]}
             />
