@@ -13,7 +13,7 @@ const httpClient = (url: string, options: any = {}) => {
   const token = localStorage.getItem("token");
   if (token) {
     options.headers.set("Authorization", `Bearer ${token}`);
-    console.log("Authorization header set:", `Bearer ${token}`);
+    // console.log("Authorization header set:", `Bearer ${token}`);
   } else {
     console.log("No token found in localStorage");
   }

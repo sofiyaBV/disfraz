@@ -1,4 +1,4 @@
-import { BooleanField, BooleanInput, Datagrid, DateField, DeleteButton, Edit, List, Show, SimpleForm, SimpleShowLayout, TextField } from "react-admin";
+import { BooleanField, BooleanInput, Datagrid, DateField, DeleteButton, Edit, FunctionField, ImageField, Link, List, ReferenceField, Show, SimpleForm, SimpleShowLayout, TextField } from "react-admin";
 
 export const CommentList = () => (
     <List>
@@ -29,7 +29,13 @@ export const CommentShow = () => (
             <TextField source="content" label="Вміст" />
             <DateField source="createdAt" label="Дата створення" />
             <BooleanField source="isModerated" label="Пройшов перевірку" />
-            <TextField source="productAttributeId"/>
+
+            {/* Email користувача */}
+            <FunctionField
+            label="Email користувача"
+            render={record => record.user?.email || 'N/A'}
+            />
+
             <DeleteButton />
         </SimpleShowLayout>
     </Show>
