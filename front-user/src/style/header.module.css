@@ -1,0 +1,89 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0; /* Тонкая граница снизу */
+    height: 60px; /* Высота хедера */
+  }
+  
+  /* Левая часть: меню и логотип */
+  .left_section {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Отступ между троеточием и логотипом */
+  }
+  
+  .menu_icon {
+    background-color: #e0e0e0; /* Серая заглушка для троеточия */
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer; /* Курсор для будущей интерактивности */
+  }
+  
+  .logo {
+    height: 40px; /* Размер логотипа, можно изменить */
+    width: auto;
+  }
+  
+  /* Центральная часть: кнопка и поиск */
+  .center_section {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Отступ между кнопкой и полем поиска */
+  }
+  
+  .custom_button {
+    background-color: #fff; /* Белый фон по умолчанию */
+    color: #000; /* Чёрный текст по умолчанию */
+    border: 1px solid #000; /* Чёрная рамка */
+    padding: 8px 20px; /* Размер кнопки */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Плавная смена цвета */
+  }
+  
+  /* Состояние кнопки при нажатии */
+  .button_active {
+    background-color: #000; /* Чёрный фон */
+    color: #fff; /* Белый текст */
+    border: 1px solid #000; /* Чёрная рамка */
+  }
+  
+  .search_container {
+    position: relative;
+    width: 400px; /* Ширина поля поиска, можно изменить */
+  }
+  
+  .search_input {
+    width: 100%;
+    padding: 8px 40px 8px 15px; /* Отступы с учётом иконки поиска */
+    border: 1px solid #e0e0e0;
+    border-radius: 20px; /* Скругление углов */
+    font-size: 14px;
+  }
+  
+  .search_icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555;
+  }
+  
+  /* Правая часть: иконки */
+  .right_section {
+    display: flex;
+    gap: 20px; /* Отступ между иконками */
+  }
+  
+  .icon_link {
+    color: #000;
+    font-size: 20px; /* Размер иконок */
+    text-decoration: none;
+  }
+  
+  .icon_link:hover {
+    color: #555; /* Цвет при наведении */
+  }
