@@ -6,19 +6,19 @@ export const footerSections = [
     title: "Інформація про компанію",
     links: {
       "Про нас": "/about",
-      "Мови вибору сайту": "/languages",
-      Замовлення: "/orders",
+      "Умови використання сайту": "/languages",
+      Вакансії: "/orders",
       Контакти: "/contact",
     },
     type: "text",
   },
   {
-    title: "Сервіс",
+    title: "Сервіси",
     links: {
-      "Бонуси для друзів": "/bonuses",
-      "Топ-акції сервісу": "/promotions",
+      "Бонусний рахунок": "/bonuses",
+      "Подарункові сертифікати": "/promotions",
       "Disfraz обмін": "/exchange",
-      "Допомога клієнтам": "/support",
+      "Корпоративним клієнтам": "/support",
     },
     type: "text",
   },
@@ -35,20 +35,20 @@ export const footerSections = [
   {
     title: "Партнерам",
     links: {
-      "Програма на Disfraz": "/program",
-      "Суперціна за нами": "/super-price",
-      Офіційний: "/official",
-      "Оренда реклами людям": "/ad-rental",
+      "Продавати на Disfraz": "/program",
+      "Співпраця за нами": "/super-price",
+      Франчайзинг: "/official",
+      "Оренда рекламних площ": "/ad-rental",
     },
     type: "text",
   },
   {
-    title: "Завантажити наші додатки",
+    title: "Завантажуйте наші застосунки",
     apps: [
       { name: "Google Play", url: "/google-play", image: GooglePay },
       { name: "App Store", url: "/app-store", image: AppStore },
     ],
-    socialTitle: "Ми у соціальних мережах",
+    socialTitle: "Ми в соціальних мережах",
     socialLinks: {
       Facebook: "/facebook",
       Instagram: "/instagram",

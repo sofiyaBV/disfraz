@@ -1,26 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import styles from "../../style/header.module.css"; // Импорт стилей для хедера
+import styles from "../../style/header.module.css";
 import logoImage from "../../assets/LOGO.png"; // Импорт логотипа из assets
+import menuImage from "../../assets/menu.png"; // Импорт изображения меню
 import { FaSearch, FaUser, FaHeart, FaShoppingCart } from "react-icons/fa"; // Иконки для правой части хедера
+import ButtonGeneral from "../buttons/ButtonGeneral"; // Импорт нового компонента кнопки
 
 const Header = () => {
-  // Состояние для кнопки (чёрно-белая или бело-чёрная)
-  const [isButtonActive, setIsButtonActive] = useState(false);
-
-  // Функция для переключения состояния кнопки
-  const handleButtonClick = () => {
-    setIsButtonActive(!isButtonActive);
-  };
-
   return (
     <header className={styles.header}>
-      {/* Левая часть: троеточие и логотип */}
+      {/* Левая часть: меню и логотип */}
       <div className={styles.left_section}>
-        {/* Троеточие (будущая выплывающая страница) */}
+        {/* Изображение меню вместо троеточия */}
         <div className={styles.menu_icon}>
           {/* Можно добавить onClick для будущей функциональности */}
-          <span>☰</span>
+          <img src={menuImage} alt="Menu" className={styles.menu_image} />
         </div>
 
         {/* Логотип */}
@@ -31,17 +25,10 @@ const Header = () => {
 
       {/* Центральная часть: кнопка и поле поиска */}
       <div className={styles.center_section}>
-        {/* Кнопка с переключением цвета */}
-        <button
-          className={`${styles.custom_button} ${
-            isButtonActive ? styles.button_active : ""
-          }`}
-          onClick={handleButtonClick}
-        >
-          Каталог
-        </button>
+        {/* Используем новый компонент ButtonGeneral */}
+        <ButtonGeneral initialColor="black" text="Каталог" />
 
-        {/* Поле поиска (пока только ввод) */}
+        {/* Поле поиска (растянутое на доступное пространство) */}
         <div className={styles.search_container}>
           <input
             type="text"
