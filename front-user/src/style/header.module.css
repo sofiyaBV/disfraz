@@ -2,19 +2,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem; /* Гибкие отступы */
   background-color: #fff;
-  border-bottom: 1px solid #e0e0e0;
-  height: 3.5rem; /* Гибкая высота */
+  border-bottom: 1px solid #EEEEEE;
+  height: 6.3rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Левая часть: меню и логотип */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  pointer-events: none;
+}
+
 .left_section {
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* Гибкий отступ между меню и логотипом */
+  gap: 0.82rem;
+  margin-left: 6.13rem;
 }
 
 .menu_icon {
@@ -23,59 +33,194 @@
 }
 
 .menu_image {
-  height: 2rem; /* Гибкий размер изображения меню */
+  height: 2rem;
   width: auto;
 }
 
 .logo {
-  height: 2.5rem; /* Гибкий размер логотипа */
+  height: 3rem;
   width: auto;
 }
 
-/* Центральная часть: кнопка и поиск */
 .center_section {
   display: flex;
   align-items: center;
-  gap: 1rem; /* Гибкий отступ между кнопкой и полем поиска */
-  flex-grow: 1; /* Растягиваем секцию, чтобы занять всё доступное пространство */
-  max-width: 70%; /* Ограничение максимальной ширины для больших экранов */
+  gap: 1.6rem;
+  flex-grow: 1;
+  margin-left: 1.5rem;
+  max-width: calc(100% - 15rem);
 }
 
 .search_container {
   position: relative;
-  flex-grow: 1; /* Растягиваем поле поиска на всё доступное пространство */
-  min-width: 15rem; /* Минимальная ширина для маленьких экранов */
+  flex-grow: 1;
+  min-width: 10rem;
+  display: flex;
+  align-items: center;
+  z-index: 30;
 }
 
 .search_input {
   width: 100%;
-  padding: 0.5rem 2.5rem 0.5rem 1rem; /* Гибкие отступы */
-  border: 1px solid #e0e0e0;
-  border-radius: 1.25rem;
-  font-size: 0.9rem;
+  height: 2.5rem;
+  padding: 0.5rem 5rem 0.5rem 1rem;
+  font-size: 1.5rem;
+  color: #989898;
+  background-color: #F5f5F5;
+}
+
+.search_input:focus {
+  outline: none;
 }
 
 .search_icon {
   position: absolute;
-  right: 1rem;
+  right: 3rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #555;
-  font-size: 1rem;
+  color: #292D32;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-/* Правая часть: иконки */
+.search_icon_focused {
+  filter: brightness(0) invert(1);
+}
+
+.search_button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #e0e0e0;
+  border-left: none;
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 0 0.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 10rem;
+}
+
+.search_button_icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: brightness(0) invert(1);
+}
+
+.search_popup {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  padding: 0.5rem;
+}
+
+.recent_searches {
+  padding: 0.5rem 0;
+}
+
+.recent_searches h4 {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.recent_searches ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recent_searches li {
+  font-size: 0.85rem;
+  color: #555;
+  padding: 0.3rem 0;
+  cursor: pointer;
+}
+
+.recent_searches li:hover {
+  color: #000;
+}
+
 .right_section {
   display: flex;
-  gap: 1rem; /* Гибкий отступ между иконками */
+  gap: 1rem;
+  margin-right: 6.13rem;
+  min-width: 100px;
 }
 
 .icon_link {
   color: #000;
-  font-size: 1.25rem; /* Гибкий размер иконок */
+  font-size: 1.25rem;
   text-decoration: none;
+  margin-left: 1.5rem;
+}
+
+.icon_link img {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .icon_link:hover {
   color: #555;
+}
+
+@media (max-width: 1024px) {
+  .left_section {
+    margin-left: 1rem;
+  }
+
+  .center_section {
+    margin-left: 1rem;
+    max-width: calc(100% - 10rem);
+  }
+
+  .search_input {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .center_section {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 0.5rem;
+    max-width: 100%;
+  }
+
+  .search_container {
+    width: 100%;
+  }
+
+  .search_input {
+    font-size: 1rem;
+    padding-right: 3rem;
+    height: 2rem;
+  }
+
+  .search_icon {
+    right: 1rem;
+  }
+
+  .search_button {
+    display: none;
+  }
+
+  .right_section {
+    gap: 0.5rem;
+    margin-right: 0.5rem;
+    min-width: 80px;
+  }
 }

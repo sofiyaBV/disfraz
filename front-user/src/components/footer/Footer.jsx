@@ -15,7 +15,7 @@ const Footer = () => {
   const rightTextSections = textSections.slice(2, 4);
 
   return (
-    <div>
+    <footer>
       <div className={styles.footer_section_1}>
         <div className={styles.components_section}>
           <div className={styles.text_links}>
@@ -64,7 +64,7 @@ const Footer = () => {
       <div className={styles.footer_section_3}>
         <p>© Copyright 2024-2025. Disfraz.com. All Rights Reserved.</p>
       </div>
-    </div>
+    </footer>
   );
 };
 
