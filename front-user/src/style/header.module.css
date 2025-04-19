@@ -1,0 +1,81 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem; /* Гибкие отступы */
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  height: 3.5rem; /* Гибкая высота */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Левая часть: меню и логотип */
+.left_section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Гибкий отступ между меню и логотипом */
+}
+
+.menu_icon {
+  display: flex;
+  align-items: center;
+}
+
+.menu_image {
+  height: 2rem; /* Гибкий размер изображения меню */
+  width: auto;
+}
+
+.logo {
+  height: 2.5rem; /* Гибкий размер логотипа */
+  width: auto;
+}
+
+/* Центральная часть: кнопка и поиск */
+.center_section {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Гибкий отступ между кнопкой и полем поиска */
+  flex-grow: 1; /* Растягиваем секцию, чтобы занять всё доступное пространство */
+  max-width: 70%; /* Ограничение максимальной ширины для больших экранов */
+}
+
+.search_container {
+  position: relative;
+  flex-grow: 1; /* Растягиваем поле поиска на всё доступное пространство */
+  min-width: 15rem; /* Минимальная ширина для маленьких экранов */
+}
+
+.search_input {
+  width: 100%;
+  padding: 0.5rem 2.5rem 0.5rem 1rem; /* Гибкие отступы */
+  border: 1px solid #e0e0e0;
+  border-radius: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.search_icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #555;
+  font-size: 1rem;
+}
+
+/* Правая часть: иконки */
+.right_section {
+  display: flex;
+  gap: 1rem; /* Гибкий отступ между иконками */
+}
+
+.icon_link {
+  color: #000;
+  font-size: 1.25rem; /* Гибкий размер иконок */
+  text-decoration: none;
+}
+
+.icon_link:hover {
+  color: #555;
+}
