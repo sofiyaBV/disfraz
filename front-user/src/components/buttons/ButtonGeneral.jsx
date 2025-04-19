@@ -1,27 +1,25 @@
-import React, { useState } from "react";
-import styles from "../../style/buttons/buttonGeneral.module.css"; // Импорт стилей для кнопки
+import React from "react";
+import styles from "../../style/buttons/buttonGeneral.module.css";
 
-const ButtonGeneral = ({ initialColor = "black", text }) => {
-  // Состояние для отслеживания активности кнопки (чёрная или белая)
-  const [isActive, setIsActive] = useState(false);
-
-  // Функция для переключения состояния кнопки
-  const handleClick = () => {
-    setIsActive(!isActive);
+const ButtonGeneral = ({
+  initialColor = "black",
+  text,
+  width,
+  height,
+  transitionDuration = "0.3s",
+}) => {
+  const buttonStyle = {
+    width: width || "auto",
+    height: height || "auto",
+    transitionDuration: transitionDuration,
   };
 
   return (
     <button
+      style={buttonStyle}
       className={`${styles.custom_button} ${
-        initialColor === "black"
-          ? isActive
-            ? styles.button_white
-            : styles.button_black
-          : isActive
-          ? styles.button_black
-          : styles.button_white
+        initialColor === "black" ? styles.button_black : styles.button_white
       }`}
-      onClick={handleClick}
     >
       {text}
     </button>
