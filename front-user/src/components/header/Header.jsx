@@ -1,63 +1,103 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../style/header.module.css";
-import logoImage from "../../assets/LOGO.png"; // Импорт логотипа из assets
-import menuImage from "../../assets/menu.png"; // Импорт изображения меню
-import { FaSearch, FaUser, FaHeart, FaShoppingCart } from "react-icons/fa"; // Иконки для правой части хедера
-import ButtonGeneral from "../buttons/ButtonGeneral"; // Импорт нового компонента кнопки
+import logoImage from "../../assets/LOGO.png";
+import menuImage from "../../assets/menu.png";
+import ButtonGeneral from "../buttons/ButtonGeneral";
+
+// Импорт SVG-иконок
+import FaSearch from "../../assets/svg/search-normal.svg";
+import FaHeart from "../../assets/svg/heart.svg";
+import FaShoppingCart from "../../assets/svg/shopping-bag.svg";
+import FaUser from "../../assets/svg/profile.svg";
 
 const Header = () => {
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  useEffect(() => {
+    if (isSearchFocused) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isSearchFocused]);
   return (
-    <header className={styles.header}>
-      {/* Левая часть: меню и логотип */}
-      <div className={styles.left_section}>
-        {/* Изображение меню вместо троеточия */}
-        <div className={styles.menu_icon}>
-          {/* Можно добавить onClick для будущей функциональности */}
-          <img src={menuImage} alt="Menu" className={styles.menu_image} />
+    <>
+      {isSearchFocused && <div className={styles.overlay}></div>}
+      <header className={styles.header}>
+        <div className={styles.left_section}>
+          <div className={styles.menu_icon}>
+            <img src={menuImage} alt="Menu" className={styles.menu_image} />
+          </div>
+          <Link to="/">
+            <img src={logoImage} alt="Logo" className={styles.logo} />
+          </Link>
         </div>
 
-        {/* Логотип */}
-        <Link to="/">
-          <img src={logoImage} alt="Logo" className={styles.logo} />
-        </Link>
-      </div>
-
-      {/* Центральная часть: кнопка и поле поиска */}
-      <div className={styles.center_section}>
-        {/* Используем новый компонент ButtonGeneral */}
-        <ButtonGeneral initialColor="black" text="Каталог" />
-
-        {/* Поле поиска (растянутое на доступное пространство) */}
-        <div className={styles.search_container}>
-          <input
-            type="text"
-            placeholder="Я ищу обувь"
-            className={styles.search_input}
+        <div className={styles.center_section}>
+          <ButtonGeneral
+            initialColor="black"
+            text="Каталог"
+            width="10.4rem"
+            height="3rem"
+            transitionDuration="0.1s"
           />
-          <FaSearch className={styles.search_icon} />
+
+          <div className={styles.search_container}>
+            <input
+              type="text"
+              className={styles.search_input}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setTimeout(() => setIsSearchFocused(false), 100)}
+              placeholder="Знайти собі образ"
+            />
+
+            <img
+              src={FaSearch}
+              alt="Search"
+              className={`${styles.search_icon} ${
+                isSearchFocused ? styles.search_icon_focused : ""
+              }`}
+            />
+
+            {isSearchFocused && (
+              <button className={styles.search_button}>
+                <span>Знайти</span>
+                <img
+                  src={FaSearch}
+                  alt="Search"
+                  className={styles.search_button_icon}
+                />
+              </button>
+            )}
+
+            {isSearchFocused && (
+              <div className={styles.search_popup}>
+                <div className={styles.recent_searches}>
+                  <h4>Популярні запити</h4>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Правая часть: иконки */}
-      <div className={styles.right_section}>
-        {/* Иконка профиля (переход на страницу) */}
-        <Link to="/profile" className={styles.icon_link}>
-          <FaUser />
-        </Link>
-
-        {/* Иконка избранного (переход на страницу) */}
-        <Link to="/favorites" className={styles.icon_link}>
-          <FaHeart />
-        </Link>
-
-        {/* Иконка корзины (в будущем отображение над ней) */}
-        <div className={styles.icon_link}>
-          <FaShoppingCart />
-          {/* Здесь можно добавить логику для отображения количества товаров */}
+        <div className={styles.right_section}>
+          <Link to="/profile" className={styles.icon_link}>
+            <img src={FaUser} alt="Profile" />
+          </Link>
+          <Link to="/favorites" className={styles.icon_link}>
+            <img src={FaHeart} alt="Favorites" />
+          </Link>
+          <div className={styles.icon_link}>
+            <img src={FaShoppingCart} alt="Cart" />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 
