@@ -42,14 +42,14 @@
   gap: 1rem;
 }
 
-.section_news{
+.section_news {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
 }
 
-.scrol_tematic{
+.scrol_tematic {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -59,7 +59,7 @@
 }
 
 .scrol_tematic > * {
-  flex: 0 0 calc(50% - 0.5rem); /* Каждая карточка занимает половину ширины минус половина gap */
+  flex: 0 0 calc(50% - 0.5rem);
   height: 100%;
   scroll-snap-align: start;
 }
@@ -69,6 +69,45 @@
 }
 
 .scrol_tematic {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Секция категорий */
+.categories_section {
+  margin-top: 6.2rem;
+}
+
+.categories_section h3 {
+  font-size: 2rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  text-align: left;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.scrol_categories {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  height: 100px; /* Уменьшенная высота, как в Figma */
+  gap: 1rem;
+}
+
+.scrol_categories > * {
+  flex: 0 0 calc(20% - 0.8rem); /* 5 карточек: 20% ширины минус 4/5 gap */
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.scrol_categories::-webkit-scrollbar {
+  display: none;
+}
+
+.scrol_categories {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -85,6 +124,26 @@
     border-bottom-right-radius: 15px;
     border-top-left-radius: 15px;
     border-bottom-left-radius: 0;
+  }
+
+  .scrol_tematic {
+    height: 350px;
+  }
+
+  .scrol_tematic > * {
+    flex: 0 0 calc(50% - 0.5rem);
+  }
+
+  .scrol_categories {
+    height: 80px; /* Уменьшенная высота для средних экранов */
+  }
+
+  .scrol_categories > * {
+    flex: 0 0 calc(20% - 0.8rem);
+  }
+
+  .categories_section h3 {
+    font-size: 1.3rem;
   }
 }
 
@@ -113,5 +172,17 @@
 
   .scrol_tematic > * {
     flex: 0 0 calc(50% - 0.5rem);
+  }
+
+  .scrol_categories {
+    height: 60px; /* Еще меньше для маленьких экранов */
+  }
+
+  .scrol_categories > * {
+    flex: 0 0 calc(20% - 0.8rem);
+  }
+
+  .categories_section h3 {
+    font-size: 1.2rem;
   }
 }

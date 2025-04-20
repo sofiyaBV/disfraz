@@ -6,7 +6,9 @@ import offersData from "../utils/OffersData";
 import SuitWM from "../components/homePage/SuitWM";
 import NewsOnTheSite from "../components/homePage/NewsOnTheSite";
 import TematicsScrole from "../components/homePage/TematicsScrole";
-import TematicsData from "../utils/TematicsData"; // Импортируем данные
+import TematicsData from "../utils/TematicsData";
+import CategoriesScrole from "../components/CategoriesScrole"; // Новый компонент
+import categoriesData from "../utils/CategoriesData"; // Данные категорий
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
@@ -15,9 +17,10 @@ import img2woman from "../img/newsS/women2.png";
 
 const HomePage = () => {
   const scrollRef = useRef(null);
-  const tematicsScrollRef = useRef(null); // Новый реф для TematicsScrole
+  const tematicsScrollRef = useRef(null);
+  const categoriesScrollRef = useRef(null); // Новый реф для категорий
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const [currentTematicsIndex, setCurrentTematicsIndex] = useState(0); // Индекс для TematicsScrole
+  const [currentTematicsIndex, setCurrentTematicsIndex] = useState(0);
 
   // Автопрокрутка для Offers
   useEffect(() => {
@@ -58,7 +61,7 @@ const HomePage = () => {
     const tematicsContainer = tematicsScrollRef.current;
     if (!tematicsContainer) return;
 
-    const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2); // Ширина двух карточек
+    const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2);
     let scrollPosition = 0;
 
     const scrollInterval = setInterval(() => {
@@ -73,6 +76,29 @@ const HomePage = () => {
       setCurrentTematicsIndex((prevIndex) =>
         prevIndex + 2 >= TematicsData.length ? 0 : prevIndex + 2
       );
+    }, 5000);
+
+    return () => clearInterval(scrollInterval);
+  }, []);
+
+  // Автопрокрутка для CategoriesScrole (по 5 карточек)
+  useEffect(() => {
+    const categoriesContainer = categoriesScrollRef.current;
+    if (!categoriesContainer) return;
+
+    const cardWidth =
+      categoriesContainer.scrollWidth / (categoriesData.length / 5);
+    let scrollPosition = 0;
+
+    const scrollInterval = setInterval(() => {
+      scrollPosition += cardWidth;
+      if (scrollPosition >= categoriesContainer.scrollWidth) {
+        scrollPosition = 0;
+      }
+      categoriesContainer.scrollTo({
+        left: scrollPosition,
+        behavior: "smooth",
+      });
     }, 5000);
 
     return () => clearInterval(scrollInterval);
@@ -117,16 +143,25 @@ const HomePage = () => {
       <div className={style.scrol_tematic} ref={tematicsScrollRef}>
         {TematicsData.map((item, index) => (
           <TematicsScrole
+            key={index}
             text={item.title}
             bacgraundImg={item.img}
             buttonLink={item.link}
           />
         ))}
       </div>
-      {/* Scrol Categories */}
-      <div>
+      {/* Скролл Categories */}
+      <div className={style.categories_section}>
         <h3>ПОПУЛЯРНІ КАТЕГОРІЇ</h3>
-        <div ref={tematicsScrollRef}></div>
+        <div className={style.scrol_categories} ref={categoriesScrollRef}>
+          {categoriesData.map((category, index) => (
+            <CategoriesScrole
+              key={index}
+              img={category.img}
+              link={category.link}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
