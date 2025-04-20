@@ -1,49 +1,67 @@
 .general {
   margin: 6.25rem 6.1rem 0 6.1rem;
+  width: calc(100vw - 12.2rem);
+  overflow: hidden;
+  position: relative;
 }
 
 .offers_scroll {
   display: flex;
-  overflow-x: auto; /* Горизонтальный скролл */
-  gap: 2rem; /* Зазор между компонентами Offers */
-  padding-bottom: 1rem; /* Отступ снизу для скроллбара */
-  scroll-snap-type: x mandatory; /* Прокрутка с привязкой к элементам */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  height: 100%;
+  gap: 0;
 }
 
 .offers_scroll > * {
-  flex: 0 0 auto; /* Элементы не сжимаются */
-  width: 80vw; /* Ширина каждого компонента Offers */
-  max-width: 1200px; /* Ограничение максимальной ширины */
-  scroll-snap-align: start; /* Привязка к началу элемента */
+  flex: 0 0 auto;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
-/* Скрываем скроллбар, но оставляем возможность прокрутки */
 .offers_scroll::-webkit-scrollbar {
   display: none;
 }
 
 .offers_scroll {
-  -ms-overflow-style: none; /* Для Edge */
-  scrollbar-width: none; /* Для Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Адаптация для узких экранов */
 @media (max-width: 1020px) {
   .general {
-    margin: 3rem 1rem 0 1rem; /* Уменьшаем отступы */
+    margin: 3rem 1rem 0 1rem;
+    width: calc(100vw - 2rem);
   }
 
   .offers_scroll > * {
-    width: 90vw; /* Увеличиваем ширину на узких экранах */
+    border-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 0;
   }
 }
 
 @media (max-width: 480px) {
   .general {
     margin: 2rem 0.5rem 0 0.5rem;
+    width: calc(100vw - 1rem);
+    height: calc(100vh - 2rem);
   }
 
   .offers_scroll > * {
-    width: 95vw;
+    border-radius: 10px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 0;
   }
 }

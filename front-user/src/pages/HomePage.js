@@ -12,7 +12,7 @@ const HomePage = () => {
     if (!scrollContainer) return;
 
     const scrollWidth = scrollContainer.scrollWidth;
-    const clientWidth = scrollContainer.clientWidth;
+    const clientWidth = window.innerWidth;
     let scrollPosition = 0;
 
     const scrollInterval = setInterval(() => {
