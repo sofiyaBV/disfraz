@@ -1,14 +1,21 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
+import newsData from "../utils/NewsData";
 import offersData from "../utils/OffersData";
+import SuitWM from "../components/homePage/SuitWM";
 import NewsOnTheSite from "../components/homePage/NewsOnTheSite";
 
-import foto from "../img/newSite.png";
+import img1man from "../img/newsS/man1.png";
+import img2man from "../img/newsS/man2.png";
+import img1woman from "../img/newsS/women1.png";
+import img2woman from "../img/newsS/women2.png";
 
 const HomePage = () => {
   const scrollRef = useRef(null);
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0); // Состояние для текущей новости
 
+  // Автопрокрутка для Offers
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
@@ -31,6 +38,19 @@ const HomePage = () => {
     return () => clearInterval(scrollInterval);
   }, []);
 
+  // Циклическая смена новостей
+  useEffect(() => {
+    const newsInterval = setInterval(() => {
+      setCurrentNewsIndex((prevIndex) =>
+        prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000); // Смена каждые 5 секунд
+
+    return () => clearInterval(newsInterval);
+  }, []);
+
+  const currentNews = newsData[currentNewsIndex]; // Текущая новость
+
   return (
     <div className={style.general}>
       <div className={style.offers_scroll} ref={scrollRef}>
@@ -47,13 +67,22 @@ const HomePage = () => {
           />
         ))}
       </div>
-      <div className={style.news_general}>
-        <NewsOnTheSite
-          title="Новинки на сайті"
-          productName="Товар 1"
-          img={foto}
-          link="/products"
-        />
+      <div className={style.section_news}>
+        <div className={style.news_general}>
+          <NewsOnTheSite
+            title="Новинки на сайті"
+            productName={currentNews.productName}
+            img={currentNews.img}
+            link={currentNews.link}
+            newsKey={currentNewsIndex} // Передаем индекс для анимации
+          />
+        </div>
+        <div className={style.news_general}>
+          <SuitWM title="Чоловічі костюми" img1={img1man} img2={img2man} />
+        </div>
+        <div className={style.news_general}>
+          <SuitWM title="Жіночі костюми" img1={img1woman} img2={img2woman} />
+        </div>
       </div>
     </div>
   );
