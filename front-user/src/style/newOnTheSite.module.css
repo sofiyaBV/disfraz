@@ -1,0 +1,95 @@
+/* Главный контейнер */
+.general {
+    display: flex;
+    /* width: 100%; Занимает всю доступную ширину родителя */
+    max-width: 600px; /* Максимальная ширина для крупных экранов */
+    border: 1px solid #EEEEEE;
+    border-radius: 10px;
+    /* align-items: center; */
+    /* justify-content: flex-start; Элементы выравниваются слева */
+    overflow: hidden; /* Скрываем лишнее */
+    box-sizing: border-box; /* Учитываем padding и border в размерах */
+  }
+  
+  /* Контейнер для фото */
+  .general div:nth-child(2) {
+    /* width: 40%; Фото занимает 40% ширины контейнера */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Изображение */
+  .general img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Изображение заполняет контейнер */
+    display: block;
+  }
+  
+  /* Контейнер для текста и кнопки */
+  .general div:nth-child(1) {
+    width: 60%; /* Текст и кнопка занимают 60% ширины */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    padding: 20px; /* Отступы внутри */
+    box-sizing: border-box;
+  }
+  
+  /* Заголовок */
+  .general h3 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    line-height: 1.5;
+    margin: 0 0 1rem 0; /* Небольшой отступ снизу */
+    text-align: left;
+  }
+  
+  /* Подзаголовок */
+  .general p {
+    font-size: 1rem;
+    font-weight: 200;
+    color: #9C9C9C;
+    margin: 0 0 13rem 0; /* Отступ снизу перед кнопкой */
+    text-align: left;
+  }
+  
+  /* Стили для кнопки (переопределим стили ButtonGeneral) */
+  .general button {
+    width: 100%; /* Кнопка занимает всю ширину текстового блока */
+    max-width: 200px; /* Ограничиваем ширину кнопки (примерно треть контейнера) */
+    height: 40px; /* Фиксированная высота кнопки */
+    font-size: 1rem;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  
+  /* Адаптация для маленьких экранов */
+  @media (max-width: 480px) {
+    .general {
+      max-width: 100%; /* На маленьких экранах контейнер растягивается */
+      height: 180px; /* Уменьшаем высоту */
+    }
+  
+    .general h3 {
+      font-size: 1.2rem;
+    }
+  
+    .general p {
+      font-size: 0.9rem;
+    }
+  
+    .general button {
+      height: 35px;
+      font-size: 0.9rem;
+      max-width: 180px;
+    }
+  }

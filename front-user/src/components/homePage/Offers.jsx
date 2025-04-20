@@ -14,7 +14,6 @@ const Offers = ({
   return (
     <div className={style.offers_container}>
       <div className={style.offers_content}>
-        {/* Левая сторона с текстом */}
         <div
           className={style.text_section}
           style={{ backgroundColor, color: textColor }}
@@ -26,12 +25,11 @@ const Offers = ({
             borderColor={textColor}
             text={buttonText}
             width="clamp(1rem, 11vw, 49rem)"
-            height="clamp(2rem, 5vw, 3.13rem)"
+            height="clamp(2rem, 5vw, 4.13rem)"
             link={buttonLink}
             textColor={buttonTextColor}
           />
         </div>
-        {/* Правая сторона с фото */}
         <div className={style.image_section}>
           <img src={img} alt="Offer Foto" />
         </div>
