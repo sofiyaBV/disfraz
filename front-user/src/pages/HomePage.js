@@ -2,11 +2,13 @@ import React, { useEffect, useRef } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
 import offersData from "../utils/OffersData";
+import NewsOnTheSite from "../components/homePage/NewsOnTheSite";
+
+import foto from "../img/newSite.png";
 
 const HomePage = () => {
   const scrollRef = useRef(null);
 
-  // Автоматическая прокрутка
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
@@ -44,6 +46,14 @@ const HomePage = () => {
             img={offer.img}
           />
         ))}
+      </div>
+      <div className={style.news_general}>
+        <NewsOnTheSite
+          title="Новинки на сайті"
+          productName="Товар 1"
+          img={foto}
+          link="/products"
+        />
       </div>
     </div>
   );
