@@ -49,6 +49,30 @@
   gap: 1rem;
 }
 
+.scrol_tematic{
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  height: 32rem;
+  gap: 1rem;
+}
+
+.scrol_tematic > * {
+  flex: 0 0 calc(50% - 0.5rem); /* Каждая карточка занимает половину ширины минус половина gap */
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.scrol_tematic::-webkit-scrollbar {
+  display: none;
+}
+
+.scrol_tematic {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @media (max-width: 1020px) {
   .general {
     margin: 3rem 1rem 0 1rem;
@@ -77,5 +101,17 @@
     border-bottom-right-radius: 10px;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 0;
+  }
+
+  .section_news {
+    flex-direction: column;
+  }
+
+  .scrol_tematic {
+    height: 300px;
+  }
+
+  .scrol_tematic > * {
+    flex: 0 0 calc(50% - 0.5rem);
   }
 }
