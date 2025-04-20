@@ -1,16 +1,13 @@
 import React from "react";
-// import Navigation from "../components/Navigation";
-import errorFoto from "../img/eror.png"; // Путь к изображению
+import errorFoto from "../img/eror.png";
 import ButtonGeneral from "../components/buttons/ButtonGeneral";
-import style from "../style/error.module.css";
+import style from "../style/pagesStyle/error.module.css";
 const ErrorPage = () => {
   return (
     <div className={style.general_section}>
-      {/* Foto */}
       <div>
         <img src={errorFoto} alt="Error 404" />
       </div>
-      {/* Info */}
       <div className={style.informations}>
         <h1>
           {" "}

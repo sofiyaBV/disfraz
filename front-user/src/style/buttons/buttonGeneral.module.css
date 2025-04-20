@@ -10,23 +10,3 @@
   justify-content: center;
   transition-property: background-color, color;
 }
-
-.button_black {
-  background-color: #000;
-  color: #fff;
-}
-
-.button_black:hover {
-  background-color: #fff;
-  color: #000;
-}
-
-.button_white {
-  background-color: #fff;
-  color: #000;
-}
-
-.button_white:hover {
-  background-color: #000;
-  color: #fff;
-}

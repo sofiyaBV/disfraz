@@ -45,6 +45,8 @@ const Header = () => {
             width="10.4rem"
             height="3rem"
             transitionDuration="0.1s"
+            link="/catalog"
+            textColor="#fff"
           />
 
           <div className={styles.search_container}>
