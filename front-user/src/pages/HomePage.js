@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
 import newsData from "../utils/NewsData";
@@ -7,8 +7,10 @@ import SuitWM from "../components/homePage/SuitWM";
 import NewsOnTheSite from "../components/homePage/NewsOnTheSite";
 import TematicsScrole from "../components/homePage/TematicsScrole";
 import TematicsData from "../utils/TematicsData";
-import CategoriesScrole from "../components/CategoriesScrole"; // Новый компонент
-import categoriesData from "../utils/CategoriesData"; // Данные категорий
+import CategoriesScrole from "../components/CategoriesScrole";
+import categoriesData from "../utils/CategoriesData";
+import ProductCard from "../components/cart/ProductCart";
+import useProduct from "../utils/useProduct";
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
@@ -18,93 +20,161 @@ import img2woman from "../img/newsS/women2.png";
 const HomePage = () => {
   const scrollRef = useRef(null);
   const tematicsScrollRef = useRef(null);
-  const categoriesScrollRef = useRef(null); // Новый реф для категорий
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const [currentTematicsIndex, setCurrentTematicsIndex] = useState(0);
+  const categoriesScrollRef = useRef(null);
+  const currentNewsIndexRef = useRef(0);
+  const currentTematicsIndexRef = useRef(0);
+
+  const { products, loading, error } = useProduct();
 
   // Автопрокрутка для Offers
   useEffect(() => {
+    let mounted = true;
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
     const scrollWidth = scrollContainer.scrollWidth;
     const clientWidth = window.innerWidth;
     let scrollPosition = 0;
+    let lastTime = 0;
 
-    const scrollInterval = setInterval(() => {
-      scrollPosition += clientWidth;
-      if (scrollPosition >= scrollWidth) {
-        scrollPosition = 0;
+    const scroll = (currentTime) => {
+      if (!mounted) return;
+
+      if (!lastTime) lastTime = currentTime;
+      const deltaTime = currentTime - lastTime;
+
+      if (deltaTime >= 5000) {
+        scrollPosition += clientWidth;
+        if (scrollPosition >= scrollWidth) {
+          scrollPosition = 0;
+        }
+        scrollContainer.scrollTo({
+          left: scrollPosition,
+          behavior: "smooth",
+        });
+        lastTime = currentTime;
       }
-      scrollContainer.scrollTo({
-        left: scrollPosition,
-        behavior: "smooth",
-      });
-    }, 5000);
 
-    return () => clearInterval(scrollInterval);
+      requestAnimationFrame(scroll);
+    };
+
+    requestAnimationFrame(scroll);
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Циклическая смена новостей
   useEffect(() => {
-    const newsInterval = setInterval(() => {
-      setCurrentNewsIndex((prevIndex) =>
-        prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000);
+    let mounted = true;
 
-    return () => clearInterval(newsInterval);
+    const updateNews = (currentTime) => {
+      if (!mounted) return;
+
+      if (!lastNewsTime) lastNewsTime = currentTime;
+      const deltaTime = currentTime - lastNewsTime;
+
+      if (deltaTime >= 5000) {
+        currentNewsIndexRef.current =
+          currentNewsIndexRef.current === newsData.length - 1
+            ? 0
+            : currentNewsIndexRef.current + 1;
+        lastNewsTime = currentTime;
+      }
+
+      requestAnimationFrame(updateNews);
+    };
+
+    let lastNewsTime = 0;
+    requestAnimationFrame(updateNews);
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Автопрокрутка для TematicsScrole (по 2 карточки)
   useEffect(() => {
+    let mounted = true;
     const tematicsContainer = tematicsScrollRef.current;
     if (!tematicsContainer) return;
 
     const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2);
     let scrollPosition = 0;
+    let lastTime = 0;
 
-    const scrollInterval = setInterval(() => {
-      scrollPosition += cardWidth;
-      if (scrollPosition >= tematicsContainer.scrollWidth) {
-        scrollPosition = 0;
+    const scrollTematics = (currentTime) => {
+      if (!mounted) return;
+
+      if (!lastTime) lastTime = currentTime;
+      const deltaTime = currentTime - lastTime;
+
+      if (deltaTime >= 5000) {
+        scrollPosition += cardWidth;
+        if (scrollPosition >= tematicsContainer.scrollWidth) {
+          scrollPosition = 0;
+          currentTematicsIndexRef.current = 0;
+        } else {
+          currentTematicsIndexRef.current += 2;
+        }
+        tematicsContainer.scrollTo({
+          left: scrollPosition,
+          behavior: "smooth",
+        });
+        lastTime = currentTime;
       }
-      tematicsContainer.scrollTo({
-        left: scrollPosition,
-        behavior: "smooth",
-      });
-      setCurrentTematicsIndex((prevIndex) =>
-        prevIndex + 2 >= TematicsData.length ? 0 : prevIndex + 2
-      );
-    }, 5000);
 
-    return () => clearInterval(scrollInterval);
+      requestAnimationFrame(scrollTematics);
+    };
+
+    requestAnimationFrame(scrollTematics);
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Автопрокрутка для CategoriesScrole (по 5 карточек)
   useEffect(() => {
+    let mounted = true;
     const categoriesContainer = categoriesScrollRef.current;
     if (!categoriesContainer) return;
 
     const cardWidth =
       categoriesContainer.scrollWidth / (categoriesData.length / 5);
     let scrollPosition = 0;
+    let lastTime = 0;
 
-    const scrollInterval = setInterval(() => {
-      scrollPosition += cardWidth;
-      if (scrollPosition >= categoriesContainer.scrollWidth) {
-        scrollPosition = 0;
+    const scrollCategories = (currentTime) => {
+      if (!mounted) return;
+
+      if (!lastTime) lastTime = currentTime;
+      const deltaTime = currentTime - lastTime;
+
+      if (deltaTime >= 5000) {
+        scrollPosition += cardWidth;
+        if (scrollPosition >= categoriesContainer.scrollWidth) {
+          scrollPosition = 0;
+        }
+        categoriesContainer.scrollTo({
+          left: scrollPosition,
+          behavior: "smooth",
+        });
+        lastTime = currentTime;
       }
-      categoriesContainer.scrollTo({
-        left: scrollPosition,
-        behavior: "smooth",
-      });
-    }, 5000);
 
-    return () => clearInterval(scrollInterval);
+      requestAnimationFrame(scrollCategories);
+    };
+
+    requestAnimationFrame(scrollCategories);
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const currentNews = newsData[currentNewsIndex];
+  const currentNews = newsData[currentNewsIndexRef.current];
 
   return (
     <div className={style.general}>
@@ -129,7 +199,7 @@ const HomePage = () => {
             productName={currentNews.productName}
             img={currentNews.img}
             link={currentNews.link}
-            newsKey={currentNewsIndex}
+            newsKey={currentNewsIndexRef.current}
           />
         </div>
         <div className={style.news_general}>
@@ -162,6 +232,28 @@ const HomePage = () => {
             />
           ))}
         </div>
+      </div>
+      {/* Интерактив с карточками по тематикам */}
+      <div className={style.products_section}>
+        <h3>ТОВАРИ</h3>
+        {loading && <p>Завантаження...</p>}
+        {error && <p>Помилка: {error}</p>}
+        {!loading && !error && (
+          <div className={style.products_grid}>
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                name={product.name}
+                price={product.price}
+                url={
+                  product.images && product.images.length > 0
+                    ? product.images[0]
+                    : img1man // Используем импортированное изображение как заглушку
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
