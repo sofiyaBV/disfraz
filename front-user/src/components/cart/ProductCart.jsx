@@ -4,14 +4,10 @@ import { ReactSVG } from "react-svg";
 import heart from "../../assets/svg/heartborder.svg";
 import discount_icon from "../../assets/svg/discount.svg";
 
-import foto from "../../img/newsS/man1.png";
-const name = "Назва товару";
-const price = "1000";
-// const link = "/product";
-
 const ProductCart = ({ discount = false, product }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [isHovered, setIsHovered] = useState(false); // Для отслеживания наведения
+  console.log("Product:", product);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -31,6 +27,10 @@ const ProductCart = ({ discount = false, product }) => {
   const message = isClicked
     ? "Товар додано в обране"
     : "Товар видалено с обраних";
+
+  // Проверяем, что product.images существует и содержит хотя бы один элемент
+  const imageUrl =
+    product.images && product.images.length > 0 ? product.images[0].url : null;
 
   return (
     <div className={style.container}>
@@ -53,7 +53,11 @@ const ProductCart = ({ discount = false, product }) => {
             wrapper="span"
           />
         </div>
-        <img src={product.photo} alt={name} className={style.image} />
+        {imageUrl ? (
+          <img src={imageUrl} alt={product.name} className={style.image} />
+        ) : (
+          <div className={style.image_placeholder}>Нет изображения</div>
+        )}
       </div>
       <div className={style.container_text}>
         <p className={style.name}>{product.name}</p>

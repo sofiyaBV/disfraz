@@ -40,8 +40,8 @@ import { productPaginateConfig } from '../config/pagination.config'; // Импо
 
 @ApiTags('Products')
 @Controller('products')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -115,7 +115,7 @@ export class ProductController {
   })
   @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig)
   @Get()
-  @Roles(Role.User, Role.Admin)
+  // @Roles(Role.User, Role.Admin)
   async findAll(
     @Paginate() query: PaginateQuery, // Використовуємо декоратор Paginate для отримання параметрів пагінації
   ): Promise<Paginated<Product>> {
