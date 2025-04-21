@@ -40,8 +40,8 @@ import { productPaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Products')
 @Controller('products')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -115,7 +115,7 @@ export class ProductController {
   })
   @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig)
   @Get()
-  @Roles(Role.User, Role.Admin)
+  // @Roles(Role.User, Role.Admin)
   async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Product>> {
     return this.productService.findAllPag(query);
   }
