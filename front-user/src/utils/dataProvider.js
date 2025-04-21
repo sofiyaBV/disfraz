@@ -8,9 +8,7 @@ console.log(
 const apiUrl = process.env.REACT_APP_JSON_SERVER_URL;
 
 if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
-  throw new Error(
-    "REACT_APP_JSON_SERVER_URL is not defined or invalid in .env"
-  );
+  throw new Error("VITE_JSON_SERVER_URL is not defined or invalid in .env");
 }
 
 const httpClient = async (url, options = {}) => {
