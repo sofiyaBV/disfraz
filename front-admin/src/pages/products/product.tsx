@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Create, Datagrid, Edit, ImageField, ImageInput, List, TextInput,  Show, SimpleForm, TextField, AutocompleteInput, useDataProvider, EditProps, SelectArrayInput, SimpleShowLayout, ArrayField, CreateProps } from "react-admin";
+import { Create, Datagrid, Edit, ImageField, ImageInput, List, TextInput,  Show, SimpleForm, TextField, AutocompleteInput, useDataProvider, EditProps, SelectArrayInput, SimpleShowLayout, ArrayField, CreateProps, SimpleList, DeleteButton, required } from "react-admin";
+import { productNameValidationFormat, productPriceValidationFormat } from "../../validations/validation";
 // Родительский компонент, который получает данные
 const productFilters = [
     <TextInput
@@ -17,45 +18,27 @@ export const ProductList = () => (
             <TextField label="Назва товару" source="name" />
             <TextField label="Ціна" source="price" />
             <TextField label="Опис товару" source="description" />
-            <ImageField label="Фотографії" source="images" />
+            <ArrayField label="Фотографії" source="images">
+                <SimpleList primaryText={(record) => (
+                    <img key={record.url} src={record.url} alt="Фотографія" style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                )} />
+            </ArrayField>
+            <DeleteButton />
         </Datagrid>
     </List>
 );
 
 
 
-export const ProductEdit = (props: EditProps) => {
-    const dataProvider = useDataProvider();
-    const [productChoices, setProductChoices] = useState<{ id: string; name: string }[]>([]);
-
-    useEffect(() => {
-        dataProvider.getList('products', {
-            pagination: { page: 1, perPage: 100 }, // Получаем все товары
-            sort: { field: 'name', order: 'ASC' },
-            filter: {},
-        }).then(({ data }) => {
-            setProductChoices(data);
-        });
-    }, [dataProvider]);
-
-    return (
-        <Edit {...props}>
+export const ProductEdit = () => (
+        <Edit>
             <SimpleForm>
-                <TextInput label="Назва товару" source="name" />
-                <TextInput label="Ціна товару" source="price" />
-                <TextInput label="Опис товару" source="description" />
-                <ImageInput label="Фотографії товару" source="images" multiple />
-                <SelectArrayInput
-                    source="similarProducts"
-                    label="Схожі товари"
-                    choices={productChoices}
-                    optionValue="id"
-                    filter="name"
-                />
+                <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
+                <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
+                <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
             </SimpleForm>
         </Edit>
-    );
-};
+);
 
 export const ProductShow = () => (
     <Show>
@@ -64,12 +47,24 @@ export const ProductShow = () => (
             <TextField  source="name" label="Назва товару" />
             <TextField label="Ціна товару" source="price" />
             <TextField label="Опис товару" source="description" />
-            <ImageField label="Фотографії" source="images" />
-            <ArrayField label="Схожі товари" source="similarProducts">//список походих товаров
-                <Datagrid>
-                    <TextField source="name" label="Назва товару" />
-                    <ImageField label="Фотографії" source="images" />
-                </Datagrid>
+            <ArrayField label="Фотографії" source="images">
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <SimpleList primaryText={(record) => (
+                        <img key={record.url } src={record.url} alt="Фотографія" style={{ maxWidth: '200px', maxHeight: '200px' }} />
+                    )} />
+                </div>
+            </ArrayField>
+            <ArrayField label="Схожі товари" source="similarProducts">
+                <SimpleList
+                    primaryText={(record) => record.name}
+                    secondaryText={(record) => (
+                        <img
+                            src={record.images?.[0]?.url}
+                            alt="Фотографія"
+                            style={{ maxWidth: '100px', maxHeight: '100px' }}
+                        />
+                    )}
+                />
             </ArrayField>
         </SimpleShowLayout>
     </Show>
@@ -90,11 +85,38 @@ export const ProductCreate = (props: CreateProps) => {
     }, [dataProvider]);
 
     return (
-        <Create {...props}>
+        <Create
+            {...props}
+            save={async (values: any) => {
+                try {
+                    const productResponse = await dataProvider.createFormData("products", {
+                        data: values,
+                    });
+
+                    const productId = productResponse.data.id;
+
+                    if (values.similarProducts && values.similarProducts.length > 0) {
+                        for (const similarProductId of values.similarProducts) {
+                            await dataProvider.create("product_similar", {
+                                data: {
+                                    product_id: productId,
+                                    similar_product_id: similarProductId,
+                                },
+                            });
+                        }
+                    }
+
+                    return productResponse;
+                } catch (error) {
+                    console.error("Error creating product:", error);
+                    throw error;
+                }
+            }}
+        >
             <SimpleForm>
-                <TextInput label="Назва товару" source="name" />
-                <TextInput label="Ціна товару" source="price" />
-                <TextInput label="Опис товару" source="description" />
+            <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
+                <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
+                <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
                 <ImageInput label="Фотогрвфії товару" source="images" multiple />
                 <SelectArrayInput
                     source="similarProducts"
