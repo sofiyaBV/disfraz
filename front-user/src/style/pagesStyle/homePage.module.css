@@ -94,12 +94,12 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   width: 100%;
-  height: 100px; /* Уменьшенная высота, как в Figma */
+  height: 100px;
   gap: 1rem;
 }
 
 .scrol_categories > * {
-  flex: 0 0 calc(20% - 0.8rem); /* 5 карточек: 20% ширины минус 4/5 gap */
+  flex: 0 0 calc(20% - 0.8rem);
   height: 100%;
   scroll-snap-align: start;
 }
@@ -113,6 +113,33 @@
   scrollbar-width: none;
 }
 
+/* Секция продуктов */
+.products_section {
+  margin-top: 6.2rem;
+}
+
+.products_section h3 {
+  font-size: 2rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  text-align: left;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.products_list {
+  display: flex;
+  flex-wrap: wrap; /* Перенос элементов на следующую строку */
+  gap: 1rem; /* Расстояние между карточками */
+}
+
+.products_list > * {
+  flex: 0 0 calc(25% - 0.75rem); /* 4 карточки в ряд (25% ширины минус 3/4 gap) */
+  box-sizing: border-box; /* Учитываем padding и border в ширине */
+}
+
+/* Медиа-запросы */
 @media (max-width: 1020px) {
   .general {
     margin: 3rem 1rem 0 1rem;
@@ -136,7 +163,7 @@
   }
 
   .scrol_categories {
-    height: 80px; /* Уменьшенная высота для средних экранов */
+    height: 80px;
   }
 
   .scrol_categories > * {
@@ -145,6 +172,14 @@
 
   .categories_section h3 {
     font-size: 1.3rem;
+  }
+
+  .products_section h3 {
+    font-size: 1.3rem;
+  }
+
+  .products_list > * {
+    flex: 0 0 calc(33.33% - 0.67rem); /* 3 карточки в ряд (33.33% ширины минус 2/3 gap) */
   }
 }
 
@@ -176,7 +211,7 @@
   }
 
   .scrol_categories {
-    height: 60px; /* Еще меньше для маленьких экранов */
+    height: 60px;
   }
 
   .scrol_categories > * {
@@ -185,5 +220,13 @@
 
   .categories_section h3 {
     font-size: 1.2rem;
+  }
+
+  .products_section h3 {
+    font-size: 1.2rem;
+  }
+
+  .products_list > * {
+    flex: 0 0 calc(50% - 0.5rem); /* 2 карточки в ряд (50% ширины минус 1/2 gap) */
   }
 }

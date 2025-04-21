@@ -275,13 +275,12 @@ const HomePage = () => {
         </div>
       </div>
       {/* Интерактив с карточками по тематикам */}
-      <div>
+      <div className={style.products_section}>
         <h3>ТОВАРИ</h3>
-        {/* <ProductCart discount={true} /> */}
         {loading && <p>Завантаження...</p>}
         {error && <p>Помилка: {error}</p>}
         {!loading && !error && (
-          <div className={style.products_grid}>
+          <div className={style.products_list}>
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
