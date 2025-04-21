@@ -37,8 +37,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @ApiOperation({
-    summary:
-      'Створити нове замовлення для авторизованого користувача на основі кошика',
+    summary: 'Створити нове замовлення',
   })
   @ApiResponse({
     status: 201,
