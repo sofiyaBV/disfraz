@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
 import newsData from "../utils/NewsData";
@@ -9,22 +9,24 @@ import TematicsScrole from "../components/homePage/TematicsScrole";
 import TematicsData from "../utils/TematicsData";
 import CategoriesScrole from "../components/CategoriesScrole";
 import categoriesData from "../utils/CategoriesData";
-import ProductCard from "../components/cart/ProductCart";
-import useProduct from "../utils/useProduct";
+// import ProductCard from "../components/cart/ProductCart";
+// import useProduct from "../utils/useProduct";
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
 import img1woman from "../img/newsS/women1.png";
 import img2woman from "../img/newsS/women2.png";
+import ProductCart from "../components/cart/ProductCart";
 
 const HomePage = () => {
   const scrollRef = useRef(null);
-  const tematicsScrollRef = useRef(null);
+  const tematicsScrollRef1 = useRef(null);
+  const tematicsScrollRef2 = useRef(null);
   const categoriesScrollRef = useRef(null);
-  const currentNewsIndexRef = useRef(0);
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0); // Заменяем useRef на useState
   const currentTematicsIndexRef = useRef(0);
 
-  const { products, loading, error } = useProduct();
+  // const { products, loading, error } = useProduct();
 
   // Автопрокрутка для Offers
   useEffect(() => {
@@ -43,7 +45,7 @@ const HomePage = () => {
       if (!lastTime) lastTime = currentTime;
       const deltaTime = currentTime - lastTime;
 
-      if (deltaTime >= 5000) {
+      if (deltaTime >= 5500) {
         scrollPosition += clientWidth;
         if (scrollPosition >= scrollWidth) {
           scrollPosition = 0;
@@ -75,11 +77,10 @@ const HomePage = () => {
       if (!lastNewsTime) lastNewsTime = currentTime;
       const deltaTime = currentTime - lastNewsTime;
 
-      if (deltaTime >= 5000) {
-        currentNewsIndexRef.current =
-          currentNewsIndexRef.current === newsData.length - 1
-            ? 0
-            : currentNewsIndexRef.current + 1;
+      if (deltaTime >= 6000) {
+        setCurrentNewsIndex((prevIndex) =>
+          prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
+        ); // Обновляем состояние
         lastNewsTime = currentTime;
       }
 
@@ -97,7 +98,47 @@ const HomePage = () => {
   // Автопрокрутка для TematicsScrole (по 2 карточки)
   useEffect(() => {
     let mounted = true;
-    const tematicsContainer = tematicsScrollRef.current;
+    const tematicsContainer = tematicsScrollRef1.current;
+    if (!tematicsContainer) return;
+
+    const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2);
+    let scrollPosition = 0;
+    let lastTime = 0;
+
+    const scrollTematics = (currentTime) => {
+      if (!mounted) return;
+
+      if (!lastTime) lastTime = currentTime;
+      const deltaTime = currentTime - lastTime;
+
+      if (deltaTime >= 5000) {
+        scrollPosition += cardWidth;
+        if (scrollPosition >= tematicsContainer.scrollWidth) {
+          scrollPosition = 0;
+          currentTematicsIndexRef.current = 0;
+        } else {
+          currentTematicsIndexRef.current += 2;
+        }
+        tematicsContainer.scrollTo({
+          left: scrollPosition,
+          behavior: "smooth",
+        });
+        lastTime = currentTime;
+      }
+
+      requestAnimationFrame(scrollTematics);
+    };
+
+    requestAnimationFrame(scrollTematics);
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const tematicsContainer = tematicsScrollRef2.current;
     if (!tematicsContainer) return;
 
     const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2);
@@ -152,7 +193,7 @@ const HomePage = () => {
       if (!lastTime) lastTime = currentTime;
       const deltaTime = currentTime - lastTime;
 
-      if (deltaTime >= 5000) {
+      if (deltaTime >= 6000) {
         scrollPosition += cardWidth;
         if (scrollPosition >= categoriesContainer.scrollWidth) {
           scrollPosition = 0;
@@ -174,7 +215,7 @@ const HomePage = () => {
     };
   }, []);
 
-  const currentNews = newsData[currentNewsIndexRef.current];
+  const currentNews = newsData[currentNewsIndex];
 
   return (
     <div className={style.general}>
@@ -199,7 +240,7 @@ const HomePage = () => {
             productName={currentNews.productName}
             img={currentNews.img}
             link={currentNews.link}
-            newsKey={currentNewsIndexRef.current}
+            newsKey={currentNewsIndex}
           />
         </div>
         <div className={style.news_general}>
@@ -210,7 +251,7 @@ const HomePage = () => {
         </div>
       </div>
       {/* Скролл TematicsScrole */}
-      <div className={style.scrol_tematic} ref={tematicsScrollRef}>
+      <div className={style.scrol_tematic} ref={tematicsScrollRef1}>
         {TematicsData.map((item, index) => (
           <TematicsScrole
             key={index}
@@ -234,9 +275,10 @@ const HomePage = () => {
         </div>
       </div>
       {/* Интерактив с карточками по тематикам */}
-      <div className={style.products_section}>
+      <div>
         <h3>ТОВАРИ</h3>
-        {loading && <p>Завантаження...</p>}
+        <ProductCart />
+        {/* {loading && <p>Завантаження...</p>}
         {error && <p>Помилка: {error}</p>}
         {!loading && !error && (
           <div className={style.products_grid}>
@@ -253,7 +295,19 @@ const HomePage = () => {
               />
             ))}
           </div>
-        )}
+        )} */}
+      </div>
+
+      {/* Скролл TematicsScrole */}
+      <div className={style.scrol_tematic} ref={tematicsScrollRef2}>
+        {TematicsData.map((item, index) => (
+          <TematicsScrole
+            key={index}
+            text={item.title}
+            bacgraundImg={item.img}
+            buttonLink={item.link}
+          />
+        ))}
       </div>
     </div>
   );
