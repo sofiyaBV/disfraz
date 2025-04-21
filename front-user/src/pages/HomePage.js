@@ -9,8 +9,8 @@ import TematicsScrole from "../components/homePage/TematicsScrole";
 import TematicsData from "../utils/TematicsData";
 import CategoriesScrole from "../components/CategoriesScrole";
 import categoriesData from "../utils/CategoriesData";
-// import ProductCard from "../components/cart/ProductCart";
-// import useProduct from "../utils/useProduct";
+import ProductCard from "../components/cart/ProductCart";
+import useProduct from "../utils/useProduct";
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
@@ -26,7 +26,7 @@ const HomePage = () => {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0); // Заменяем useRef на useState
   const currentTematicsIndexRef = useRef(0);
 
-  // const { products, loading, error } = useProduct();
+  const { products, loading, error } = useProduct();
 
   // Автопрокрутка для Offers
   useEffect(() => {
@@ -277,25 +277,16 @@ const HomePage = () => {
       {/* Интерактив с карточками по тематикам */}
       <div>
         <h3>ТОВАРИ</h3>
-        <ProductCart />
-        {/* {loading && <p>Завантаження...</p>}
+        {/* <ProductCart discount={true} /> */}
+        {loading && <p>Завантаження...</p>}
         {error && <p>Помилка: {error}</p>}
         {!loading && !error && (
           <div className={style.products_grid}>
             {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                name={product.name}
-                price={product.price}
-                url={
-                  product.images && product.images.length > 0
-                    ? product.images[0]
-                    : img1man // Используем импортированное изображение как заглушку
-                }
-              />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
-        )} */}
+        )}
       </div>
 
       {/* Скролл TematicsScrole */}
