@@ -36,10 +36,10 @@ import { attributePaginateConfig } from '../config/pagination.config';
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 
-  @ApiOperation({ summary: 'Create a new attribute' })
+  @ApiOperation({ summary: 'Створити новий Attribute' })
   @ApiResponse({
     status: 201,
-    description: 'Attribute successfully created',
+    description: 'Attribute успішно створений',
     type: Attribute,
   })
   @ApiBody({ type: CreateAttributeDto })
@@ -52,10 +52,10 @@ export class AttributesController {
     return this.attributesService.create(createAttributeDto);
   }
 
-  @ApiOperation({ summary: 'Get all attributes' })
+  @ApiOperation({ summary: 'Отримати всі Attributes' })
   @ApiResponse({
     status: 200,
-    description: 'List of all attributes',
+    description: 'Список усіх Attributes',
   })
   @PaginatedSwaggerDocs(CreateAttributeDto, attributePaginateConfig)
   @Get()
@@ -66,13 +66,17 @@ export class AttributesController {
     return this.attributesService.findAllPag(query);
   }
 
-  @ApiOperation({ summary: 'Get an attribute by ID' })
-  @ApiResponse({ status: 200, description: 'Attribute found', type: Attribute })
-  @ApiResponse({ status: 404, description: 'Attribute not found' })
+  @ApiOperation({ summary: 'Отримати Attribute за ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Attribute знайдений',
+    type: Attribute,
+  })
+  @ApiResponse({ status: 404, description: 'Attribute не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Attribute ID',
+    description: 'ID Attribute',
     example: 1,
   })
   @Get(':id')
@@ -81,18 +85,18 @@ export class AttributesController {
     return this.attributesService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Update an attribute by ID' })
+  @ApiOperation({ summary: 'Оновити Attribute за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Attribute updated successfully',
+    description: 'Attribute успішно оновлений',
     type: Attribute,
   })
-  @ApiResponse({ status: 404, description: 'Attribute not found' })
+  @ApiResponse({ status: 404, description: 'Attribute не знайдений' })
   @ApiBody({ type: UpdateAttributeDto })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Attribute ID',
+    description: 'ID Attribute',
     example: 1,
   })
   @Patch(':id')
@@ -105,13 +109,13 @@ export class AttributesController {
     return this.attributesService.update(id, updateAttributeDto);
   }
 
-  @ApiOperation({ summary: 'Delete an attribute by ID' })
-  @ApiResponse({ status: 200, description: 'Attribute deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Attribute not found' })
+  @ApiOperation({ summary: 'Видалити Attribute за ID' })
+  @ApiResponse({ status: 200, description: 'Attribute успішно видалений' })
+  @ApiResponse({ status: 404, description: 'Attribute не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Attribute ID',
+    description: 'ID Attribute',
     example: 1,
   })
   @Delete(':id')
