@@ -1,5 +1,4 @@
 const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
-
 export const authProvider = {
     async login({ email, password }: { email: string; password: string }) {
 
