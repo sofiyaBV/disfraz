@@ -1,0 +1,92 @@
+.general {
+    display: flex;
+    max-width: 600px;
+    border: 1px solid #EEEEEE;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+    /* min-width: 31rem; */
+}
+
+.general div:nth-child(2) {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.general img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.general div:nth-child(1) {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.h3_news {
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+    text-align: left;
+}
+
+.general p {
+    font-size: 1rem;
+    font-weight: 200;
+    color: #9C9C9C;
+    margin: 0 0 8rem 0;
+    text-align: left;
+}
+
+.h3_suit{
+    margin: 10rem 0 2rem 0;
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.general button {
+    width: 100%;
+    max-width: 200px;
+    height: 40px;
+    font-size: 1rem;
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .general {
+        max-width: 100%;
+        height: 180px;
+    }
+
+    .general h3 {
+        font-size: 1.2rem;
+    }
+
+    .general p {
+        font-size: 0.9rem;
+    }
+
+    .general button {
+        height: 35px;
+        font-size: 0.9rem;
+        max-width: 180px;
+    }
+}

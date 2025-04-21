@@ -1,25 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../style/buttons/buttonGeneral.module.css";
 
 const ButtonGeneral = ({
   initialColor = "black",
+  borderColor = "black",
+  textColor = "white",
   text,
   width,
   height,
   transitionDuration = "0.3s",
+  link,
 }) => {
+  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
+
+  const backgroundColor = isHovered
+    ? initialColor === "white"
+      ? "#000"
+      : "#fff"
+    : initialColor;
+
+  const finalTextColor = isHovered
+    ? initialColor === "white"
+      ? "#fff"
+      : "#000"
+    : textColor;
+
   const buttonStyle = {
-    width: width || "auto",
-    height: height || "auto",
+    backgroundColor: backgroundColor,
+    borderColor: borderColor,
+    color: finalTextColor,
+    width: `clamp(1rem, 25vw, ${width || "49rem"})`,
+    height: `clamp(2rem, 5vw, ${height || "3.13rem"})`,
     transitionDuration: transitionDuration,
+  };
+
+  const handleClick = () => {
+    if (link) {
+      navigate(link);
+    }
   };
 
   return (
     <button
       style={buttonStyle}
-      className={`${styles.custom_button} ${
-        initialColor === "black" ? styles.button_black : styles.button_white
-      }`}
+      className={styles.custom_button}
+      onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {text}
     </button>
