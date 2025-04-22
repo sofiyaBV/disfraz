@@ -31,7 +31,9 @@ const Header = () => {
       <header className={styles.header}>
         <div className={styles.left_section}>
           <div className={styles.menu_icon}>
-            <img src={menuImage} alt="Menu" className={styles.menu_image} />
+            <Link to="/test">
+              <img src={menuImage} alt="Menu" className={styles.menu_image} />
+            </Link>
           </div>
           <Link to="/">
             <img src={logoImage} alt="Logo" className={styles.logo} />
