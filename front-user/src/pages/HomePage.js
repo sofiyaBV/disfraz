@@ -1,3 +1,4 @@
+// HomePage.js
 import React, { useEffect, useRef, useState } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
@@ -22,10 +23,37 @@ const HomePage = () => {
   const tematicsScrollRef1 = useRef(null);
   const tematicsScrollRef2 = useRef(null);
   const categoriesScrollRef = useRef(null);
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0); // Заменяем useRef на useState
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const currentTematicsIndexRef = useRef(0);
-
   const { products, loading, error } = useProduct();
+
+  // Состояние для пагинации
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 6; // 6 товаров на страницу
+
+  // Вычисляем товары для текущей страницы
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  // Вычисляем общее количество страниц
+  const totalPages = Math.ceil(products.length / productsPerPage);
+
+  // Функции для перелистывания
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   // Автопрокрутка для Offers
   useEffect(() => {
@@ -79,7 +107,7 @@ const HomePage = () => {
       if (deltaTime >= 6000) {
         setCurrentNewsIndex((prevIndex) =>
           prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
-        ); // Обновляем состояние
+        );
         lastNewsTime = currentTime;
       }
 
@@ -190,7 +218,7 @@ const HomePage = () => {
       if (!mounted) return;
 
       if (!lastTime) lastTime = currentTime;
-      const deltaTime = currentTime - lastTime;
+      const deltaTime = currentTime - lastTime; // Исправлено: lastNewsTime → lastTime
 
       if (deltaTime >= 6000) {
         scrollPosition += cardWidth;
@@ -273,20 +301,40 @@ const HomePage = () => {
           ))}
         </div>
       </div>
-      {/* Интерактив с карточками по тематикам */}
+      {/* Секция товаров с пагинацией */}
       <div className={style.products_section}>
         <h3>ТОВАРИ</h3>
         {loading && <p>Завантаження...</p>}
         {error && <p>Помилка: {error}</p>}
         {!loading && !error && (
-          <div className={style.products_list}>
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            <div className={style.products_list}>
+              {currentProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+            <div className={style.pagination}>
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={style.paginationButton}
+              >
+                Попередня
+              </button>
+              <span className={style.pageInfo}>
+                Сторінка {currentPage} з {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={style.paginationButton}
+              >
+                Наступна
+              </button>
+            </div>
+          </>
         )}
       </div>
-
       {/* Скролл TematicsScrole */}
       <div className={style.scrol_tematic} ref={tematicsScrollRef2}>
         {TematicsData.map((item, index) => (

@@ -9,6 +9,8 @@ import general from "./style/general_style.css";
 import Breadcrumbs from "./components/Breadcrumbs";
 import ErrorPage from "./pages/ErrorPage";
 
+import Tests from "./pages/Tests";
+
 function App() {
   return (
     <div className={general}>
@@ -18,7 +20,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/my_account/registration" element={<Registration />} />
         <Route path="/error" element={<ErrorPage />} />
-        <Route path="*" element={<Navigate to="/error" replace />} />{" "}
+        <Route path="*" element={<Navigate to="/error" replace />} />
+
+        {/* <Route path="/test" element={<Tests />} /> */}
       </Routes>
       <Footer />
     </div>

@@ -13,7 +13,7 @@ const useProducts = () => {
         setLoading(true);
         const response = await getProducts({
           page: 1,
-          perPage: 10,
+          // perPage: 1000,
           sortField: "id",
           sortOrder: "ASC",
         });

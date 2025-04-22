@@ -1,13 +1,7 @@
 import React from "react";
-// import Navigation from "../components/Navigation";
-
+import RegistrationForm from "../components/registrations/RegistrationForm";
 const Registration = () => {
-  return (
-    <div>
-      <h1> Registration via Phone </h1>
-      <p> Welcome to the registration page. </p>
-    </div>
-  );
+  return <RegistrationForm />;
 };
 
 export default Registration;
