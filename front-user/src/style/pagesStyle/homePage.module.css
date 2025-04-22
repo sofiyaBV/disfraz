@@ -1,3 +1,4 @@
+/* homePage.module.css */
 .general {
   margin: 6.25rem 6.1rem 0 6.1rem;
   width: calc(100vw - 12.2rem);
@@ -119,7 +120,7 @@
 }
 
 .products_section h3 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 400;
   text-transform: uppercase;
   margin-bottom: 1rem;
@@ -129,14 +130,51 @@
 }
 
 .products_list {
-  display: flex;
-  flex-wrap: wrap; /* Перенос элементов на следующую строку */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+  grid-template-rows: repeat(2, auto); /* 2 ряда */
   gap: 1rem; /* Расстояние между карточками */
 }
 
 .products_list > * {
-  flex: 0 0 calc(25% - 0.75rem); /* 4 карточки в ряд (25% ширины минус 3/4 gap) */
-  box-sizing: border-box; /* Учитываем padding и border в ширине */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.paginationButton {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #151515;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.paginationButton:hover {
+  background-color: #e0e0e0;
+}
+
+.paginationButton:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 1rem;
+  color: #333;
 }
 
 /* Медиа-запросы */
@@ -178,8 +216,9 @@
     font-size: 1.3rem;
   }
 
-  .products_list > * {
-    flex: 0 0 calc(33.33% - 0.67rem); /* 3 карточки в ряд (33.33% ширины минус 2/3 gap) */
+  .products_list {
+    grid-template-columns: repeat(2, 1fr); /* 2 колонки */
+    grid-template-rows: repeat(3, auto); /* 3 ряда */
   }
 }
 
@@ -226,7 +265,8 @@
     font-size: 1.2rem;
   }
 
-  .products_list > * {
-    flex: 0 0 calc(50% - 0.5rem); /* 2 карточки в ряд (50% ширины минус 1/2 gap) */
+  .products_list {
+    grid-template-columns: repeat(1, 1fr); /* 1 колонка */
+    grid-template-rows: repeat(6, auto); /* 6 рядов */
   }
 }
