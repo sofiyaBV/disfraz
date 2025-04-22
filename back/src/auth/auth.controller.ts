@@ -21,6 +21,9 @@ import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { User } from './decorators/user.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -61,6 +64,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Отримання профілю користувача' })
   @ApiResponse({ status: 200, description: 'Інформація про користувача' })

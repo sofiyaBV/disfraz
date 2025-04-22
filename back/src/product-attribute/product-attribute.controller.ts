@@ -38,10 +38,10 @@ export class ProductAttributeController {
     private readonly productAttributeService: ProductAttributeService,
   ) {}
 
-  @ApiOperation({ summary: 'Створіть новий product-attribute посилання' })
+  @ApiOperation({ summary: 'Створіть новий product-attribute' })
   @ApiResponse({
     status: 201,
-    description: 'Product-attribute посилання успішно створено',
+    description: 'Product-attribute успішно створено',
     type: ProductAttribute,
   })
   @ApiBody({ type: CreateProductAttributeDto })
@@ -51,10 +51,10 @@ export class ProductAttributeController {
     return this.productAttributeService.create(createProductAttributeDto);
   }
 
-  @ApiOperation({ summary: 'Забирайте всi product-attribute посилання' })
+  @ApiOperation({ summary: 'Отримати всi product-attribute ' })
   @ApiResponse({
     status: 200,
-    description: 'Список всіх product-attribute посилання',
+    description: 'Список всіх product-attribute',
   })
   @PaginatedSwaggerDocs(ProductAttributeDto, productAttributePaginateConfig)
   @Get()
@@ -65,20 +65,20 @@ export class ProductAttributeController {
     return this.productAttributeService.findAllPag(query);
   }
 
-  @ApiOperation({ summary: 'Отримати посилання product-attribute за ID' })
+  @ApiOperation({ summary: 'Отримати product-attribute за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Product-attribute посилання знайдено',
+    description: 'Product-attribute  знайдено',
     type: ProductAttribute,
   })
   @ApiResponse({
     status: 404,
-    description: 'Product-attribute посилання не знайдено',
+    description: 'Product-attribute  не знайдено',
   })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Product-attribute ідентифікатор посилання',
+    description: 'Product-attribute ID',
     example: 1,
   })
   @Get(':id')
@@ -88,22 +88,22 @@ export class ProductAttributeController {
   }
 
   @ApiOperation({
-    summary: 'Оновлення product-attribute посилання за ідентифікатором',
+    summary: 'Оновлення product-attribute за ID',
   })
   @ApiResponse({
     status: 200,
-    description: 'Product-attribute посилання успішно оновлено',
+    description: 'Product-attribute успішно оновлено',
     type: ProductAttribute,
   })
   @ApiResponse({
     status: 404,
-    description: 'Product-attribute посилання не знайдено',
+    description: 'Product-attribute  не знайдено',
   })
   @ApiBody({ type: UpdateProductAttributeDto })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Product-attribute ідентифікатор посилання',
+    description: 'Product-attribute ID',
     example: 1,
   })
   @Patch(':id')
@@ -115,14 +115,14 @@ export class ProductAttributeController {
     return this.productAttributeService.update(+id, updateProductAttributeDto);
   }
 
-  @ApiOperation({ summary: 'Видалення посилання product-attribute за ID' })
+  @ApiOperation({ summary: 'Видалення  product-attribute за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Product-attribute посилання успішно видалено',
+    description: 'Product-attribute успішно видалено',
   })
   @ApiResponse({
     status: 404,
-    description: 'Product-attribute посилання не знайдено',
+    description: 'Product-attribute  не знайдено',
   })
   @ApiParam({
     name: 'id',

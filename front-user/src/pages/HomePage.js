@@ -16,7 +16,6 @@ import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
 import img1woman from "../img/newsS/women1.png";
 import img2woman from "../img/newsS/women2.png";
-import ProductCart from "../components/cart/ProductCart";
 
 const HomePage = () => {
   const scrollRef = useRef(null);

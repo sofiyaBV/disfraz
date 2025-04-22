@@ -36,10 +36,10 @@ import { UserDto } from './dto/user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: 'Create a new admin' })
+  @ApiOperation({ summary: 'Додати нового користувача' })
   @ApiResponse({
     status: 201,
-    description: 'User successfully created',
+    description: 'користувача',
     type: User,
   })
   @ApiBody({ type: CreateAdminDto })
@@ -49,13 +49,13 @@ export class UserController {
     return this.userService.createAdmin(createAdminDto);
   }
 
-  @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiOperation({ summary: 'Оновити користувача за ID' })
   @ApiResponse({
     status: 200,
-    description: 'User successfully updated',
+    description: 'Користувача успiшно оновлено',
     type: User,
   })
-  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 404, description: 'Користувач не знайдений' })
   @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
   @ApiBody({ type: UpdateUserDto })
   @Patch(':id')
@@ -67,7 +67,7 @@ export class UserController {
     return this.userService.updateUser(id, updateUserDto);
   }
 
-  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiOperation({ summary: 'Видалити користувача за ID' })
   @ApiResponse({
     status: 200,
     description: 'User successfully deleted',
@@ -78,10 +78,10 @@ export class UserController {
   @Roles(Role.Admin)
   async delete(@Param('id') id: number): Promise<{ message: string }> {
     await this.userService.deleteUser(id);
-    return { message: 'Пользователь успешно удален' };
+    return { message: 'Користувача успішно видалено' };
   }
 
-  @ApiOperation({ summary: 'Get all users' })
+  @ApiOperation({ summary: 'Отримати всіх користувачів' })
   @ApiResponse({
     status: 200,
     description: 'List of all users',
@@ -93,7 +93,7 @@ export class UserController {
     return this.userService.findAllPag(query);
   }
 
-  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiOperation({ summary: 'Отримати користувача за ID' })
   @ApiResponse({ status: 200, description: 'User found', type: User })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
