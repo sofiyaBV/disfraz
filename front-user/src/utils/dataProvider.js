@@ -47,7 +47,7 @@ const httpClient = async (url, options = {}) => {
 export const getProducts = async (params = {}) => {
   const {
     page = 1,
-    perPage = 10,
+    perPage = 1000,
     sortField = "id",
     sortOrder = "ASC",
     filter = {},
