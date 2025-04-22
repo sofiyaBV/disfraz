@@ -9,9 +9,9 @@ async function bootstrap() {
   // Валідація
   // app.useGlobalPipes(
   //   new ValidationPipe({
-  //     whitelist: true, // Удаляет поля, которых нет в DTO
-  //     forbidNonWhitelisted: true, // Выбрасывает ошибку, если есть лишние поля
-  //     transform: true, // Преобразует входные данные в типы, указанные в DTO
+  //     whitelist: true,
+  //     forbidNonWhitelisted: true,
+  //     transform: true,
   //   }),
   // );
 
@@ -23,12 +23,12 @@ async function bootstrap() {
   // Конфігурація Swagger
   const config = new DocumentBuilder()
     .setTitle('User API')
-    .setDescription('Документация API для работы с пользователями')
+    .setDescription('Документація API для роботи з користувачами')
     .setVersion('1.0')
     .addBearerAuth() // JWT підтримка
     .build();
 
-  // Дополнительные настройки Swagger
+  // Додаткові налаштування Swagger
   const documentOptions = {
     operationIdFactory: (_controllerKey: string, methodKey: string) =>
       methodKey,
@@ -37,16 +37,15 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config, documentOptions);
 
-  // Кастомные настройки UI Swagger
+  // Кастомні налаштування UI Swagger
   const swaggerCustomOptions = {
-    jsonDocumentUrl: 'swagger/json', // JSON-документация по /swagger/json
-    yamlDocumentUrl: 'swagger/yaml', // YAML-документация по /swagger/yaml
-    explorer: true, // Включаем переключатель версий API
-    customCss: '.topbar { background-color: #4CAF50 }', // Меняем цвет заголовка
-    customSiteTitle: 'User API Docs', // Кастомное название страницы
+    jsonDocumentUrl: 'swagger/json',
+    yamlDocumentUrl: 'swagger/yaml',
+    explorer: true, // Вмикаємо перемикач версій API
+    customCss: '.topbar { background-color: #4CAF50 }',
+    customSiteTitle: 'User API Docs',
   };
 
-  // Відкриваємо Swagger UI за `/api`
   SwaggerModule.setup('doc', app, document, swaggerCustomOptions);
 
   await app.listen(3000);

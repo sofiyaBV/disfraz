@@ -28,7 +28,7 @@ export class RolesGuard implements CanActivate {
     const user = request.user;
 
     if (!user || !user.roles) {
-      // ✅ Перевіряємо, чи є взагалі ролі
+      //  Перевіряємо, чи є взагалі ролі
       this.logger.warn('Запит без користувача або ролей - відхилено');
       return false;
     }
