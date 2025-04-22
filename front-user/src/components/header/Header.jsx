@@ -4,6 +4,7 @@ import styles from "../../style/header.module.css";
 import logoImage from "../../assets/LOGO.png";
 import menuImage from "../../assets/menu.png";
 import ButtonGeneral from "../buttons/ButtonGeneral";
+import BurgerMenuLogged from "./BurgerMenuLogged"; // Импортируем компонент меню
 
 // Импорт SVG-иконок
 import FaSearch from "../../assets/svg/search-normal.svg";
@@ -13,9 +14,10 @@ import FaUser from "../../assets/svg/profile.svg";
 
 const Header = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (isSearchFocused) {
+    if (isSearchFocused || isMenuOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -24,14 +26,26 @@ const Header = () => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isSearchFocused]);
+  }, [isSearchFocused, isMenuOpen]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <>
-      {isSearchFocused && <div className={styles.overlay}></div>}
+      {(isSearchFocused || isMenuOpen) && (
+        <div
+          className={styles.overlay}
+          onClick={isMenuOpen ? toggleMenu : undefined}
+        ></div>
+      )}
       <header className={styles.header}>
         <div className={styles.left_section}>
           <div className={styles.menu_icon}>
-            <img src={menuImage} alt="Menu" className={styles.menu_image} />
+            <div onClick={toggleMenu}>
+              <img src={menuImage} alt="Menu" className={styles.menu_image} />
+            </div>
           </div>
           <Link to="/">
             <img src={logoImage} alt="Logo" className={styles.logo} />
@@ -99,6 +113,7 @@ const Header = () => {
           </div>
         </div>
       </header>
+      {isMenuOpen && <BurgerMenuLogged onClose={toggleMenu} />}
     </>
   );
 };
