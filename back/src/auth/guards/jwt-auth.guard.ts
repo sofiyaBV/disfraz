@@ -34,7 +34,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       throw new UnauthorizedException('Недійсний або прострочений токен');
     }
 
-    request.user = user; // ✅ Явно встановлюємо користувача в request
+    request.user = user;
     this.logger.log(
       `Автентифікований користувач JWT: ${user.username} з ролями: ${user.roles}`,
     );

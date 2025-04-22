@@ -40,8 +40,8 @@ import { productPaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Products')
 @Controller('products')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard('jwt'), RolesGuard)
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 

@@ -19,6 +19,7 @@ export class AuthGuard implements CanActivate {
   private readonly publicRoutes = [
     { method: 'POST', path: '/auth/signin' },
     { method: 'POST', path: '/auth/register' },
+
     { method: 'GET', path: '/products' },
     { method: 'POST', path: '/products' },
   ];
@@ -27,7 +28,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
 
     if (this.isPublicRoute(request)) {
-      this.logger.log(`Публичный маршрут: ${request.method} ${request.path}`);
+      this.logger.log(`Публічний маршрут: ${request.method} ${request.path}`);
       return true;
     }
 
@@ -46,7 +47,7 @@ export class AuthGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
 
-      this.logger.log(`JWT Decoded: ${JSON.stringify(payload)}`);
+      this.logger.log(`JWT Розшифровано: ${JSON.stringify(payload)}`);
       request['user'] = payload;
     } catch (error) {
       const jwtError = error as JsonWebTokenError;
