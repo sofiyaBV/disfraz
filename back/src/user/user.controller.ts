@@ -98,7 +98,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
   @Get(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.User)
   findOne(@Param('id') id: number): Promise<User | null> {
     return this.userService.findOne(id);
   }
