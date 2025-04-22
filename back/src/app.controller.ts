@@ -17,7 +17,7 @@ export class AppController {
 
   @Get('check-db')
   @ApiBearerAuth()
-  @Roles(Role.User, Role.Admin)
+  @Roles(Role.Admin)
   async checkDbConnection(): Promise<string> {
     return this.appService.checkDatabaseConnection();
   }

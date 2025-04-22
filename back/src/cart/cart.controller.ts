@@ -34,7 +34,7 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @ApiOperation({
-    summary: 'Створити новий кошик для авторизованого користувача',
+    summary: 'Додати товар до кошика',
   })
   @ApiResponse({
     status: 201,
