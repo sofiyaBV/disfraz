@@ -1,0 +1,89 @@
+.container{
+    width: 19rem;
+    max-width:19rem ;
+    background-color: #F2F2F2;
+}
+.header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #151515;
+    gap: 2em;
+    height: 6.25rem;
+}
+.header span{
+    color: #F2F2F2;
+    /* padding: 0 1.9rem; */
+}
+
+.center{
+    margin-left: 1.6rem;
+}
+.ButtonGeneral{
+margin-top: 1.9rem;
+width: 100%;
+max-width: 80%;
+min-width: 80%;
+}
+
+.links_group_1{
+    margin-top: 1.9rem;
+    
+
+}
+
+.links_group_1 span{
+    display: flex;
+    gap: 16px;
+    margin-bottom: 1rem;
+}
+
+.links_group_1 img{
+    width: 1.6rem ;
+    height: 1.6rem;
+}
+
+.links_group_1 h3{
+    font-weight: 500;
+}
+
+.links_group_2{
+    margin-top: 1.9rem;
+    font-weight: 500;
+}
+.links_group_2 h3{
+    margin-bottom: 1.9rem;
+}
+.links_group_2 p{
+    margin-bottom: 0.6rem;
+}
+.loading{
+    margin-top: 30.4px;
+}
+.loading h3{
+    margin-bottom: 1.9rem;
+}
+.loading img{
+    width: 15.3rem;
+    margin-bottom: 0.8rem;
+}
+
+.cotial{
+    margin-top: 1.9rem;
+}
+
+.imgs img{
+    margin: 1.6rem;
+
+}
+
+
+.display{
+    background-color: #feee;
+    margin-right:1.6rem ;
+    margin-top: 1.9rem;
+    padding: 0 0.8rem;
+}
+.display h4{
+    font-weight: 300;
+}
