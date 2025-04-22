@@ -20,7 +20,7 @@ import {
   ApiTags,
   ApiBearerAuth,
   ApiConsumes,
-  ApiOkResponse, // Для Swagger-документации
+  ApiOkResponse,
 } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -34,9 +34,9 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
-import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate'; // Импортируем для пагинации
-import { PaginatedSwaggerDocs } from 'nestjs-paginate'; // Для Swagger-документации
-import { productPaginateConfig } from '../config/pagination.config'; // Импортируем конфигурацию
+import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
+import { PaginatedSwaggerDocs } from 'nestjs-paginate';
+import { productPaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Products')
 @Controller('products')
@@ -45,15 +45,15 @@ import { productPaginateConfig } from '../config/pagination.config'; // Импо
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @ApiOperation({ summary: 'Create a new product' })
+  @ApiOperation({ summary: 'Створити новий Product' })
   @ApiResponse({
     status: 201,
-    description: 'Product successfully created',
+    description: 'Product успішно створений',
     type: Product,
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: 'Create product with images',
+    description: 'Створити Product із зображеннями',
     schema: {
       type: 'object',
       properties: {
@@ -108,27 +108,25 @@ export class ProductController {
     return this.productService.create(createProductDto, files);
   }
 
-  @ApiOperation({ summary: 'Get all products' })
+  @ApiOperation({ summary: 'Отримати всі Products' })
   @ApiResponse({
     status: 200,
-    description: 'List of all products',
+    description: 'Список усіх Products',
   })
   @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig)
   @Get()
   // @Roles(Role.User, Role.Admin)
-  async findAll(
-    @Paginate() query: PaginateQuery, // Використовуємо декоратор Paginate для отримання параметрів пагінації
-  ): Promise<Paginated<Product>> {
+  async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Product>> {
     return this.productService.findAllPag(query);
   }
 
-  @ApiOperation({ summary: 'Get a product by ID' })
-  @ApiResponse({ status: 200, description: 'Product found', type: Product })
-  @ApiResponse({ status: 404, description: 'Product not found' })
+  @ApiOperation({ summary: 'Отримати Product за ID' })
+  @ApiResponse({ status: 200, description: 'Product знайдений', type: Product })
+  @ApiResponse({ status: 404, description: 'Product не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Product ID',
+    description: 'ID Product',
     example: 1,
   })
   @Get(':id')
@@ -137,13 +135,13 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Update a product by ID' })
+  @ApiOperation({ summary: 'Оновити Product за ID' })
   @ApiResponse({
     status: 200,
-    description: 'Product updated successfully',
+    description: 'Product успішно оновлений',
     type: Product,
   })
-  @ApiResponse({ status: 404, description: 'Product not found' })
+  @ApiResponse({ status: 404, description: 'Product не знайдений' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FilesInterceptor('images', 10))
   @Patch(':id')
@@ -153,19 +151,19 @@ export class ProductController {
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
-    console.log(`Received body for update: ${id}, body:`, updateProductDto);
+    console.log(`Отримано тіло для оновлення: ${id}, body:`, updateProductDto);
     console.log('Uploaded files:', files);
 
     return this.productService.update(id, updateProductDto, files);
   }
 
-  @ApiOperation({ summary: 'Delete a product by ID' })
-  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
-  @ApiResponse({ status: 404, description: 'Product not found' })
+  @ApiOperation({ summary: 'Видалити Product за ID' })
+  @ApiResponse({ status: 200, description: 'Product успішно видалений' })
+  @ApiResponse({ status: 404, description: 'Product не знайдений' })
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'Product ID',
+    description: 'ID Product',
     example: 1,
   })
   @Delete(':id')

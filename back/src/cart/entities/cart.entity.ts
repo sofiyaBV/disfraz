@@ -14,7 +14,7 @@ export class Cart {
   @PrimaryGeneratedColumn()
   @ApiProperty({
     example: 1,
-    description: 'Уникальный идентификатор элемента корзины',
+    description: 'Унікальний ідентифікатор елемента кошика',
   })
   id: number;
 
@@ -25,7 +25,7 @@ export class Cart {
   @JoinColumn({ name: 'productAttributeId' })
   @ApiProperty({
     type: () => ProductAttribute,
-    description: 'Связь с продуктом и атрибутом',
+    description: 'Связь з продуктом і атрибутом',
   })
   productAttribute: ProductAttribute;
 
@@ -33,25 +33,25 @@ export class Cart {
   @JoinColumn({ name: 'userId' })
   @ApiProperty({
     type: () => User,
-    description: 'Пользователь, который добавил товар в корзину',
+    description: 'Користувач, який додав товар у кошик',
   })
   user: User;
 
   @Column({ type: 'int', default: 1 })
   @ApiProperty({
     example: 1,
-    description: 'Количество данного продукта в корзине',
+    description: 'Кількість цього продукту в кошику',
   })
   quantity: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
-  @ApiProperty({ example: 199.99, description: 'Цена за единицу товара' })
+  @ApiProperty({ example: 199.99, description: 'Ціна за одиницю' })
   price: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   @ApiProperty({
     example: '2023-01-01T12:00:00Z',
-    description: 'Дата добавления в корзину',
+    description: 'Дата додавання в кошик',
   })
   addedAt: Date;
 }
