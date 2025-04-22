@@ -20,7 +20,7 @@ import telegram from "../../img/icon/telegram.png";
 import inst from "../../img/icon/instagram.png";
 import facebook from "../../img/icon/facebook.png";
 
-const BurgerMenuLogged = () => {
+const BurgerMenuLogged = ({ onClose }) => {
   return (
     <div className={styles.container}>
       {/* LOGO */}
@@ -28,9 +28,11 @@ const BurgerMenuLogged = () => {
         <img src={LOGO} alt="LOGO" />
         <div>
           <span>
-            UA <img src={arrow} slt="arrow" />
+            UA <img src={arrow} alt="arrow" />
           </span>
-          <span>✕</span>
+          <span onClick={onClose} className={styles.close_icon}>
+            ✕
+          </span>
         </div>
       </div>
       <div className={styles.center}>
