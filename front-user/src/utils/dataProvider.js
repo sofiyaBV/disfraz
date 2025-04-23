@@ -13,13 +13,11 @@ if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
 }
 
 const httpClient = async (url, options = {}) => {
-  // Устанавливаем заголовки по умолчанию
   const defaultHeaders = {
     Accept: "application/json",
     "Content-Type": "application/json",
   };
 
-  // Объединяем заголовки, если они переданы в options
   options.headers = {
     ...defaultHeaders,
     ...options.headers,
@@ -47,18 +45,25 @@ const httpClient = async (url, options = {}) => {
 export const getProducts = async (params = {}) => {
   const {
     page = 1,
-    perPage = 1000,
+    perPage = 20,
     sortField = "id",
     sortOrder = "ASC",
     filter = {},
   } = typeof params === "object" ? params : {};
 
-  // Формируем параметры запроса в формате JSON Server
+  console.log("Pagination params:", {
+    page,
+    perPage,
+    sortField,
+    sortOrder,
+    filter,
+  });
+
   const query = new URLSearchParams({
-    _page: page.toString(),
-    _limit: perPage.toString(),
-    _sort: sortField,
-    _order: sortOrder.toLowerCase(),
+    page: page.toString(),
+    limit: perPage.toString(),
+    sort: sortField,
+    order: sortOrder.toLowerCase(),
     ...filter,
   });
 
@@ -69,8 +74,6 @@ export const getProducts = async (params = {}) => {
     const response = await httpClient(url);
     console.log("API response:", response);
 
-    // JSON Server возвращает массив данных, но нам нужно общее количество записей
-    // Для этого можно использовать заголовок X-Total-Count (нужно настроить fetch для получения заголовков)
     const total = Array.isArray(response)
       ? response.length
       : response.total || 0;
@@ -85,7 +88,6 @@ export const getProducts = async (params = {}) => {
   }
 };
 
-// Дополнительная функция для получения одного продукта по ID
 export const getProductById = async (id) => {
   const url = `${apiUrl}/products/${id}`;
   console.log("Fetching product from:", url);
