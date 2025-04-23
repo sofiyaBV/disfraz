@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -47,6 +51,25 @@ export class UserService {
     });
 
     return this.userRepository.save(user);
+  }
+
+  async findByEmailOrPhone(
+    email?: string,
+    phone?: string,
+  ): Promise<User | null> {
+    if (!email && !phone) {
+      throw new UnauthorizedException('Email or phone must be provided');
+    }
+
+    const where = [];
+    if (email) {
+      where.push({ email });
+    }
+    if (phone) {
+      where.push({ phone });
+    }
+
+    return this.userRepository.findOne({ where });
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
