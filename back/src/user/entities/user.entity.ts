@@ -22,8 +22,7 @@ export class User {
   })
   id: number;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  @IsNotEmpty({ message: 'Електронна пошта не може бути порожньою' })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
   @IsEmail({}, { message: 'Некоректний формат електронної пошти' })
   @ApiProperty({
     example: 'user@example.com',

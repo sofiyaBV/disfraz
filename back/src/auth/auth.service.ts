@@ -33,11 +33,29 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto): Promise<void> {
-    const { email, password, phone } = createUserDto;
+    const { email, phone, password } = createUserDto;
 
-    const existingUser = await this.usersService.findByEmail(email);
-    if (existingUser) {
-      throw new UnauthorizedException('Користувач з таким email вже існує');
+    // Проверяем, что хотя бы email или phone переданы
+    if (!email && !phone) {
+      throw new UnauthorizedException('Email or phone must be provided');
+    }
+
+    // Проверяем, передан ли email и существует ли пользователь с таким email
+    if (email) {
+      const existingUserByEmail = await this.usersService.findByEmail(email);
+      if (existingUserByEmail) {
+        throw new UnauthorizedException('Користувач з таким email вже існує');
+      }
+    }
+
+    // Проверяем, передан ли phone и существует ли пользователь с таким номером телефона
+    if (phone) {
+      const existingUserByPhone = await this.usersService.findByPhone(phone);
+      if (existingUserByPhone) {
+        throw new UnauthorizedException(
+          'Користувач з таким номером телефону вже існує',
+        );
+      }
     }
 
     const newUser = {

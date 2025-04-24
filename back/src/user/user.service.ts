@@ -24,7 +24,6 @@ export class UserService {
   async createAdmin(createAdminDto: CreateAdminDto): Promise<User> {
     const { email, password } = createAdminDto;
 
-    // Хешуємо пароль перед збереженням
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -40,13 +39,35 @@ export class UserService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { email, password, phone } = createUserDto;
 
+    // Проверяем, передан ли email и существует ли пользователь с таким email
+    if (email) {
+      const existingUserByEmail = await this.userRepository.findOne({
+        where: { email },
+      });
+      if (existingUserByEmail) {
+        throw new UnauthorizedException('Користувач з таким email вже існує');
+      }
+    }
+
+    // Проверяем, передан ли phone и существует ли пользователь с таким номером телефона
+    if (phone) {
+      const existingUserByPhone = await this.userRepository.findOne({
+        where: { phone },
+      });
+      if (existingUserByPhone) {
+        throw new UnauthorizedException(
+          'Користувач з таким номером телефону вже існує',
+        );
+      }
+    }
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = this.userRepository.create({
-      email,
+      email: email || null, // Если email не передан, сохраняем как null
+      phone: phone || null, // Если phone не передан, сохраняем как null
       password: hashedPassword,
-      phone,
       roles: [Role.User],
     });
 
@@ -116,6 +137,16 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
+    if (!email) {
+      return null; // Если email не передан, возвращаем null
+    }
     return this.userRepository.findOneBy({ email });
+  }
+
+  async findByPhone(phone: string): Promise<User | null> {
+    if (!phone) {
+      return null; // Если phone не передан, возвращаем null
+    }
+    return this.userRepository.findOneBy({ phone });
   }
 }
