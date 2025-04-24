@@ -12,10 +12,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
-    const user = await this.usersService.findByEmail(email);
+  async signIn(
+    email: string | undefined,
+    phone: string | undefined,
+    pass: string,
+  ): Promise<{ access_token: string }> {
+    const user = await this.usersService.findByEmailOrPhone(email, phone);
     if (!user || !(await bcrypt.compare(pass, user.password))) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = {
@@ -36,7 +40,6 @@ export class AuthService {
       throw new UnauthorizedException('Користувач з таким email вже існує');
     }
 
-    // Передаємо пароль у вихідному вигляді, хешування буде в UserService
     const newUser = {
       email,
       password,

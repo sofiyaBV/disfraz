@@ -33,42 +33,46 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  @ApiOperation({ summary: 'Авторизація користувача' })
+  @ApiOperation({ summary: 'Авторизация пользователя' })
   @ApiBody({ type: SignInDto })
   @ApiResponse({
     status: 200,
     type: SignInResponseDto,
-    description: 'Успішний вхід',
+    description: 'Успешный вход',
   })
-  @ApiResponse({ status: 401, description: 'Помилка авторизації' })
+  @ApiResponse({ status: 401, description: 'Ошибка авторизации' })
   async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
-    return this.authService.signIn(signInDto.email, signInDto.password);
+    return this.authService.signIn(
+      signInDto.email,
+      signInDto.phone,
+      signInDto.password,
+    );
   }
 
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  @ApiOperation({ summary: 'Реєстрація нового користувача' })
+  @ApiOperation({ summary: 'Регистрация нового пользователя' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
-    description: 'Користувач успішно зареєстрований',
+    description: 'Пользователь успешно зарегистрирован',
   })
-  @ApiResponse({ status: 400, description: 'Некоректні дані' })
+  @ApiResponse({ status: 400, description: 'Некорректные данные' })
   async register(
-    @Body() CreateUserDto: CreateUserDto,
+    @Body() createUserDto: CreateUserDto,
   ): Promise<{ message: string }> {
-    await this.authService.register(CreateUserDto);
-    return { message: 'Користувач успішно зареєстрований' };
+    await this.authService.register(createUserDto);
+    return { message: 'Пользователь успешно зарегистрирован' };
   }
 
   @Get('profile')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin, Role.User)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Отримання профілю користувача' })
-  @ApiResponse({ status: 200, description: 'Інформація про користувача' })
-  @ApiResponse({ status: 401, description: 'Неавторизований запит' })
+  @ApiOperation({ summary: 'Получение профиля пользователя' })
+  @ApiResponse({ status: 200, description: 'Информация о пользователе' })
+  @ApiResponse({ status: 401, description: 'Неавторизованный запрос' })
   getProfile(@Request() req) {
     return req.user;
   }
