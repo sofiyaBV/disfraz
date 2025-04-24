@@ -1,4 +1,4 @@
-// RegistrationForm.js
+// components/registrations/RegistrationForm.js
 import React, { useState } from "react";
 import styles from "../../style/pagesStyle/registration.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
@@ -10,9 +10,9 @@ const RegistrationForm = () => {
     phone: "",
     email: "",
     password: "",
-    confirmPassword: "", // Новое поле для подтверждения пароля
+    confirmPassword: "",
     agree: false,
-    loginLater: false, // Новое поле для чекбокса "Пізніше на вході"
+    loginLater: false,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,13 +76,10 @@ const RegistrationForm = () => {
 
     try {
       const requestData = {
+        email: method === "email" ? formData.email : "",
+        phone: method === "phone" ? formData.phone : "",
         password: formData.password,
       };
-      if (method === "phone") {
-        requestData.phone = formData.phone;
-      } else {
-        requestData.email = formData.email;
-      }
 
       await dataProvider.create("users", {
         data: requestData,
