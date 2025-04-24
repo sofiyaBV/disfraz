@@ -1,3 +1,4 @@
+// components/buttons/ButtonGeneral.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../style/buttons/buttonGeneral.module.css";
@@ -11,6 +12,8 @@ const ButtonGeneral = ({
   height,
   transitionDuration = "0.3s",
   link,
+  type = "button", // Добавляем type по умолчанию
+  disabled = false, // Добавляем disabled
 }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -44,6 +47,8 @@ const ButtonGeneral = ({
 
   return (
     <button
+      type={type} // Передаем type
+      disabled={disabled} // Передаем disabled
       style={buttonStyle}
       className={styles.custom_button}
       onClick={handleClick}
