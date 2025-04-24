@@ -13,6 +13,18 @@ export class Migration1743868231694 implements MigrationInterface {
       `CREATE TABLE "product" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "price" numeric(10,2) NOT NULL, "description" text, "images" jsonb, CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
+      `CREATE TABLE "payment" (
+        "id" SERIAL NOT NULL,
+        "orderId" character varying(255) NOT NULL,
+        "amount" numeric(10,2) NOT NULL,
+        "currency" character varying(10) NOT NULL,
+        "status" character varying(50) NOT NULL,
+        "paymentId" character varying(255),
+        "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
+        "description" character varying(255)
+      )`,
+    );
+    await queryRunner.query(
       `CREATE TABLE "comment" ("id" SERIAL NOT NULL, "content" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "isModerated" boolean NOT NULL DEFAULT false, "productAttributeId" integer, "userId" integer, CONSTRAINT "PK_0b0e4bbc8415ec426f87f3a88e2" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
@@ -129,6 +141,7 @@ export class Migration1743868231694 implements MigrationInterface {
     `);
 
     // Видалення зовнішніх ключів
+ 
     await queryRunner.query(
       `ALTER TABLE "product_similars" DROP CONSTRAINT "FK_c08bfa57cca9873f9dba24d5bb7"`,
     );
@@ -172,6 +185,7 @@ export class Migration1743868231694 implements MigrationInterface {
     );
 
     // Видалення таблиць
+    await queryRunner.query(`DROP TABLE "payment"`);
     await queryRunner.query(`DROP TABLE "product_similars"`);
     await queryRunner.query(`DROP TABLE "product_attribute"`);
     await queryRunner.query(`DROP TABLE "cart"`);

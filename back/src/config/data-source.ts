@@ -7,6 +7,7 @@ import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import { Comment } from '../comments/entities/comment.entity';
 import * as dotenv from 'dotenv';
+import { Payment } from 'src/payment/entities/payment.entity';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ export const AppDataSource = new DataSource({
     Order,
     User,
     Comment,
+    Payment,
     __dirname + '/**/*.entity{.ts,.js}',
   ],
   synchronize: false,
