@@ -1,5 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Order } from '../../order/entities/order.entity';
 
 @Entity()
 export class Payment {
@@ -7,9 +14,13 @@ export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ description: 'ID заказа', example: 'order_12345' })
+  @ApiProperty({ description: 'ID заказа', example: 1 })
   @Column()
-  orderId: string;
+  orderId: number;
+
+  @ManyToOne(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'orderId' })
+  order: Order;
 
   @ApiProperty({ description: 'Сумма платежа', example: 100.5 })
   @Column()
