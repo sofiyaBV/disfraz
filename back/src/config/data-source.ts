@@ -7,7 +7,7 @@ import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import { Comment } from '../comments/entities/comment.entity';
 import * as dotenv from 'dotenv';
-import { Payment } from 'src/payment/entities/payment.entity';
+import { Payment } from '../payment/entities/payment.entity';
 
 dotenv.config();
 

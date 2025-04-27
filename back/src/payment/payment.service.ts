@@ -4,19 +4,20 @@ import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import * as LiqPay from 'liqpay';
+import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
+import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
-  private liqpay: any;
+  private stripe: Stripe;
 
   constructor(
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
   ) {
-    const publicKey = process.env.LIQPAY_PUBLIC_KEY;
-    const privateKey = process.env.LIQPAY_PRIVATE_KEY;
-    this.liqpay = LiqPay(publicKey, privateKey);
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-03-31.basil', // Исправляем на актуальную версию
+    });
   }
 
   async create(createPaymentDto: CreatePaymentDto) {
@@ -25,27 +26,81 @@ export class PaymentService {
     const payment = this.paymentRepository.create({
       orderId,
       amount,
-      currency,
-      description,
+      currency: currency || 'UAH',
+      description: description || `Оплата заказа #${orderId}`,
       status: 'pending',
     });
     await this.paymentRepository.save(payment);
 
-    const data = {
-      action: 'pay',
-      amount: amount.toString(),
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe ожидает сумму в копейках
       currency: currency || 'UAH',
       description: description || `Оплата заказа #${orderId}`,
-      order_id: orderId,
-      version: '3',
-      sandbox: '1',
-      result_url: 'http://localhost:3000/result_url',
-      server_url: 'http://localhost:3000/callback',
+      metadata: { orderId, paymentId: payment.id },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never', // Отключаем методы оплаты с перенаправлением
+      },
+    });
+
+    payment.stripePaymentIntentId = paymentIntent.id;
+    await this.paymentRepository.save(payment);
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentId: payment.id,
+      stripePaymentIntentId: paymentIntent.id,
     };
+  }
 
-    const { data: liqpayData, signature } = this.liqpay.cnb_object(data);
+  async confirmPayment(confirmPaymentDto: ConfirmPaymentDto) {
+    const { stripePaymentIntentId, paymentMethodId } = confirmPaymentDto;
 
-    return { data: liqpayData, signature, paymentId: payment.id };
+    // Находим платеж в базе
+    const payment = await this.paymentRepository.findOneBy({
+      stripePaymentIntentId,
+    });
+
+    if (!payment) {
+      throw new Error('Платёж не найден');
+    }
+
+    if (payment.status !== 'pending') {
+      throw new Error('Платёж уже обработан');
+    }
+
+    try {
+      // Подтверждаем PaymentIntent, используя переданный paymentMethodId
+      const paymentIntent = await this.stripe.paymentIntents.confirm(
+        stripePaymentIntentId,
+        {
+          payment_method: paymentMethodId,
+        },
+      );
+
+      // Обновляем статус платежа в базе в зависимости от результата
+      if (paymentIntent.status === 'succeeded') {
+        payment.status = 'success';
+      } else if (paymentIntent.status === 'requires_payment_method') {
+        payment.status = 'failed';
+      } else {
+        payment.status = 'pending'; // Для других статусов (например, requires_action)
+      }
+
+      await this.paymentRepository.save(payment);
+
+      return {
+        paymentId: payment.id,
+        stripePaymentIntentId: paymentIntent.id,
+        status: paymentIntent.status,
+      };
+    } catch (error: any) {
+      payment.status = 'failed';
+      await this.paymentRepository.save(payment);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      throw new Error(`Ошибка при подтверждении платежа: ${errorMessage}`);
+    }
   }
 
   async findAll() {
@@ -63,28 +118,22 @@ export class PaymentService {
 
   async remove(id: number) {
     await this.paymentRepository.delete(id);
-    return { message: `Платеж #${id} удален` };
+    return { message: `Платеж #${id} удалён` };
   }
 
-  async handleCallback(data: any, signature: string) {
-    const isValid = this.liqpay.verify(signature, data);
-    if (!isValid) {
-      throw new Error('Неверная подпись');
-    }
-
-    const decodedData = JSON.parse(
-      Buffer.from(data, 'base64').toString('utf-8'),
-    );
-    const { order_id, status, payment_id } = decodedData;
+  async handleCallback(data: { paymentIntentId: string; status: string }) {
+    const { paymentIntentId, status } = data;
 
     const payment = await this.paymentRepository.findOneBy({
-      orderId: order_id,
+      stripePaymentIntentId: paymentIntentId,
     });
-    if (payment) {
-      payment.status = status;
-      payment.paymentId = payment_id;
-      await this.paymentRepository.save(payment);
+
+    if (!payment) {
+      throw new Error('Платёж не найден');
     }
+
+    payment.status = status;
+    await this.paymentRepository.save(payment);
 
     return { status: 'ok' };
   }

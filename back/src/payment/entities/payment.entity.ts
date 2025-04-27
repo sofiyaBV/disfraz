@@ -24,12 +24,12 @@ export class Payment {
   status: string;
 
   @ApiProperty({
-    description: 'ID платежа от LiqPay',
-    example: 'pay_987654',
+    description: 'ID платежа от Stripe',
+    example: 'pi_1J2K3L4M5N6O7P8Q',
     required: false,
   })
   @Column({ nullable: true })
-  paymentId: string;
+  stripePaymentIntentId: string;
 
   @ApiProperty({
     description: 'Дата создания платежа',
