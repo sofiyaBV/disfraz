@@ -19,7 +19,7 @@ export class Migration1743868231694 implements MigrationInterface {
         "amount" numeric(10,2) NOT NULL,
         "currency" character varying(10) NOT NULL,
         "status" character varying(50) NOT NULL,
-        "paymentId" character varying(255),
+        "stripePaymentIntentId" character varying(255),
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         "description" character varying(255)
       )`,
@@ -141,7 +141,7 @@ export class Migration1743868231694 implements MigrationInterface {
     `);
 
     // Видалення зовнішніх ключів
- 
+
     await queryRunner.query(
       `ALTER TABLE "product_similars" DROP CONSTRAINT "FK_c08bfa57cca9873f9dba24d5bb7"`,
     );
