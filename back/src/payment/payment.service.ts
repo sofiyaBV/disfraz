@@ -5,6 +5,7 @@ import { Payment } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
+import { Order } from '../order/entities/order.entity';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -14,6 +15,8 @@ export class PaymentService {
   constructor(
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-03-31.basil', // Исправляем на актуальную версию
@@ -22,6 +25,12 @@ export class PaymentService {
 
   async create(createPaymentDto: CreatePaymentDto) {
     const { orderId, amount, currency, description } = createPaymentDto;
+
+    // Проверяем, существует ли заказ с указанным orderId
+    const order = await this.orderRepository.findOneBy({ id: orderId });
+    if (!order) {
+      throw new Error(`Заказ с ID ${orderId} не найден`);
+    }
 
     const payment = this.paymentRepository.create({
       orderId,
@@ -36,7 +45,7 @@ export class PaymentService {
       amount: Math.round(amount * 100), // Stripe ожидает сумму в копейках
       currency: currency || 'UAH',
       description: description || `Оплата заказа #${orderId}`,
-      metadata: { orderId, paymentId: payment.id },
+      metadata: { orderId: orderId.toString(), paymentId: payment.id },
       automatic_payment_methods: {
         enabled: true,
         allow_redirects: 'never', // Отключаем методы оплаты с перенаправлением
