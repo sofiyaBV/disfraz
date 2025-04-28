@@ -1,7 +1,6 @@
 import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -23,7 +22,7 @@ export class PaymentController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.User, Role.Admin) // Разрешаем и пользователям, и админам
+  @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Создать новый платёж' })
   @ApiResponse({
     status: 201,
@@ -32,20 +31,6 @@ export class PaymentController {
   })
   create(@Body() createPaymentDto: CreatePaymentDto, @User() user: any) {
     return this.paymentService.create(createPaymentDto, user.id);
-  }
-
-  @Post('/confirm')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.User, Role.Admin)
-  @ApiOperation({ summary: 'Подтвердить платёж' })
-  @ApiResponse({
-    status: 200,
-    description: 'Платёж успешно подтверждён',
-    type: Object,
-  })
-  confirm(@Body() confirmPaymentDto: ConfirmPaymentDto) {
-    return this.paymentService.confirmPayment(confirmPaymentDto);
   }
 
   @Post('/callback')

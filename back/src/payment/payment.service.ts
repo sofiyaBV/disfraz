@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import Stripe from 'stripe';
@@ -85,9 +84,9 @@ export class PaymentService {
         amount: Math.round(amount * 100),
         currency: currency || 'UAH',
         description: description || `Оплата заказа #${order.id}`,
-        metadata: { orderId: order.id.toString(), paymentId: undefined },
+        metadata: { orderId: order.id.toString(), paymentId: savedPayment.id },
         payment_method: paymentMethodId,
-        confirm: true, // автоматическое потдверждение
+        confirm: true,
         automatic_payment_methods: {
           enabled: true,
           allow_redirects: 'never',
@@ -95,11 +94,16 @@ export class PaymentService {
       });
 
       savedPayment.stripePaymentIntentId = paymentIntent.id;
+      if (paymentIntent.status === 'succeeded') {
+        savedPayment.status = 'success';
+      } else if (paymentIntent.status === 'requires_payment_method') {
+        savedPayment.status = 'failed';
+      } else if (paymentIntent.status === 'requires_action') {
+        savedPayment.status = 'pending';
+      } else {
+        savedPayment.status = 'pending';
+      }
       await this.paymentRepository.save(savedPayment);
-
-      await this.stripe.paymentIntents.update(paymentIntent.id, {
-        metadata: { orderId: order.id.toString(), paymentId: savedPayment.id },
-      });
     } catch (error: any) {
       await this.paymentRepository.delete(savedPayment.id);
       const errorMessage =
@@ -111,61 +115,8 @@ export class PaymentService {
       clientSecret: paymentIntent.client_secret,
       paymentId: savedPayment.id,
       stripePaymentIntentId: paymentIntent.id,
+      status: paymentIntent.status,
     };
-  }
-
-  async confirmPayment(confirmPaymentDto: ConfirmPaymentDto) {
-    const { stripePaymentIntentId } = confirmPaymentDto;
-
-    const payment = await this.paymentRepository.findOne({
-      where: { stripePaymentIntentId },
-    });
-
-    if (!payment) {
-      throw new NotFoundException('Платёж не найден');
-    }
-
-    if (payment.status !== 'pending') {
-      throw new Error('Платёж уже обработан');
-    }
-
-    try {
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(
-        stripePaymentIntentId,
-      );
-
-      if (paymentIntent.status !== 'requires_confirmation') {
-        throw new Error(
-          `PaymentIntent находится в неподходящем состоянии: ${paymentIntent.status}`,
-        );
-      }
-
-      const confirmedIntent = await this.stripe.paymentIntents.confirm(
-        stripePaymentIntentId,
-      );
-
-      if (confirmedIntent.status === 'succeeded') {
-        payment.status = 'success';
-      } else if (confirmedIntent.status === 'requires_payment_method') {
-        payment.status = 'failed';
-      } else {
-        payment.status = 'pending';
-      }
-
-      await this.paymentRepository.save(payment);
-
-      return {
-        paymentId: payment.id,
-        stripePaymentIntentId: confirmedIntent.id,
-        status: confirmedIntent.status,
-      };
-    } catch (error: any) {
-      payment.status = 'failed';
-      await this.paymentRepository.save(payment);
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new Error(`Ошибка при подтверждении платежа: ${errorMessage}`);
-    }
   }
 
   async findAll() {
