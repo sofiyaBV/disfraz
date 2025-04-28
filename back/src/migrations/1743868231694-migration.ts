@@ -22,6 +22,8 @@ export class Migration1743868231694 implements MigrationInterface {
         "stripePaymentIntentId" character varying(255),
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         "description" character varying(255),
+        "last4" character varying(4),
+        "cardType" character varying(50),
         CONSTRAINT "PK_payment_id" PRIMARY KEY ("id")
       )`,
     );
