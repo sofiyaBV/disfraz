@@ -1,0 +1,76 @@
+/* src/style/pagesStyle/thematicProducts.module.css */
+.thematicSection {
+  margin: 2rem 0;
+  /* position: relative; */
+  display: flex;
+  /* flex-direction: column; Сначала заголовок, затем контент */
+}
+
+.h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  /* text-align: center; Центрируем заголовок */
+  margin-bottom: 2rem;
+  margin-left: 3.125rem;
+  
+  text-transform: uppercase; /* Для соответствия стилю на скриншоте */
+}
+
+.thematicContent {
+  display: flex;
+  gap: 1rem;
+  /* min-height: 400px; Задаём минимальную высоту, чтобы фото могло растянуться */
+}
+
+.thematicImage {
+  flex: 0 0 20%; /* Занимает ровно 20% ширины */
+}
+
+.thematicImage img {
+  width: 100%;
+  height: 100%; /* Растягиваем изображение на всю высоту */
+  object-fit: cover; /* Сохраняем пропорции, обрезая лишнее */
+  border-radius: 8px;
+}
+
+.productsList {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 товара в ряду */
+  gap: 1rem;
+  margin-left: 3.125rem;
+}
+
+/* Стили для карточек товаров */
+.productsList > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Карточки занимают всю высоту ячейки */
+}
+
+@media (max-width: 768px) {
+  .thematicContent {
+    flex-direction: column;
+    min-height: 300px; /* Уменьшаем высоту на мобильных */
+  }
+
+  .thematicImage {
+    flex: 0 0 auto; /* На мобильных изображение не фиксировано по ширине */
+    height: 200px; /* Ограничиваем высоту на мобильных */
+  }
+
+  .productsList {
+    grid-template-columns: repeat(2, 1fr); /* 2 товара в ряду на мобильных */
+  }
+}
+
+@media (max-width: 480px) {
+  .thematicSection h3 {
+    font-size: 1.2rem;
+  }
+
+  .productsList {
+    grid-template-columns: 1fr; /* 1 товар в ряду на очень маленьких экранах */
+  }
+}
