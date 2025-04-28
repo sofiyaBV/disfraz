@@ -41,7 +41,7 @@ const BurgerMenuLogged = ({ onClose }) => {
             initialColor="#151515"
             borderColor="#151515"
             text="Каталог товарів"
-            width="clamp(16rem, 13vw, 49rem)"
+            width="clamp(16rem, 17vw, 49rem)"
             height="clamp(2rem, 5vw, 4.13rem)"
             link="/categories"
             textColor="#F2F2F2"
@@ -49,23 +49,25 @@ const BurgerMenuLogged = ({ onClose }) => {
         </div>
         {/* Исчезающий */}
         <div>
-          <img src={vector} alt="" />
+          <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.display}>
             <h4>
               Увійдіть, щоб отримати рекомендації,персональні бонуси і знижки
             </h4>
-            <ButtonGeneral
-              initialColor="#151515"
-              borderColor="#151515"
-              text="Увійти в особистий кабінет"
-              width="clamp(1rem, 12vw, 49rem)"
-              height="clamp(2rem, 5vw, 4.13rem)"
-              link="/my_account/registration"
-              textColor="#F2F2F2"
-            />
+            <div className={styles.buttonG}>
+              <ButtonGeneral
+                initialColor="#151515"
+                borderColor="#151515"
+                text="Увійти в особистий кабінет"
+                width="clamp(1rem, 12vw, 49rem)"
+                height="clamp(2rem, 5vw, 4.13rem)"
+                link="/my_account/authorization"
+                textColor="#F2F2F2"
+              />
+            </div>
           </div>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
         <div className={styles.links_group_1}>
           <span>
             <img src={profile} alt="profile" />
@@ -84,7 +86,7 @@ const BurgerMenuLogged = ({ onClose }) => {
             <h3>Чат з Disfraz</h3>
           </span>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
 
         <div className={styles.links_group_2}>
           <h3>Інформація про компанію</h3>
@@ -94,7 +96,7 @@ const BurgerMenuLogged = ({ onClose }) => {
           <p>Контакти</p>
           <p>Всі категорії</p>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
 
         <div className={styles.links_group_2}>
           <h3>Допомога</h3>
@@ -103,7 +105,7 @@ const BurgerMenuLogged = ({ onClose }) => {
           <p>Гарантія</p>
           <p>Повернення товару</p>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
 
         <div className={styles.links_group_2}>
           <h3>Сервіси</h3>
@@ -112,7 +114,7 @@ const BurgerMenuLogged = ({ onClose }) => {
           <p>Disfraz обмін</p>
           <p>Корпоративним клієнтам</p>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
 
         <div className={styles.links_group_2}>
           <h3>Партнерам</h3>
@@ -121,7 +123,7 @@ const BurgerMenuLogged = ({ onClose }) => {
           <p>Франчайзинг</p>
           <p>Оренда рекламних площ</p>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
 
         <div className={styles.loading}>
           <h3>Завантажуйте наші застосунки</h3>
@@ -130,7 +132,7 @@ const BurgerMenuLogged = ({ onClose }) => {
             <img src={AppStore} alt="App Store" />
           </div>
         </div>
-        <img src={vector} alt="" />
+        <img src={vector} alt="" className={styles.img_border} />
 
         <div className={styles.cotial}>
           <h3>Ми в соціальних мережах</h3>

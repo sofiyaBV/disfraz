@@ -1,10 +1,10 @@
 import React from "react";
-import BurgerMenuLogged from "../components/header/BurgerMenuLogged";
+import Authorization from "../components/registrations/Authorization";
 
 const Tests = () => {
   return (
     <div>
-      <BurgerMenuLogged />
+      <Authorization />
     </div>
   );
 };

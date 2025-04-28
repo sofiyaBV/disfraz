@@ -1,0 +1,92 @@
+.component{
+    background-color: white;
+    width: 36.29rem;
+    text-align: center;
+    border-radius: 5px;
+    padding: 2rem;
+}
+.add{
+    margin-left: 97%;
+}
+h2 {
+    font-size: 2rem;
+    font-weight: 500;
+    color: #151515;
+    margin-bottom: 2rem;
+}
+.buttons{
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.buttons span{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #151515;
+    margin-left: 1rem;
+}
+.buttons button{
+    width: 16.3rem;
+    height: 3.4rem;
+    border-radius: 5px;
+    border-color: #797F83;
+    background-color: white;
+}
+
+.buttons button:hover{
+    border-color: #eacd5b;
+    background-color: white;
+
+}
+.form{
+    margin-top: 2rem;
+    
+}
+
+
+.form input {
+    margin-top: 10px;
+    width: 90%;
+    height: 3.4rem;
+    padding: 0 0 0 1rem;
+    font-size: 1.2rem;
+    color: #151515;
+    font-weight: 600;
+    border-radius: 5px;
+}
+
+.form input:hover {
+    outline: none;
+    border-color: #E48D41;
+}
+
+.component a {
+    text-decoration: none;
+    color: #E48D41;
+    font-weight: 500;
+}
+
+.component a:hover {
+    text-decoration: underline;
+}
+
+.component p{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #151515;
+    margin-top: 1rem;
+}
+
+
+.buttonsG{
+    display: block;
+    margin-left: 9%;
+    margin-top: 10px;
+}
+
+.buttonsG p{
+    margin-left: -11%;
+    margin-bottom: 10px;
+}
