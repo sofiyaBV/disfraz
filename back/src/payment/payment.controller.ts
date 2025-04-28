@@ -13,8 +13,9 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { Payment } from './entities/payment.entity';
+import { User } from '../auth/decorators/user.decorator';
 
-@ApiTags('payment') // Группируем эндпоинты под тегом "payment" в Swagger
+@ApiTags('payment')
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
@@ -22,21 +23,21 @@ export class PaymentController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin)
+  @Roles(Role.User, Role.Admin) // Разрешаем и пользователям, и админам
   @ApiOperation({ summary: 'Создать новый платёж' })
   @ApiResponse({
     status: 201,
     description: 'Платёж успешно создан',
     type: Object,
   })
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  create(@Body() createPaymentDto: CreatePaymentDto, @User() user: any) {
+    return this.paymentService.create(createPaymentDto, user.id);
   }
 
   @Post('/confirm')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin)
+  @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Подтвердить платёж' })
   @ApiResponse({
     status: 200,
@@ -77,11 +78,11 @@ export class PaymentController {
   @Get(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin)
+  @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Получить платёж по ID' })
   @ApiResponse({ status: 200, description: 'Платёж найден', type: Payment })
   @ApiResponse({ status: 404, description: 'Платёж не найден' })
   findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id); // Преобразуем string в number
+    return this.paymentService.findOne(+id);
   }
 }

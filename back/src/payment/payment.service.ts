@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
@@ -23,20 +23,27 @@ export class PaymentService {
     });
   }
 
-  async create(createPaymentDto: CreatePaymentDto) {
-    const { orderId, amount, currency, description } = createPaymentDto;
+  async create(createPaymentDto: CreatePaymentDto, userId: number) {
+    const { amount, currency, description } = createPaymentDto;
 
-    // Проверяем, существует ли заказ с указанным orderId
-    const order = await this.orderRepository.findOneBy({ id: orderId });
+    // Находим последний заказ пользователя
+    const order = await this.orderRepository.findOne({
+      where: { user: { id: userId } },
+      order: { createdAt: 'DESC' }, // Сортируем по дате создания (последний заказ)
+      relations: ['user'],
+    });
+
     if (!order) {
-      throw new Error(`Заказ с ID ${orderId} не найден`);
+      throw new NotFoundException(
+        `Заказ для пользователя с ID ${userId} не найден`,
+      );
     }
 
     const payment = this.paymentRepository.create({
-      orderId,
+      orderId: order.id,
       amount,
       currency: currency || 'UAH',
-      description: description || `Оплата заказа #${orderId}`,
+      description: description || `Оплата заказа #${order.id}`,
       status: 'pending',
     });
     await this.paymentRepository.save(payment);
@@ -44,8 +51,8 @@ export class PaymentService {
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Stripe ожидает сумму в копейках
       currency: currency || 'UAH',
-      description: description || `Оплата заказа #${orderId}`,
-      metadata: { orderId: orderId.toString(), paymentId: payment.id },
+      description: description || `Оплата заказа #${order.id}`,
+      metadata: { orderId: order.id.toString(), paymentId: payment.id },
       automatic_payment_methods: {
         enabled: true,
         allow_redirects: 'never', // Отключаем методы оплаты с перенаправлением
@@ -66,12 +73,12 @@ export class PaymentService {
     const { stripePaymentIntentId, paymentMethodId } = confirmPaymentDto;
 
     // Находим платеж в базе
-    const payment = await this.paymentRepository.findOneBy({
-      stripePaymentIntentId,
+    const payment = await this.paymentRepository.findOne({
+      where: { stripePaymentIntentId },
     });
 
     if (!payment) {
-      throw new Error('Платёж не найден');
+      throw new NotFoundException('Платёж не найден');
     }
 
     if (payment.status !== 'pending') {
@@ -117,15 +124,21 @@ export class PaymentService {
   }
 
   async findOne(id: number) {
-    return this.paymentRepository.findOneBy({ id });
+    const payment = await this.paymentRepository.findOne({ where: { id } });
+    if (!payment) {
+      throw new NotFoundException(`Платёж с ID ${id} не найден`);
+    }
+    return payment;
   }
 
   async update(id: number, updatePaymentDto: UpdatePaymentDto) {
+    const payment = await this.findOne(id);
     await this.paymentRepository.update(id, updatePaymentDto);
-    return this.paymentRepository.findOneBy({ id });
+    return this.findOne(id);
   }
 
   async remove(id: number) {
+    const payment = await this.findOne(id);
     await this.paymentRepository.delete(id);
     return { message: `Платеж #${id} удалён` };
   }
@@ -133,12 +146,12 @@ export class PaymentService {
   async handleCallback(data: { paymentIntentId: string; status: string }) {
     const { paymentIntentId, status } = data;
 
-    const payment = await this.paymentRepository.findOneBy({
-      stripePaymentIntentId: paymentIntentId,
+    const payment = await this.paymentRepository.findOne({
+      where: { stripePaymentIntentId: paymentIntentId },
     });
 
     if (!payment) {
-      throw new Error('Платёж не найден');
+      throw new NotFoundException('Платёж не найден');
     }
 
     payment.status = status;
