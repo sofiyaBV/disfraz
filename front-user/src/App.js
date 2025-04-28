@@ -22,7 +22,7 @@ function App() {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<Navigate to="/error" replace />} />
 
-        {/* <Route path="/test" element={<Tests />} /> */}
+        <Route path="/my_account/authorization" element={<Tests />} />
       </Routes>
       <Footer />
     </div>

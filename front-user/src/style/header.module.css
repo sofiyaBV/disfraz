@@ -9,6 +9,9 @@
   box-sizing: border-box;
   position: relative;
   z-index: 20;
+  position: fixed; /* Фиксируем хедер */
+  top: 0; /* Привязываем к верхней части экрана */
+  left: 0;
 }
 
 .overlay {
