@@ -10,22 +10,25 @@ import Breadcrumbs from "./components/Breadcrumbs";
 import ErrorPage from "./pages/ErrorPage";
 
 import Tests from "./pages/Tests";
+import { AuthProvider } from "./utils/AuthContext";
 
 function App() {
   return (
-    <div className={general}>
-      <Header />
-      <Breadcrumbs />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/my_account/registration" element={<Registration />} />
-        <Route path="/error" element={<ErrorPage />} />
-        <Route path="*" element={<Navigate to="/error" replace />} />
+    <AuthProvider>
+      <div className={general}>
+        <Header />
+        <Breadcrumbs />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/my_account/registration" element={<Registration />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<Navigate to="/error" replace />} />
 
-        <Route path="/my_account/authorization" element={<Tests />} />
-      </Routes>
-      <Footer />
-    </div>
+          <Route path="/my_account/authorization" element={<Tests />} />
+        </Routes>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 }
 

@@ -8,7 +8,6 @@ if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
 }
 
 const userDataProvider = {
-  // Регистрация нового пользователя
   create: async (resource, params) => {
     if (resource !== "users") {
       throw new Error(`Unsupported resource: ${resource}`);
@@ -17,7 +16,6 @@ const userDataProvider = {
     const { email, phone, password } = params.data;
 
     const response = await fetch(`${apiUrl}/auth/register`, {
-      // Используем apiUrl
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,13 +28,13 @@ const userDataProvider = {
     });
 
     if (!response.ok) {
-      const errorText = await response.text(); // Получаем текст ошибки
+      const errorText = await response.text();
       let errorMessage;
       try {
-        const errorJson = JSON.parse(errorText); // Пробуем разобрать как JSON
+        const errorJson = JSON.parse(errorText);
         errorMessage = errorJson.message || "Registration failed";
       } catch (e) {
-        errorMessage = errorText || "Registration failed"; // Если не JSON, используем текст
+        errorMessage = errorText || "Registration failed";
       }
       throw new Error(errorMessage);
     }
@@ -45,12 +43,10 @@ const userDataProvider = {
     return { data };
   },
 
-  // Авторизация пользователя
   signin: async (params) => {
     const { email, phone, password } = params;
 
     const response = await fetch(`${apiUrl}/auth/signin`, {
-      // Используем apiUrl
       method: "POST",
       headers: {
         "Content-Type": "application/json",

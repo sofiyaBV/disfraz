@@ -1,17 +1,74 @@
+// Authorization.jsx
 import facebook from "../../img/icon/facebook_color.png";
 import google from "../../img/icon/google_color.png";
-import add from "../../assets//add.png";
+import add from "../../assets/add.png";
 import add_hover from "../../assets/add_hover.png";
 import styles from "../../style/authorization.module.css";
-
+import dataProvider from "../../utils/userDataProvider";
 import { useState } from "react";
 import ButtonGeneral from "../buttons/ButtonGeneral";
+import { useAuth } from "../../utils/AuthContext";
 
-const Authorization = () => {
+const Authorization = ({ onClose }) => {
+  const { login } = useAuth(); // Теперь login должен быть функцией
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    email: "",
+    phone: "",
+    password: "",
+  });
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const toggleLoginMethod = () => {
     setIsPhoneLogin(!isPhoneLogin);
+    setFormData({ ...formData, email: "", phone: "" });
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const { email, phone, password } = formData;
+    if (!password) {
+      setError("Пароль обязателен");
+      setLoading(false);
+      return;
+    }
+    if (isPhoneLogin && !phone) {
+      setError("Введите номер телефона");
+      setLoading(false);
+      return;
+    }
+    if (!isPhoneLogin && !email) {
+      setError("Введите email");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const params = {
+        email: isPhoneLogin ? "" : formData.email,
+        phone: isPhoneLogin ? formData.phone : "",
+        password: formData.password,
+      };
+
+      const response = await dataProvider.signin(params);
+      console.log("Signin successful:", response.data);
+
+      login(response.data.token || "some-token"); // Теперь это должно работать
+
+      onClose("Авторизація пройшла успішно!");
+    } catch (err) {
+      setError(err.message || "Не удалось авторизоваться. Попробуйте снова.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,6 +79,7 @@ const Authorization = () => {
         alt=""
         onMouseEnter={(e) => (e.currentTarget.src = add_hover)}
         onMouseLeave={(e) => (e.currentTarget.src = add)}
+        onClick={() => onClose()}
       />
       <h2>Вхід</h2>
       <p>Увійти за допомогою профілю</p>
@@ -29,33 +87,44 @@ const Authorization = () => {
         <button>
           <img src={facebook} alt="Facebook" />
           <span>FACEBOOK</span>
-        </button>{" "}
+        </button>
         <button>
           <img src={google} alt="Google" />
           <span>GOOGLE</span>
         </button>
       </div>
       <div className={styles.form}>
-        {" "}
         <p>
           {isPhoneLogin
             ? "За номером телефону"
             : "Увійти за допомогою електронної пошти"}
         </p>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div>
             <label>
               <input
                 type={isPhoneLogin ? "tel" : "email"}
-                placeholder={isPhoneLogin ? "38 (___) ___ - __ -__ " : "Email"}
+                name={isPhoneLogin ? "phone" : "email"}
+                placeholder={isPhoneLogin ? "38 (___) ___ - __ -__" : "Email"}
+                value={isPhoneLogin ? formData.phone : formData.email}
+                onChange={handleChange}
+                required
               />
             </label>
           </div>
           <div>
             <label>
-              <input type="password" placeholder="Пароль" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Пароль"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
             </label>
           </div>
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <p>
             <a href="#">Не пам'ятаю пароль</a>
           </p>
@@ -76,13 +145,14 @@ const Authorization = () => {
           initialColor="black"
           borderColor="black"
           textColor="white"
-          text="Продовжити"
+          text={loading ? "Завантаження..." : "Продовжити"}
           width="100%"
           height="3.4rem"
           transitionDuration="0.3s"
-          link="/my_account/registration"
           type="submit"
           colorHover="red"
+          disabled={loading}
+          onClick={handleSubmit}
         />
         <p>Або</p>
         <ButtonGeneral
@@ -93,8 +163,8 @@ const Authorization = () => {
           width="100%"
           height="3.4rem"
           transitionDuration="0.3s"
-          // link="/my_account/registration"
-          type="submit"
+          type="button"
+          onClick={() => onClose()}
         />
       </div>
     </div>
