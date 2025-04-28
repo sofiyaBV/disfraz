@@ -1,22 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class UpdatePaymentDto {
   @ApiProperty({
-    description: 'Статус платежа',
-    example: 'success',
+    description: 'Описание платежа',
+    example: 'Оплата заказа #12345',
     required: false,
   })
   @IsString()
   @IsOptional()
-  status?: string;
+  description?: string;
 
   @ApiProperty({
-    description: 'ID платежа от LiqPay',
-    example: 'pay_987654',
+    description: 'Сумма платежа',
+    example: 100.5,
     required: false,
   })
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  paymentId?: string;
+  amount?: number;
 }

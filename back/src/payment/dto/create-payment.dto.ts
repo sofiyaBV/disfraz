@@ -23,4 +23,11 @@ export class CreatePaymentDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({
+    description: 'ID метода оплаты, созданного на клиенте через Stripe.js',
+    example: 'pm_card_visa',
+  })
+  @IsString()
+  paymentMethodId: string;
 }

@@ -56,4 +56,20 @@ export class Payment {
   })
   @Column({ nullable: true })
   description: string;
+
+  @ApiProperty({
+    description: 'Последние 4 цифры карты',
+    example: '4242',
+    required: false,
+  })
+  @Column({ nullable: true })
+  last4: string;
+
+  @ApiProperty({
+    description: 'Тип карты (например, visa, mastercard)',
+    example: 'visa',
+    required: false,
+  })
+  @Column({ nullable: true })
+  cardType: string;
 }

@@ -8,11 +8,4 @@ export class ConfirmPaymentDto {
   })
   @IsString()
   stripePaymentIntentId: string;
-
-  @ApiProperty({
-    description: 'ID тестового метода оплаты (PaymentMethod) от Stripe',
-    example: 'pm_card_visa', // Тестовый PaymentMethod для карты Visa
-  })
-  @IsString()
-  paymentMethodId: string;
 }
