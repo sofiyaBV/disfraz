@@ -2,7 +2,7 @@
     background-color: white;
     width: 36.29rem;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 2rem;
 }
 .add{
@@ -84,6 +84,7 @@ h2 {
     display: block;
     margin-left: 9%;
     margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .buttonsG p{

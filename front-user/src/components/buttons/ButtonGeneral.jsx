@@ -15,6 +15,7 @@ const ButtonGeneral = ({
   type = "button", // Добавляем type по умолчанию
   disabled = false, // Добавляем disabled
   colorHover, // Добавляем colorHover
+  onClick, // Добавляем onClick в props
 }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -40,7 +41,12 @@ const ButtonGeneral = ({
     transition: `background-color ${transitionDuration}, color ${transitionDuration}`,
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    // Вызываем переданный onClick, если он есть
+    if (onClick) {
+      onClick(e);
+    }
+    // Обрабатываем навигацию, если задан link
     if (link) {
       navigate(link);
     }

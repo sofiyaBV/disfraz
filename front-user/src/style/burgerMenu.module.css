@@ -1,3 +1,25 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачный тёмный фон */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Выше всех элементов */
+  pointer-events: auto; /* Блокирует взаимодействие с фоном */
+}
+
+/* Стили для содержимого модального окна */
+.modalContent {
+  background-color: transparent; /* Прозрачный фон, чтобы видеть только компонент Authorization */
+  max-width: 90%;
+  width: 36.29rem; /* Совпадает с шириной компонента Authorization */
+  pointer-events: auto; /* Разрешает взаимодействие с содержимым */
+}
+
 .container {
   width: 20%;
   /* width: 19rem; */
