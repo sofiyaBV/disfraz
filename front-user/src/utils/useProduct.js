@@ -1,8 +1,8 @@
-// src/utils/useProducts.js
+// src/utils/useProduct.js
 import { useEffect, useState } from "react";
 import { getProducts } from "./dataProvider";
 
-const useProducts = () => {
+const useProduct = ({ theme } = {}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,10 +11,13 @@ const useProducts = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
+        const filter = theme ? { theme } : {};
         const response = await getProducts({
           page: 1,
+          perPage: 6,
           sortField: "id",
           sortOrder: "ASC",
+          filter,
         });
         setProducts(response.data);
         setLoading(false);
@@ -26,9 +29,9 @@ const useProducts = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [theme]); // Зависимость теперь от примитивного значения theme
 
   return { products, loading, error };
 };
 
-export default useProducts;
+export default useProduct;
