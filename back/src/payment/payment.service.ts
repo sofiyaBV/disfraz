@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
@@ -86,7 +90,7 @@ export class PaymentService {
         description: description || `Оплата заказа #${order.id}`,
         metadata: { orderId: order.id.toString(), paymentId: savedPayment.id },
         payment_method: paymentMethodId,
-        confirm: true,
+        confirm: true, // Подтверждаем сразу
         automatic_payment_methods: {
           enabled: true,
           allow_redirects: 'never',
@@ -94,15 +98,7 @@ export class PaymentService {
       });
 
       savedPayment.stripePaymentIntentId = paymentIntent.id;
-      if (paymentIntent.status === 'succeeded') {
-        savedPayment.status = 'success';
-      } else if (paymentIntent.status === 'requires_payment_method') {
-        savedPayment.status = 'failed';
-      } else if (paymentIntent.status === 'requires_action') {
-        savedPayment.status = 'pending';
-      } else {
-        savedPayment.status = 'pending';
-      }
+      savedPayment.status = paymentIntent.status; // Статус сразу будет succeeded или failed
       await this.paymentRepository.save(savedPayment);
     } catch (error: any) {
       await this.paymentRepository.delete(savedPayment.id);
@@ -148,8 +144,12 @@ export class PaymentService {
     return { message: `Платеж #${id} удалён` };
   }
 
-  async handleCallback(data: { paymentIntentId: string; status: string }) {
+  async handleCallback(data: { paymentIntentId: string }) {
     const { paymentIntentId } = data;
+
+    if (!paymentIntentId) {
+      throw new BadRequestException('paymentIntentId обязателен');
+    }
 
     const payment = await this.paymentRepository.findOne({
       where: { stripePaymentIntentId: paymentIntentId },
@@ -159,12 +159,19 @@ export class PaymentService {
       throw new NotFoundException('Платёж не найден');
     }
 
-    const paymentIntent =
-      await this.stripe.paymentIntents.retrieve(paymentIntentId);
-    payment.status = paymentIntent.status;
+    let paymentIntent: Stripe.PaymentIntent;
+    try {
+      paymentIntent =
+        await this.stripe.paymentIntents.retrieve(paymentIntentId);
+    } catch (error: any) {
+      throw new BadRequestException(
+        `Ошибка при получении PaymentIntent: ${error.message}`,
+      );
+    }
 
+    payment.status = paymentIntent.status;
     await this.paymentRepository.save(payment);
 
-    return { status: 'ok' };
+    return payment;
   }
 }
