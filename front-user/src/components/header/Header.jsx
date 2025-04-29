@@ -11,10 +11,12 @@ import FaSearch from "../../assets/svg/search-normal.svg";
 import FaHeart from "../../assets/svg/heart.svg";
 import FaShoppingCart from "../../assets/svg/shopping-bag.svg";
 import FaUser from "../../assets/svg/profile.svg";
+import CatalogMenu from "./CatalogMenu";
 
 const Header = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isSearchFocused || isMenuOpen) {
@@ -30,6 +32,18 @@ const Header = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target.className.includes(styles.modalOverlay)) {
+      closeCatalogMenu();
+    }
+  };
+  const openCatalogMenu = () => {
+    setIsCatalogMenuOpen(true);
+  };
+  const closeCatalogMenu = () => {
+    setIsCatalogMenuOpen(false);
   };
 
   return (
@@ -59,7 +73,7 @@ const Header = () => {
             width="10.4rem"
             height="3rem"
             transitionDuration="0.1s"
-            link="/catalog"
+            onClick={openCatalogMenu}
             textColor="#fff"
           />
 
@@ -114,6 +128,13 @@ const Header = () => {
         </div>
       </header>
       {isMenuOpen && <BurgerMenuLogged onClose={toggleMenu} />}
+      {isCatalogMenuOpen && (
+        <div className={styles.modalOverlay} onClick={handleOverlayClick}>
+          <div className={styles.modalContent}>
+            <CatalogMenu onClose={closeCatalogMenu} />
+          </div>
+        </div>
+      )}
     </>
   );
 };

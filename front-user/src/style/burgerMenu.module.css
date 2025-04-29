@@ -9,14 +9,14 @@
   justify-content: center;
   align-items: center;
   z-index: 1000; /* Выше всех элементов */
-  pointer-events: auto; /* Блокирует взаимодействие с фоном */
+  /* pointer-events: auto; Блокирует взаимодействие с фоном */
 }
 
 /* Стили для содержимого модального окна */
 .modalContent {
   background-color: transparent; /* Прозрачный фон, чтобы видеть только компонент Authorization */
   max-width: 90%;
-  width: 36.29rem; /* Совпадает с шириной компонента Authorization */
+  /* width: 36.29rem; Совпадает с шириной компонента Authorization */
   pointer-events: auto; /* Разрешает взаимодействие с содержимым */
 }
 
@@ -133,6 +133,8 @@
   font-weight: 300;
   margin-bottom: 20px;
 }
+
+
 /*   
 @media (min-width: 769px) {
   .container {

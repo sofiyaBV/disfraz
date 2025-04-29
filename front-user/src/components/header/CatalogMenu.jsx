@@ -2,8 +2,20 @@ import React, { useState } from "react";
 import style from "../../style/catalogMenu.module.css";
 import arrow_right from "../../assets/arrow-right.png";
 import arrow_selected from "../../assets/Vector.png";
+import foto1 from "../../img/menu/Rectangle1.png";
+import foto2 from "../../img/menu/Rectangle2.png";
+import foto3 from "../../img/menu/Rectangle3.png";
+import foto4 from "../../img/menu/Rectangle4.png";
+import foto5 from "../../img/menu/Rectangle5.png";
+import foto6 from "../../img/menu/Rectangle6.png";
+import foto7 from "../../img/menu/Rectangle7.png";
+import foto8 from "../../img/menu/Rectangle8.png";
+import foto9 from "../../img/menu/Rectangle9.png";
+import foto10 from "../../img/menu/Rectangle10.png";
+import foto11 from "../../img/menu/Rectangle10.png";
+import foto12 from "../../img/menu/Rectangle12.png";
 
-const CatalogMenu = () => {
+const CatalogMenu = ({ onClose }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const menuItems = [
@@ -30,113 +42,173 @@ const CatalogMenu = () => {
     {
       lists: [
         {
-          title: "Аниме и манга",
+          title: "Всесвіт",
           items: [
-            { text: "Герои японских персонажей", link: "/anime1" },
-            { text: "Фильмы та серийники", link: "/anime2" },
-            { text: "Sci-Fi кие сериалы", link: "/anime3" },
+            { text: "Аніме та манга", link: "/costumes/theme/anime_and_manga" },
+            {
+              text: "Геймерські персонажі",
+              link: "/costumes/theme/gamer_charactrds",
+            },
+            { text: "Фільми та серіали", link: "/costumes/theme/film_and_TV" },
+            {
+              text: "Sci-Fi та кіберпанк",
+              link: "/costumes/theme/Sci-Fi_and_cyberpank",
+            },
+            {
+              text: "Фентезі та середньовіччя",
+              link: "/costumes/theme/fantasy_and_middle_school",
+            },
+            {
+              text: "Комікси Marvel/DC",
+              link: "/costumes/theme/Marvel_DC_Comics",
+            },
           ],
         },
         {
-          title: "Поп и сет-костюмы",
+          title: "Типи костюмів",
           items: [
-            { text: "Маскарад та гало образ", link: "/pop1" },
-            { text: "Сукня та костюми", link: "/pop2" },
-            { text: "Больше костюмов", link: "/pop3" },
+            { text: "Повні сет-костюми", link: "/costumes/type/all_set" },
+            {
+              text: "Маскаради та бальні образи",
+              link: "/costumes/type/masquerade_and_ballrom",
+            },
+            {
+              text: "Сукні та мантії",
+              link: "/costumes/type/cloth_and_mantles",
+            },
+            { text: "Бойові костюми", link: "/costumes/type/fight_costumes" },
+            { text: "Костюми супергероїв", link: "/costumes/type/superhero" },
+            { text: "Казкові персонажі", link: "/costumes/type/fairytale" },
+            { text: "Тематичні образи", link: "/costumes/type/thematic_looks" },
           ],
         },
         {
-          title: "Герои комиксов",
+          title: "Призначення",
           items: [
-            { text: "Комиксы Marvel/DC", link: "/comics1" },
-            { text: "Каждый персонаж", link: "/comics2" },
-            { text: "Тематики образа", link: "/comics3" },
+            {
+              text: "Костюми для фотосесій",
+              link: "/costumes/purpose/for_photo",
+            },
+            {
+              text: "Театральні та сценічні костюми",
+              link: "/costumes/purpose/theatrical",
+            },
+            {
+              text: "Карнавальні та фанатські костюми",
+              link: "/costumes/purpose/carnaval",
+            },
+            {
+              text: "Спортивні та бойові костюми",
+              link: "/costumes/purpose/sports",
+            },
           ],
         },
       ],
-      images: ["/path/to/cowboy.jpg", "/path/to/spiderman.jpg"],
+      images: [foto1, foto2],
     },
     // Святкові костюми (1 list)
     {
       lists: [
         {
-          title: "Принадлежности к праздникам",
           items: [
-            { text: "Карнавальные костюмы", link: "/holiday1" },
-            { text: "Карнавальные костюмы для семьи", link: "/holiday2" },
+            { text: "хелловін", link: "/holiday/helloween" },
+            { text: "різдво та новий рік", link: "/holiday/christmas" },
+            { text: "день святого патрика", link: "/holiday/st_patrick's_day" },
+            { text: "пасха", link: "/holiday/easter" },
+            { text: "дитячі свята ", link: "/holiday/children's_holidays" },
+            {
+              text: "весілля та тематичні вечірки ",
+              link: "/holiday/weddings_and_theme_parties",
+            },
           ],
         },
       ],
-      images: ["/path/to/holiday1.jpg", "/path/to/holiday2.jpg"],
+      images: [foto3, foto4],
     },
     // Аксесуари (1 list)
     {
       lists: [
         {
-          title: "Театральные и сценические костюмы",
           items: [
-            { text: "Спортивные и боевые костюмы", link: "/accessory1" },
-            { text: "Карнавальные костюмы для семьи", link: "/accessory2" },
+            { text: "Маски та грим", link: "/accessories/masks_and_makeup" },
+            { text: "Лінзи", link: "/accessories/lenses" },
+            { text: "Перуки", link: "/accessories/wigs" },
+            {
+              text: "Рукавички, кігті, кібер-руки",
+              link: "/accessories/gloves_claws_cyber_hands",
+            },
+            {
+              text: "Вуха, роги, хвости",
+              link: "/accessories/ears_horns_tails",
+            },
+            { text: "Крила та накидки", link: "/accessories/wings_and_capes" },
+            {
+              text: "Обладнання (посохи, зброя)",
+              link: "/accessories/equipment_staffs_weapons",
+            },
+            {
+              text: "костюмна біжутерія та прикраси",
+              link: "/accessories/costume_jewelry_and_ornaments",
+            },
           ],
         },
       ],
-      images: ["/path/to/accessory1.jpg", "/path/to/accessory2.jpg"],
+      images: [foto5, foto6],
     },
     // Взуття (1 list)
     {
       lists: [
         {
-          title: "Костюмы субкультур",
           items: [
-            { text: "Костюмы субкультур", link: "/shoes1" },
-            { text: "Карнавальные костюмы для семьи", link: "/shoes2" },
+            { text: "черевики та чоботи", link: "/shoes/boots_and_shoes" },
+            {
+              text: "сандалії та легке взуття",
+              link: "/shoes/sandals_and_light_shoes",
+            },
+            {
+              text: "мокасини та святкові туфлі",
+              link: "/shoes/moccasins_and_festive_shoes",
+            },
+            {
+              text: "геймерські футуристичні моделі",
+              link: "/shoes/gamer_futuristic_models",
+            },
+            { text: "тематичне взуття", link: "/shoes/thematic_shoes" },
           ],
         },
       ],
-      images: ["/path/to/shoes1.jpg", "/path/to/shoes2.jpg"],
+      images: [foto7, foto8],
     },
     // Головні убори (1 list)
     {
       lists: [
         {
-          title: "Карнавальные та готические костюмы",
           items: [
-            { text: "Карнавальные костюмы для вечеринок", link: "/hats1" },
-            { text: "Карнавальные костюмы для семьи", link: "/hats2" },
+            { text: "Корони та діадеми", link: "/headwear/crowns_and_tiaras" },
+            { text: "Капелюхи", link: "/headwear/hats" },
+            { text: "бойові шоломи", link: "/headwear/combat_helmets" },
+            {
+              text: "Тематичні головні убори",
+              link: "/headwear/thematic_headwear",
+            },
           ],
         },
       ],
-      images: ["/path/to/hats1.jpg", "/path/to/hats2.jpg"],
+      images: [foto9, foto10],
     },
     // Декорації та реквізит (3 lists)
     {
       lists: [
         {
-          title: "Аниме и манга",
           items: [
-            { text: "Герои японских персонажей", link: "/props1" },
-            { text: "Фильмы та серийники", link: "/props2" },
-            { text: "Sci-Fi кие сериалы", link: "/props3" },
-          ],
-        },
-        {
-          title: "Поп и сет-костюмы",
-          items: [
-            { text: "Маскарад та гало образ", link: "/props4" },
-            { text: "Сукня та костюми", link: "/props5" },
-            { text: "Больше костюмов", link: "/props6" },
-          ],
-        },
-        {
-          title: "Герои комиксов",
-          items: [
-            { text: "Комиксы Marvel/DC", link: "/props7" },
-            { text: "Каждый персонаж", link: "/props8" },
-            { text: "Тематики образа", link: "/props9" },
+            { text: "атрибути для фотосесій", link: "/props1" },
+            { text: "декор для косплей зустрічей", link: "/props2" },
+            { text: "карнавальні аксесуари", link: "/props3" },
+            { text: "реалістична зброя", link: "/props3" },
           ],
         },
       ],
-      images: ["/path/to/props1.jpg", "/path/to/props2.jpg"],
+      images: [foto11, foto12],
     },
   ];
 
@@ -167,30 +239,35 @@ const CatalogMenu = () => {
         ))}
       </div>
       <div className={style.container_info}>
-        <div className={style.lists_container}>
-          {contentInfo[selectedIndex]?.lists.map((list, idx) => (
-            <div key={idx} className={style.list_section}>
-              <h5>{list.title}</h5>
-              <ul>
-                {list.items.map((item, itemIdx) => (
-                  <li key={itemIdx}>
-                    <a href={item.link}>{item.text}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className={style.promotions}>
-          <h5>Акции</h5>
-          <ul>
-            {promotions.map((promo, idx) => (
-              <li key={idx}>
-                {promo.text} <span>{promo.discount}</span>
-              </li>
+        <div className={style.container_info_text}>
+          <div className={style.lists_container}>
+            {contentInfo[selectedIndex]?.lists.map((list, idx) => (
+              <div key={idx} className={style.list_section}>
+                <h5>{list.title}</h5>
+                <ul>
+                  {list.items.map((item, itemIdx) => (
+                    <li key={itemIdx}>
+                      <a href={item.link}>{item.text}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
+          <div className={style.promotions}>
+            <h5>Акції</h5>
+            <ul>
+              {promotions.map((promo, idx) => (
+                <li key={idx}>
+                  <a href={promo.link}>
+                    {promo.text} <span>{promo.discount}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
+
         <div className={style.images}>
           {contentInfo[selectedIndex]?.images.map((src, idx) => (
             <img key={idx} src={src} alt={`Image ${idx + 1}`} />
