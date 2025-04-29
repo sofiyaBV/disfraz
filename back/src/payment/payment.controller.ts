@@ -1,6 +1,7 @@
 import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { HandleCallbackDto } from './dto/HandleCallback.Dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -41,13 +42,10 @@ export class PaymentController {
   @ApiResponse({
     status: 200,
     description: 'Callback успешно обработан',
-    type: Object,
+    type: Payment,
   })
-  handleCallback(
-    @Body('paymentIntentId') paymentIntentId: string,
-    @Body('status') status: string,
-  ) {
-    return this.paymentService.handleCallback({ paymentIntentId, status });
+  handleCallback(@Body() handleCallbackDto: HandleCallbackDto) {
+    return this.paymentService.handleCallback(handleCallbackDto);
   }
 
   @Get()
