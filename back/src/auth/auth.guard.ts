@@ -21,6 +21,7 @@ export class AuthGuard implements CanActivate {
     { method: 'POST', path: '/auth/register' },
 
     { method: 'GET', path: '/products' },
+    { method: 'GET', path: '/product-attribute' },
     { method: 'POST', path: '/products' },
   ];
 

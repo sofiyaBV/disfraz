@@ -1,0 +1,102 @@
+.container{
+    background-color: rgb(209, 232, 232);
+    border-radius: 20px;
+    width: 107.8125rem;
+    height: 46.1875rem;
+    display: flex;
+
+    margin-left: 20px;
+}
+
+.container_menu{
+    padding-top: 1.5625rem;
+    background-color: #EBEBEB;
+    height: 100%;
+    width: 18.75rem;
+    border-radius: 20px 0 0 20px;
+}
+.container_menu h4{
+    color: #2B3338;
+    font-size: 16px;
+    font-weight: 400; /* Regular font weight */
+    text-transform: uppercase; /* Ensures text is written in all caps */
+}
+
+.menu_item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;    padding: 10px 20px;
+    cursor: pointer;
+    color: #2B3338;
+}
+.selected .selected_text{
+   color: #385B9D;
+}
+.container_info {
+    background-color: #882727;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .lists_container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .list_section h5 {
+    font-size: 14px;
+    color: #2b3338;
+    margin-bottom: 10px;
+  }
+  
+  .list_section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .list_section ul li {
+    margin-bottom: 5px;
+  }
+  
+  .list_section ul li a {
+    text-decoration: none;
+    color: #385b9d;
+    font-size: 14px;
+  }
+  
+  .promotions h5 {
+    font-size: 14px;
+    color: #2b3338;
+    margin-bottom: 10px;
+  }
+  
+  .promotions ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .promotions ul li {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #2b3338;
+  }
+  
+  .promotions ul li span {
+    color: #ff6200;
+    font-weight: bold;
+  }
+  
+  .images {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .images img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
