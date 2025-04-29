@@ -31,8 +31,8 @@ import { ProductAttributeDto } from './dto/product-attribute.dto';
 
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductAttributeController {
   constructor(
     private readonly productAttributeService: ProductAttributeService,
@@ -58,7 +58,7 @@ export class ProductAttributeController {
   })
   @PaginatedSwaggerDocs(ProductAttributeDto, productAttributePaginateConfig)
   @Get()
-  @Roles(Role.User, Role.Admin)
+  // @Roles(Role.User, Role.Admin)
   async findAll(
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<ProductAttribute>> {
