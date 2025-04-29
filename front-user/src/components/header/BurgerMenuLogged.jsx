@@ -1,9 +1,10 @@
-// BurgerMenuLogged.js
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Импортируем Link
 import styles from "../../style/burgerMenu.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import Authorization from "../registrations/Authorization";
 import { useAuth } from "../../utils/AuthContext";
+import CatalogMenu from "./CatalogMenu";
 
 import LOGO from "../../assets/LOGO.png";
 import arrow from "../../assets/arrow.png";
@@ -22,7 +23,6 @@ import pinterest from "../../img/icon/pinterest.png";
 import telegram from "../../img/icon/telegram.png";
 import inst from "../../img/icon/instagram.png";
 import facebook from "../../img/icon/facebook.png";
-import CatalogMenu from "./CatalogMenu";
 
 const BurgerMenuLogged = ({ onClose }) => {
   const { isAuthenticated, logout } = useAuth();
@@ -43,19 +43,22 @@ const BurgerMenuLogged = ({ onClose }) => {
       }, 3000);
     }
   };
+
   const handleOverlayClick = (e) => {
     if (e.target.className.includes(styles.modalOverlay)) {
       closeCatalogMenu();
     }
   };
-  // Временная функция для сброса состояния
+
   const resetAuthState = () => {
     localStorage.removeItem("authToken");
     logout();
   };
+
   const openCatalogMenu = () => {
     setIsCatalogMenuOpen(true);
   };
+
   const closeCatalogMenu = () => {
     setIsCatalogMenuOpen(false);
   };
@@ -93,7 +96,6 @@ const BurgerMenuLogged = ({ onClose }) => {
               textColor="#F2F2F2"
             />
           </div>
-          {/* Временная кнопка для сброса состояния */}
           <div style={{ margin: "10px 0" }}>
             <ButtonGeneral
               initialColor="#ff0000"
@@ -129,61 +131,61 @@ const BurgerMenuLogged = ({ onClose }) => {
           )}
           <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.links_group_1}>
-            <span>
+            <Link to="/my_account" className={styles.link_item}>
               <img src={profile} alt="profile" />
               <h3>Особистий кабінет</h3>
-            </span>
-            <span>
+            </Link>
+            <Link to="/cart" className={styles.link_item}>
               <img src={shop} alt="shop" />
               <h3>Кошик</h3>
-            </span>
-            <span>
+            </Link>
+            <Link to="/track_package" className={styles.link_item}>
               <img src={box} alt="box" />
               <h3>Відстежити посилку</h3>
-            </span>
-            <span>
+            </Link>
+            <Link to="/chat_with_disfraz" className={styles.link_item}>
               <img src={message} alt="message" />
               <h3>Чат з Disfraz</h3>
-            </span>
-            {isAuthenticated && (
+            </Link>
+            {/* {isAuthenticated && (
               <span onClick={logout} style={{ cursor: "pointer" }}>
                 <img src={profile} alt="logout" />
                 <h3>Вийти</h3>
               </span>
-            )}
+            )} */}
           </div>
           <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.links_group_2}>
             <h3>Інформація про компанію</h3>
-            <p>Про нас</p>
-            <p>Умови використання сайту</p>
-            <p>Вакансії</p>
-            <p>Контакти</p>
-            <p>Всі категорії</p>
+            <Link to="/about_us">Про нас</Link>
+            <Link to="/terms_of_use">Умови використання сайту</Link>
+            <Link to="/vacancies">Вакансії</Link>
+            <Link to="/contacts">Контакти</Link>
+            <Link to="/all_categories">Всі категорії</Link>
           </div>
           <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.links_group_2}>
             <h3>Допомога</h3>
-            <p>Доставка та оплата</p>
-            <p>Кредит</p>
-            <p>Гарантія</p>
-            <p>Повернення товару</p>
+            <Link to="/delivery_and_payment">Доставка та оплата</Link>
+            <Link to="/credit">Кредит</Link>
+            <Link to="/warranty">Гарантія</Link>
+            <Link to="/returns">Повернення товару</Link>
           </div>
           <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.links_group_2}>
             <h3>Сервіси</h3>
-            <p>Бонусний рахунок</p>
-            <p>Подарункові сертифікати</p>
-            <p>Disfraz обмін</p>
-            <p>Корпоративним клієнтам</p>
+            <Link to="/bonus_account">Бонусний рахунок</Link>
+            <Link to="/gift_certificates">Подарункові сертифікати</Link>
+            <Link to="/disfraz_exchange">Disfraz обмін</Link>
+            <Link to="/corporate_clients">Корпоративним клієнтам</Link>
           </div>
           <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.links_group_2}>
             <h3>Партнерам</h3>
-            <p>Продавати на Disfraz</p>
-            <p>Співпраця з нами</p>
-            <p>Франчайзинг</p>
-            <p>Оренда рекламних площ</p>
+            <Link to="/sell_on_disfraz">Продавати на Disfraz</Link>
+            <Link to="/cooperation">Співпраця з нами</Link>
+            <Link to="/franchising">Франчайзинг</Link>
+            <Link to="/advertising_space_rental">Оренда рекламних площ</Link>
           </div>
           <img src={vector} alt="" className={styles.img_border} />
           <div className={styles.loading}>
