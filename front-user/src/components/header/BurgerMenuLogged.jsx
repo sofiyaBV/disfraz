@@ -22,10 +22,12 @@ import pinterest from "../../img/icon/pinterest.png";
 import telegram from "../../img/icon/telegram.png";
 import inst from "../../img/icon/instagram.png";
 import facebook from "../../img/icon/facebook.png";
+import CatalogMenu from "./CatalogMenu";
 
 const BurgerMenuLogged = ({ onClose }) => {
   const { isAuthenticated, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
   const openAuthModal = () => {
@@ -41,11 +43,21 @@ const BurgerMenuLogged = ({ onClose }) => {
       }, 3000);
     }
   };
-
+  const handleOverlayClick = (e) => {
+    if (e.target.className.includes(styles.modalOverlay)) {
+      closeCatalogMenu();
+    }
+  };
   // Временная функция для сброса состояния
   const resetAuthState = () => {
     localStorage.removeItem("authToken");
     logout();
+  };
+  const openCatalogMenu = () => {
+    setIsCatalogMenuOpen(true);
+  };
+  const closeCatalogMenu = () => {
+    setIsCatalogMenuOpen(false);
   };
 
   return (
@@ -77,7 +89,7 @@ const BurgerMenuLogged = ({ onClose }) => {
               text="Каталог товарів"
               width="clamp(16rem, 17vw, 49rem)"
               height="clamp(2rem, 5vw, 4.13rem)"
-              link="/categories"
+              onClick={openCatalogMenu}
               textColor="#F2F2F2"
             />
           </div>
@@ -202,6 +214,14 @@ const BurgerMenuLogged = ({ onClose }) => {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <Authorization onClose={closeAuthModal} />
+          </div>
+        </div>
+      )}
+
+      {isCatalogMenuOpen && (
+        <div className={styles.modalOverlay} onClick={handleOverlayClick}>
+          <div className={styles.modalContent}>
+            <CatalogMenu onClose={closeCatalogMenu} />
           </div>
         </div>
       )}
