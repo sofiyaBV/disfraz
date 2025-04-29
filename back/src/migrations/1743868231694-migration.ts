@@ -5,12 +5,27 @@ export class Migration1743868231694 implements MigrationInterface {
   name = 'Migration1743868231694';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Створення таблиць
+    // Создание таблиц
     await queryRunner.query(
       `CREATE TABLE "attribute" ("id" SERIAL NOT NULL, "material" character varying(255), "size" character varying(255), "theme" character varying(255), "bodyPart" character varying(255), "isSet" boolean NOT NULL DEFAULT false, "description" character varying(255), CONSTRAINT "PK_b13fb7c5c9e9dff62b60e0de729" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "product" ("id" SERIAL NOT NULL, "name" character varying(255) NOT NULL, "price" numeric(10,2) NOT NULL, "description" text, "images" jsonb, CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "payment" (
+        "id" SERIAL NOT NULL,
+        "orderId" integer NOT NULL,
+        "amount" numeric(10,2) NOT NULL,
+        "currency" character varying(10) NOT NULL,
+        "status" character varying(50) NOT NULL,
+        "stripePaymentIntentId" character varying(255),
+        "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
+        "description" character varying(255),
+        "last4" character varying(4),
+        "cardType" character varying(50),
+        CONSTRAINT "PK_payment_id" PRIMARY KEY ("id")
+      )`,
     );
     await queryRunner.query(
       `CREATE TABLE "comment" ("id" SERIAL NOT NULL, "content" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "isModerated" boolean NOT NULL DEFAULT false, "productAttributeId" integer, "userId" integer, CONSTRAINT "PK_0b0e4bbc8415ec426f87f3a88e2" PRIMARY KEY ("id"))`,
@@ -28,13 +43,13 @@ export class Migration1743868231694 implements MigrationInterface {
       `CREATE TABLE "cart" ("id" SERIAL NOT NULL, "quantity" integer NOT NULL DEFAULT '1', "price" numeric(10,2) NOT NULL DEFAULT '0', "addedAt" TIMESTAMP NOT NULL DEFAULT now(), "productAttributeId" integer, "userId" integer, CONSTRAINT "PK_c524ec48751b9b5bcfbf6e59be7" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
-      `CREATE TABLE "product_attribute" ("id" SERIAL NOT NULL, "productId" integer NOT NULL, "attributeId" integer NOT NULL,"inStock" character varying(255) ,CONSTRAINT "PK_f9b91f38df3dbbe481d9e056e5e" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "product_attribute" ("id" SERIAL NOT NULL, "productId" integer NOT NULL, "attributeId" integer NOT NULL, "inStock" character varying(255), CONSTRAINT "PK_f9b91f38df3dbbe481d9e056e5e" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TABLE "product_similars" ("leftProductId" integer NOT NULL, "rightProductId" integer NOT NULL, CONSTRAINT "PK_c04f978d6b856f6ae68d9e88031" PRIMARY KEY ("leftProductId", "rightProductId"))`,
     );
 
-    // Створення індексів для product_similars
+    // Создание индексов для product_similars
     await queryRunner.query(
       `CREATE INDEX "IDX_21f7cdbe36e1efaed64fe0d8ea" ON "product_similars" ("leftProductId")`,
     );
@@ -42,18 +57,18 @@ export class Migration1743868231694 implements MigrationInterface {
       `CREATE INDEX "IDX_c08bfa57cca9873f9dba24d5bb" ON "product_similars" ("rightProductId")`,
     );
 
-    // Генеруємо хешований пароль для "admin"
+    // Генерируем хешированный пароль для "admin"
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash('admin', salt);
 
-    // Вставляємо запис адміністратора
+    // Вставляем запись администратора
     await queryRunner.query(
       `INSERT INTO "user" ("email", "password", "roles", "createdAt", "updatedAt") 
        VALUES ($1, $2, $3, NOW(), NOW())`,
       ['admin', hashedPassword, ['admin']],
     );
 
-    // Додавання індексів для product_attribute
+    // Добавление индексов для product_attribute
     await queryRunner.query(
       `CREATE INDEX "IDX_5134aa627db96cdfb1bf0be522" ON "product_attribute" ("attributeId")`,
     );
@@ -61,7 +76,10 @@ export class Migration1743868231694 implements MigrationInterface {
       `CREATE INDEX "IDX_c0d597555330c0a972122bf467" ON "product_attribute" ("productId")`,
     );
 
-    // Додавання зовнішніх ключів
+    // Добавление внешних ключей
+    await queryRunner.query(
+      `ALTER TABLE "payment" ADD CONSTRAINT "FK_payment_orderId_order_id" FOREIGN KEY ("orderId") REFERENCES "order"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
+    );
     await queryRunner.query(
       `ALTER TABLE "comment" ADD CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e" FOREIGN KEY ("productAttributeId") REFERENCES "product_attribute"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
@@ -90,7 +108,7 @@ export class Migration1743868231694 implements MigrationInterface {
       `ALTER TABLE "product_similars" ADD CONSTRAINT "FK_c08bfa57cca9873f9dba24d5bb7" FOREIGN KEY ("rightProductId") REFERENCES "product"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
     );
 
-    // Створення функції та тригера для оновлення ціни в кошику
+    // Создание функции и триггера для обновления цены в корзине
     await queryRunner.query(`
       CREATE OR REPLACE FUNCTION update_cart_price()
       RETURNS TRIGGER AS $$
@@ -120,7 +138,7 @@ export class Migration1743868231694 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // Видалення тригера і функції
+    // Удаление триггера и функции
     await queryRunner.query(`
       DROP TRIGGER IF EXISTS trigger_update_cart_price ON public.cart;
     `);
@@ -128,7 +146,7 @@ export class Migration1743868231694 implements MigrationInterface {
       DROP FUNCTION IF EXISTS update_cart_price;
     `);
 
-    // Видалення зовнішніх ключів
+    // Удаление внешних ключей
     await queryRunner.query(
       `ALTER TABLE "product_similars" DROP CONSTRAINT "FK_c08bfa57cca9873f9dba24d5bb7"`,
     );
@@ -156,8 +174,11 @@ export class Migration1743868231694 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "comment" DROP CONSTRAINT "FK_3703ece10c1b39c69497e30fe3e"`,
     );
+    await queryRunner.query(
+      `ALTER TABLE "payment" DROP CONSTRAINT "FK_payment_orderId_order_id"`,
+    );
 
-    // Видалення індексів
+    // Удаление индексов
     await queryRunner.query(
       `DROP INDEX "public"."IDX_c0d597555330c0a972122bf467"`,
     );
@@ -171,7 +192,8 @@ export class Migration1743868231694 implements MigrationInterface {
       `DROP INDEX "public"."IDX_21f7cdbe36e1efaed64fe0d8ea"`,
     );
 
-    // Видалення таблиць
+    // Удаление таблиц
+    await queryRunner.query(`DROP TABLE "payment"`);
     await queryRunner.query(`DROP TABLE "product_similars"`);
     await queryRunner.query(`DROP TABLE "product_attribute"`);
     await queryRunner.query(`DROP TABLE "cart"`);
