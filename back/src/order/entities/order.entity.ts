@@ -3,12 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
 import { DeliveryMethod } from '../dto/create-order.dto';
-
+import { Payment } from '../../payment/entities/payment.entity';
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
@@ -93,4 +94,7 @@ export class Order {
   @ManyToOne(() => User, (user) => user.orders, { nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @OneToMany(() => Payment, (payment) => payment.order)
+  payments: Payment[];
 }
