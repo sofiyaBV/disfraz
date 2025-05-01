@@ -23,7 +23,6 @@ export class User {
   id: number;
 
   @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
-  @IsEmail({}, { message: 'Некоректний формат електронної пошти' })
   @ApiProperty({
     example: 'user@example.com',
     description: 'Електронна пошта користувача',
