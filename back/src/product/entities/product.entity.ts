@@ -28,6 +28,27 @@ export class Product {
   })
   price: number;
 
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 }) // Знижка в процентах (0-100)
+  @ApiProperty({
+    example: 25,
+    description: 'Знижка на товар у відсотках',
+  })
+  discount: number;
+
+  @Column({ type: 'boolean', default: false })
+  @ApiProperty({
+    example: true,
+    description: 'Чи є товар топовим у продажу',
+  })
+  topSale: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @ApiPropertyOptional({
+    example: 149.99,
+    description: 'Нова ціна товару після знижки (якщо є)',
+  })
+  newPrice: number | null;
+
   @Column({ type: 'text', nullable: true })
   @ApiPropertyOptional({
     example: 'Костюм для косплею',

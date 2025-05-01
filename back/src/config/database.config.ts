@@ -7,6 +7,7 @@ import { Cart } from '../cart/entities/cart.entity';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import { Comment } from '../comments/entities/comment.entity';
+import { Payment } from 'src/payment/entities/payment.entity';
 
 export default registerAs('database', () => {
   // Валідація змінних оточення з дозволом невідомих ключів
@@ -42,6 +43,7 @@ export default registerAs('database', () => {
       Order,
       User,
       Comment,
+      Payment,
       __dirname + '/**/*.entity{.ts,.js}',
     ],
     autoLoadEntities: true,

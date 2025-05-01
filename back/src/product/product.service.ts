@@ -39,6 +39,18 @@ export class ProductService {
     }
   }
 
+  // Допоміжний метод для розрахунку нової ціни
+  private calculateNewPrice(
+    price: number,
+    discount: number | undefined,
+  ): number | null {
+    if (discount && discount > 0 && discount <= 100) {
+      const discountAmount = price * (discount / 100); // Знаходимо суму знижки
+      return parseFloat((price - discountAmount).toFixed(2)); // Нова ціна з округленням до 2 знаків
+    }
+    return null; // Якщо знижки немає, newPrice буде null
+  }
+
   async uploadToImgBB(
     file: Express.Multer.File,
   ): Promise<{ url: string; deleteHash: string }> {
@@ -124,10 +136,19 @@ export class ProductService {
         }
       }
 
+      // Розраховуємо нову ціну
+      const newPrice = this.calculateNewPrice(
+        createProductDto.price,
+        createProductDto.discount,
+      );
+
       // Створюємо продукт
       const productData = {
         name: createProductDto.name,
         price: createProductDto.price,
+        discount: createProductDto.discount ?? 0, // За замовчуванням 0
+        topSale: createProductDto.topSale ?? false, // За замовчуванням false
+        newPrice, // Нова ціна
         description: createProductDto.description,
         images: imageData,
         similarProducts,
@@ -206,24 +227,6 @@ export class ProductService {
         }
       }
 
-      // if (updateProductDto.similarProductIds) {
-      //   const similarProducts = await this.productRepository.find({
-      //     where: updateProductDto.similarProductIds.map((id) => ({ id })),
-      //   });
-
-      //   const foundIds = similarProducts.map((p) => p.id);
-      //   const missingIds = updateProductDto.similarProductIds.filter(
-      //     (id) => !foundIds.includes(id),
-      //   );
-      //   if (missingIds.length > 0) {
-      //     throw new NotFoundException(
-      //       `Продукты с ID ${missingIds.join(', ')} не найдены`,
-      //     );
-      //   }
-
-      //   product.similarProducts = similarProducts;
-      // }
-
       // Оновлюємо схожі продукти, якщо передано нові ID
       if (updateProductDto.similarProductIds) {
         const similarProducts = await this.productRepository.find({
@@ -243,9 +246,24 @@ export class ProductService {
         product.similarProducts = similarProducts;
       }
 
+      // Визначаємо ціну для розрахунку нової ціни (беремо оновлену або стару)
+      const priceForCalculation = updateProductDto.price ?? product.price;
+      // Визначаємо знижку для розрахунку (беремо оновлену або стару)
+      const discountForCalculation =
+        updateProductDto.discount ?? product.discount;
+      // Розраховуємо нову ціну
+      const newPrice = this.calculateNewPrice(
+        priceForCalculation,
+        discountForCalculation,
+      );
+
+      // Оновлюємо продукт
       manager.merge(Product, product, {
         ...updateProductDto,
         images: newImageData.length > 0 ? newImageData : product.images,
+        discount: updateProductDto.discount ?? product.discount, // Зберігаємо старе значення, якщо не передано нове
+        topSale: updateProductDto.topSale ?? product.topSale, // Зберігаємо старе значення, якщо не передано нове
+        newPrice, // Оновлюємо нову ціну
       });
 
       const updatedProduct = await manager.save(product);

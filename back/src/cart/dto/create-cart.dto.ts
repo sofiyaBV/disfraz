@@ -18,14 +18,4 @@ export class CreateCartDto {
   @IsPositive()
   @IsOptional()
   quantity?: number = 1;
-
-  @ApiPropertyOptional({
-    description: 'Ціна за одиницю',
-    example: 199.99,
-    default: 0.0,
-  })
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  price?: number = 0.0;
 }
