@@ -1,12 +1,10 @@
 import React from "react";
-import BurgerMenuLogged from "../components/header/BurgerMenuLogged";
+import Authorization from "../components/registrations/Authorization";
+import ThematicProducts from "../components/Products/ThematicProducts";
+import CatalogMenu from "../components/header/CatalogMenu";
 
 const Tests = () => {
-  return (
-    <div>
-      <BurgerMenuLogged />
-    </div>
-  );
+  return <div>{<CatalogMenu />}</div>;
 };
 
 export default Tests;

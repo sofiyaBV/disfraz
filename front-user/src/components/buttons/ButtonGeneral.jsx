@@ -11,21 +11,23 @@ const ButtonGeneral = ({
   width,
   height,
   transitionDuration = "0.3s",
-  link,
+  link = "/tematics",
   type = "button", // Добавляем type по умолчанию
   disabled = false, // Добавляем disabled
+  colorHover, // Добавляем colorHover
+  onClick, // Добавляем onClick в props
 }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
 
   const backgroundColor = isHovered
-    ? initialColor === "white"
-      ? "#000"
-      : "#fff"
+    ? colorHover || (initialColor === "white" ? "#000" : "#fff")
     : initialColor;
 
   const finalTextColor = isHovered
-    ? initialColor === "white"
+    ? colorHover
+      ? textColor // Если colorHover задан, текст остается прежнего цвета
+      : initialColor === "white"
       ? "#fff"
       : "#000"
     : textColor;
@@ -36,10 +38,15 @@ const ButtonGeneral = ({
     color: finalTextColor,
     width: `clamp(1rem, 25vw, ${width || "49rem"})`,
     height: `clamp(2rem, 5vw, ${height || "3.13rem"})`,
-    transitionDuration: transitionDuration,
+    transition: `background-color ${transitionDuration}, color ${transitionDuration}`,
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    // Вызываем переданный onClick, если он есть
+    if (onClick) {
+      onClick(e);
+    }
+    // Обрабатываем навигацию, если задан link
     if (link) {
       navigate(link);
     }

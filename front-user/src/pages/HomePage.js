@@ -1,4 +1,4 @@
-// HomePage.js
+// src/pages/HomePage.js
 import React, { useEffect, useRef, useState } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
@@ -10,8 +10,8 @@ import TematicsScrole from "../components/homePage/TematicsScrole";
 import TematicsData from "../utils/TematicsData";
 import CategoriesScrole from "../components/CategoriesScrole";
 import categoriesData from "../utils/CategoriesData";
-import ProductCard from "../components/cart/ProductCart";
-import useProduct from "../utils/useProduct";
+import ThematicProducts from "../components/Products/ThematicProducts";
+import { getProducts } from "../utils/dataProvider";
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
@@ -25,34 +25,84 @@ const HomePage = () => {
   const categoriesScrollRef = useRef(null);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const currentTematicsIndexRef = useRef(0);
-  const { products, loading, error } = useProduct();
 
-  // Состояние для пагинации
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 6; // 6 товаров на страницу
+  // Состояние для хранения товаров по тематикам
+  const [thematicProducts, setThematicProducts] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Вычисляем товары для текущей страницы
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
+  // Состояние для текущей выбранной тематики (индекс в TematicsData)
+  const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
 
-  // Вычисляем общее количество страниц
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  // Список тематик для загрузки (берём из TematicsData)
+  const themesToLoad = TematicsData.map((item) => item.theme);
 
-  // Функции для перелистывания
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+  // Функция для загрузки товаров по тематике
+  const fetchProductsByTheme = async (theme) => {
+    try {
+      // Маппинг тем на украинский для API (обновляем в соответствии с данными API)
+      const themeMapping = {
+        "sci-fi-cyberpunk": "Sci-fi та кіберпанк",
+        "battle-costumes": "Бойові костюми",
+        halloween: "Хелловін",
+        "fantasy-medieval": "Фентезі та середньовіччя",
+        "anime-manga": "Аніме та манга",
+        "dresses-robes": "Сукні та мантії",
+        "masquerade-ball": "Маскаради та бальні образи",
+        "dc-universe": "Всесвіт DC",
+        "fairy-tale-characters": "Казкові персонажі",
+        "masks-makeup": "Маски та грим",
+        "decor-props": "Декорації та реквізит",
+      };
+      const apiTheme = themeMapping[theme] || theme;
+      const response = await getProducts({
+        page: 1,
+        perPage: 6,
+        sortField: "id",
+        sortOrder: "ASC",
+        filter: { theme: apiTheme },
+      });
+      return response.data;
+    } catch (err) {
+      console.error(`Error fetching products for theme ${theme}:`, err);
+      throw err;
     }
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+  // Загружаем товары при монтировании страницы
+  useEffect(() => {
+    const loadAllProducts = async () => {
+      setLoading(true);
+      try {
+        const productsByTheme = {};
+        for (const theme of themesToLoad) {
+          if (!thematicProducts[theme]) {
+            const products = await fetchProductsByTheme(theme);
+            productsByTheme[theme] = products;
+          }
+        }
+        setThematicProducts((prev) => ({ ...prev, ...productsByTheme }));
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || "Ошибка при загрузке товаров");
+        setLoading(false);
+      }
+    };
+
+    loadAllProducts();
+  }, []); // Пустой массив зависимостей — запросы выполняются только при монтировании
+
+  // Функции для переключения тематик
+  const handlePrevTheme = () => {
+    setCurrentThemeIndex((prevIndex) =>
+      prevIndex === 0 ? TematicsData.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextTheme = () => {
+    setCurrentThemeIndex((prevIndex) =>
+      prevIndex === TematicsData.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   // Автопрокрутка для Offers
@@ -218,7 +268,7 @@ const HomePage = () => {
       if (!mounted) return;
 
       if (!lastTime) lastTime = currentTime;
-      const deltaTime = currentTime - lastTime; // Исправлено: lastNewsTime → lastTime
+      const deltaTime = currentTime - lastTime;
 
       if (deltaTime >= 6000) {
         scrollPosition += cardWidth;
@@ -243,6 +293,7 @@ const HomePage = () => {
   }, []);
 
   const currentNews = newsData[currentNewsIndex];
+  const currentTheme = TematicsData[currentThemeIndex].theme;
 
   return (
     <div className={style.general}>
@@ -277,7 +328,6 @@ const HomePage = () => {
           <SuitWM title="Жіночі костюми" img1={img1woman} img2={img2woman} />
         </div>
       </div>
-      {/* Скролл TematicsScrole */}
       <div className={style.scrol_tematic} ref={tematicsScrollRef1}>
         {TematicsData.map((item, index) => (
           <TematicsScrole
@@ -288,7 +338,6 @@ const HomePage = () => {
           />
         ))}
       </div>
-      {/* Скролл Categories */}
       <div className={style.categories_section}>
         <h3>ПОПУЛЯРНІ КАТЕГОРІЇ</h3>
         <div className={style.scrol_categories} ref={categoriesScrollRef}>
@@ -301,41 +350,21 @@ const HomePage = () => {
           ))}
         </div>
       </div>
-      {/* Секция товаров с пагинацией */}
-      <div className={style.products_section}>
-        <h3>ТОВАРИ</h3>
-        {loading && <p>Завантаження...</p>}
-        {error && <p>Помилка: {error}</p>}
-        {!loading && !error && (
-          <>
-            <div className={style.products_list}>
-              {currentProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-            <div className={style.pagination}>
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className={style.paginationButton}
-              >
-                Попередня
-              </button>
-              <span className={style.pageInfo}>
-                Сторінка {currentPage} з {totalPages}
-              </span>
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className={style.paginationButton}
-              >
-                Наступна
-              </button>
-            </div>
-          </>
-        )}
+      {/* Секция с товарами и стрелками */}
+      <div className={style.themeNavigation}>
+        <button onClick={handlePrevTheme} className={style.navArrow}>
+          {"<"}
+        </button>
+        <ThematicProducts
+          theme={currentTheme}
+          products={thematicProducts[currentTheme] || []}
+          loading={loading}
+          error={error}
+        />
+        <button onClick={handleNextTheme} className={style.navArrow}>
+          {">"}
+        </button>
       </div>
-      {/* Скролл TematicsScrole */}
       <div className={style.scrol_tematic} ref={tematicsScrollRef2}>
         {TematicsData.map((item, index) => (
           <TematicsScrole

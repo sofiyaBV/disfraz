@@ -1,3 +1,4 @@
+// src/components/cart/ProductCart.js
 import React, { useState } from "react";
 import style from "../../style/cart/productCart.module.css";
 import { ReactSVG } from "react-svg";
@@ -6,31 +7,35 @@ import discount_icon from "../../assets/svg/discount.svg";
 
 const ProductCart = ({ discount = false, product }) => {
   const [isClicked, setIsClicked] = useState(false);
-  const [isHovered, setIsHovered] = useState(false); // Для отслеживания наведения
-  console.log("Product:", product);
+  const [isHovered, setIsHovered] = useState(false);
+
+  console.log("Product in ProductCart:", product);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
-    setIsHovered(true); // Показываем текст при клике
+    setIsHovered(true);
   };
 
   const handleMouseEnter = () => {
     if (isClicked) {
-      setIsHovered(true); // Показываем текст при наведении, если сердечко активно
+      setIsHovered(true);
     }
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false); // Скрываем текст при уходе мышки
+    setIsHovered(false);
   };
 
   const message = isClicked
     ? "Товар додано в обране"
     : "Товар видалено с обраних";
 
-  // Проверяем, что product.images существует и содержит хотя бы один элемент
+  // Извлекаем данные из структуры API
+  const productData = product.product || product; // Если product уже содержит данные на верхнем уровне
   const imageUrl =
-    product.images && product.images.length > 0 ? product.images[0].url : null;
+    productData.images && productData.images.length > 0
+      ? productData.images[0].url
+      : null;
 
   return (
     <div className={style.container}>
@@ -54,15 +59,15 @@ const ProductCart = ({ discount = false, product }) => {
           />
         </div>
         {imageUrl ? (
-          <img src={imageUrl} alt={product.name} className={style.image} />
+          <img src={imageUrl} alt={productData.name} className={style.image} />
         ) : (
           <div className={style.image_placeholder}>Нет изображения</div>
         )}
       </div>
       <div className={style.container_text}>
-        <p className={style.name}>{product.name}</p>
+        <p className={style.name}>{productData.name}</p>
         <h3 className={style.price}>
-          {product.price}
+          {productData.price}
           <span> грн</span>
         </h3>
       </div>

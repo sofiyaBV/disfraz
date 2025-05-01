@@ -1,3 +1,4 @@
+// src/utils/dataProvider.js
 console.log("Environment variables:", process.env);
 console.log(
   "REACT_APP_JSON_SERVER_URL:",
@@ -59,12 +60,17 @@ export const getProducts = async (params = {}) => {
     filter,
   });
 
+  const queryFilter = {};
+  if (filter.theme) {
+    queryFilter["attribute.theme"] = filter.theme;
+  }
+
   const query = new URLSearchParams({
     page: page.toString(),
     limit: perPage.toString(),
     sort: sortField,
     order: sortOrder.toLowerCase(),
-    ...filter,
+    ...queryFilter,
   });
 
   const url = `${apiUrl}/products?${query.toString()}`;
@@ -72,7 +78,7 @@ export const getProducts = async (params = {}) => {
 
   try {
     const response = await httpClient(url);
-    console.log("API response:", response);
+    console.log("API response for products:", response); // Отладка
 
     const total = Array.isArray(response)
       ? response.length
