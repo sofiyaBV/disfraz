@@ -3,8 +3,8 @@
 }
 
 .container_img {
-  width: 12.5rem;
-  height: 16rem;
+  width: 22.5rem;
+  height: 23rem;
   display: flex;
   padding: 1.7rem 0 1.7rem;
   flex-direction: column;
@@ -47,7 +47,7 @@
 
 .image {
   width: auto;
-  height: 13rem;
+  height: 21rem;
 }
 
 .icon {
@@ -85,6 +85,7 @@
 .price {
   margin-top: 0.5rem;
   font-size: 1.5rem;
+  margin-bottom: 1.375rem;
 }
 
 .price span {

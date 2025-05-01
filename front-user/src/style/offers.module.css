@@ -1,7 +1,7 @@
 .offers_container {
   width: 100%;
   box-sizing: border-box;
-  border-radius: 20px;
+  /* border-radius: 20px; */
   overflow: hidden;
 }
   
@@ -20,6 +20,7 @@
   align-items: flex-start;
   justify-content: flex-start;
   padding-top: 3vw;
+  border-radius: 20px 0px 0px 20px;
 }
   
 .text_section h1 {
@@ -41,7 +42,7 @@
 }
   
 .image_section img {
-  width: clamp(20rem, 50vw, 100%);
+  width: 100%;
   height: auto;
   object-fit: cover;
   display: block;
@@ -50,6 +51,8 @@
 @media (max-width: 1020px) {
   .offers_content {
     flex-direction: column;
+    border-radius: 20px;
+
   }
   
   .text_section {
