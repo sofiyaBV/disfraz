@@ -6,6 +6,7 @@ const nameMap = {
   "": "DISFRAZ",
   registration: "РЕЄСТРАЦІЯ",
   my_account: "МІЙ АККАУНТ",
+  tematics: "РОЗДІЛ",
   error: "Помилка",
 };
 
