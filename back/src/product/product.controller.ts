@@ -37,11 +37,10 @@ import { BadRequestException } from '@nestjs/common';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
-
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiTags('Products')
 @Controller('products')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -63,6 +62,16 @@ export class ProductController {
           description: 'Назва товару',
         },
         price: { type: 'number', example: 199.99, description: 'Ціна товару' },
+        discount: {
+          type: 'number',
+          example: 25,
+          description: 'Знижка на товар у відсотках (опціонально)',
+        },
+        topSale: {
+          type: 'boolean',
+          example: true,
+          description: 'Чи є товар топовим у продажу (опціонально)',
+        },
         description: {
           type: 'string',
           example: 'Костюм для косплею',
@@ -95,6 +104,8 @@ export class ProductController {
     const createProductDto = plainToClass(CreateProductDto, {
       ...body,
       price: body.price ? parseFloat(body.price) : undefined,
+      discount: body.discount ? parseFloat(body.discount) : undefined,
+      topSale: body.topSale ? body.topSale === 'true' : undefined,
     });
 
     const errors = await validate(createProductDto);
@@ -115,7 +126,6 @@ export class ProductController {
   })
   @PaginatedSwaggerDocs(CreateProductDto, productPaginateConfig)
   @Get()
-  // @Roles(Role.User, Role.Admin)
   async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Product>> {
     return this.productService.findAllPag(query);
   }
@@ -143,14 +153,72 @@ export class ProductController {
   })
   @ApiResponse({ status: 404, description: 'Product не знайдений' })
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Оновити Product із зображеннями',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'Костюм супергероя',
+          description: 'Назва товару (опціонально)',
+        },
+        price: {
+          type: 'number',
+          example: 199.99,
+          description: 'Ціна товару (опціонально)',
+        },
+        discount: {
+          type: 'number',
+          example: 25,
+          description: 'Знижка на товар у відсотках (опціонально)',
+        },
+        topSale: {
+          type: 'boolean',
+          example: true,
+          description: 'Чи є товар топовим у продажу (опціонально)',
+        },
+        description: {
+          type: 'string',
+          example: 'Костюм для косплею',
+          description: 'Опис товару (опціонально)',
+        },
+        similarProductIds: {
+          type: 'array',
+          items: { type: 'integer' },
+          example: [5, 7],
+          description: 'Список ID схожих товарів (опціонально)',
+        },
+        images: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+          description: 'Файли зображень (до 10 файлів, опціонально)',
+        },
+      },
+    },
+  })
   @UseInterceptors(FilesInterceptor('images', 10))
   @Patch(':id')
   @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateProductDto: UpdateProductDto,
+    @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
+    const updateProductDto = plainToClass(UpdateProductDto, {
+      ...body,
+      price: body.price ? parseFloat(body.price) : undefined,
+      discount: body.discount ? parseFloat(body.discount) : undefined,
+      topSale: body.topSale ? body.topSale === 'true' : undefined,
+    });
+
+    const errors = await validate(updateProductDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(
+        'Validation failed: ' + JSON.stringify(errors),
+      );
+    }
+
     console.log(`Отримано тіло для оновлення: ${id}, body:`, updateProductDto);
     console.log('Uploaded files:', files);
 
