@@ -21,7 +21,16 @@ export const productPaginateConfig: PaginateConfig<Product> = {
   defaultSortBy: [['id', 'DESC']],
   maxLimit: 100,
   defaultLimit: 10,
-  select: ['id', 'name', 'price', 'description', 'images'],
+  select: [
+    'id',
+    'name',
+    'price',
+    'description',
+    'images',
+    'discount',
+    'topSale',
+    'newPrice',
+  ],
   nullSort: 'last',
 };
 
@@ -128,7 +137,6 @@ export const cartPaginateConfig: PaginateConfig<Cart> = {
   defaultSortBy: [['addedAt', 'DESC']],
   maxLimit: 100,
   defaultLimit: 10,
-  select: ['id', 'quantity', 'price', 'addedAt'],
   nullSort: 'last',
 };
 
@@ -164,7 +172,7 @@ export const productAttributePaginateConfig: PaginateConfig<ProductAttribute> =
     filterableColumns: {
       'product.id': [FilterOperator.EQ],
       'attribute.id': [FilterOperator.EQ],
-      'inStock': [FilterOperator.EQ],
+      inStock: [FilterOperator.EQ],
     },
     relations: ['product', 'attribute', 'carts', 'comments'],
     defaultSortBy: [['id', 'DESC']],
