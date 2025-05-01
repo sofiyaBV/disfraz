@@ -11,6 +11,7 @@ import ErrorPage from "./pages/ErrorPage";
 
 import Tests from "./pages/Tests";
 import { AuthProvider } from "./utils/AuthContext";
+import AllSectionPage from "./pages/AllSectionPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/my_account/registration" element={<Registration />} />
           <Route path="*" element={<ErrorPage />} />
           <Route path="*" element={<Navigate to="/error" replace />} />
+          <Route path="/tematics" element={<AllSectionPage />} />
 
           <Route path="/test" element={<Tests />} />
         </Routes>

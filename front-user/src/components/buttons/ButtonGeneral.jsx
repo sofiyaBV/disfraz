@@ -11,7 +11,7 @@ const ButtonGeneral = ({
   width,
   height,
   transitionDuration = "0.3s",
-  link,
+  link = "/tematics",
   type = "button", // Добавляем type по умолчанию
   disabled = false, // Добавляем disabled
   colorHover, // Добавляем colorHover
