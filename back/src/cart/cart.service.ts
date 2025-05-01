@@ -20,22 +20,30 @@ export class CartService {
   ) {}
 
   async create(createCartDto: CreateCartDto, userId: number): Promise<Cart> {
-    const { productAttributeId, quantity, price } = createCartDto;
+    const { productAttributeId, quantity } = createCartDto;
 
     const productAttribute =
       await this.productAttributeRepository.findOneOrFail({
         where: { id: productAttributeId },
+        relations: ['product'],
       });
 
     const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
     });
 
+    // Визначаємо ціну: беремо newPrice, якщо є знижка, інакше price
+    const priceToUse =
+      productAttribute.product.discount > 0 &&
+      productAttribute.product.newPrice !== null
+        ? productAttribute.product.newPrice
+        : productAttribute.product.price;
+
     const cart = this.cartRepository.create({
       productAttribute,
       user,
       quantity: quantity || 1,
-      price: price || productAttribute.product.price,
+      price: priceToUse * (quantity || 1), // Множимо на кількість
     });
 
     return this.cartRepository.save(cart);
@@ -73,22 +81,35 @@ export class CartService {
     updateCartDto: Partial<CreateCartDto>,
   ): Promise<Cart> {
     const cart = await this.findOne(id);
-    const { productAttributeId, quantity, price } = updateCartDto;
+    const { productAttributeId, quantity } = updateCartDto;
 
     if (productAttributeId) {
       const productAttribute =
         await this.productAttributeRepository.findOneOrFail({
           where: { id: productAttributeId },
+          relations: ['product'],
         });
       cart.productAttribute = productAttribute;
+
+      // Оновлюємо ціну: беремо newPrice, якщо є знижка, інакше price
+      const priceToUse =
+        productAttribute.product.discount > 0 &&
+        productAttribute.product.newPrice !== null
+          ? productAttribute.product.newPrice
+          : productAttribute.product.price;
+      cart.price = priceToUse * (cart.quantity || 1);
     }
 
     if (quantity !== undefined) {
       cart.quantity = quantity;
-    }
 
-    if (price !== undefined) {
-      cart.price = price;
+      // Перераховуємо ціну при зміні кількості
+      const priceToUse =
+        cart.productAttribute.product.discount > 0 &&
+        cart.productAttribute.product.newPrice !== null
+          ? cart.productAttribute.product.newPrice
+          : cart.productAttribute.product.price;
+      cart.price = priceToUse * quantity;
     }
 
     return this.cartRepository.save(cart);
