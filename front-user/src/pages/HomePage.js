@@ -10,6 +10,7 @@ import TematicsData from "../utils/TematicsData";
 import CategoriesScrole from "../components/CategoriesScrole";
 import categoriesData from "../utils/CategoriesData";
 import ThematicProducts from "../components/Products/ThematicProducts";
+import ProductScroll from "../components/Products/ProductScroll";
 import dataProvider from "../utils/dataProvider";
 
 import img1man from "../img/newsS/man1.png";
@@ -22,17 +23,25 @@ const HomePage = () => {
   const tematicsScrollRef1 = useRef(null);
   const tematicsScrollRef2 = useRef(null);
   const categoriesScrollRef = useRef(null);
+  const topSalesScrollRef = useRef(null);
+  const discountScrollRef = useRef(null);
+
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const currentTematicsIndexRef = useRef(0);
 
   const [thematicProductAttributes, setThematicProductAttributes] = useState(
     {}
   );
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
+  const [topSalesIndex, setTopSalesIndex] = useState(0);
+  const [discountIndex, setDiscountIndex] = useState(0);
+
   const themesToLoad = TematicsData.map((item) => item.theme);
+  const itemsPerPage = 4; // Отображаем по 4 товара за раз
 
   const fetchProductAttributesByTheme = async (theme) => {
     try {
@@ -69,10 +78,23 @@ const HomePage = () => {
     }
   };
 
+  const fetchAllProducts = async () => {
+    try {
+      const response = await dataProvider.getList("products", {
+        filter: {},
+      });
+      return response.data || [];
+    } catch (err) {
+      console.error("Error fetching all products:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
-    const loadAllProductAttributes = async () => {
+    const loadAllData = async () => {
       setLoading(true);
       try {
+        // Загружаем тематические товары
         const productAttributesByTheme = {};
         for (const theme of themesToLoad) {
           if (!thematicProductAttributes[theme]) {
@@ -86,6 +108,10 @@ const HomePage = () => {
           ...prev,
           ...productAttributesByTheme,
         }));
+
+        // Загружаем все товары для топ продаж и акций
+        const products = await fetchAllProducts();
+        setAllProducts(products);
         setLoading(false);
       } catch (err) {
         setError(err.message || "Ошибка при загрузке данных");
@@ -93,7 +119,7 @@ const HomePage = () => {
       }
     };
 
-    loadAllProductAttributes();
+    loadAllData();
   }, []);
 
   const handlePrevTheme = () => {
@@ -105,6 +131,38 @@ const HomePage = () => {
   const handleNextTheme = () => {
     setCurrentThemeIndex((prevIndex) =>
       prevIndex === TematicsData.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handlePrevTopSales = () => {
+    setTopSalesIndex((prevIndex) =>
+      prevIndex === 0
+        ? Math.floor(topSalesProducts.length / itemsPerPage) - 1
+        : prevIndex - 1
+    );
+  };
+
+  const handleNextTopSales = () => {
+    setTopSalesIndex((prevIndex) =>
+      prevIndex === Math.floor(topSalesProducts.length / itemsPerPage) - 1
+        ? 0
+        : prevIndex + 1
+    );
+  };
+
+  const handlePrevDiscount = () => {
+    setDiscountIndex((prevIndex) =>
+      prevIndex === 0
+        ? Math.floor(discountProducts.length / itemsPerPage) - 1
+        : prevIndex - 1
+    );
+  };
+
+  const handleNextDiscount = () => {
+    setDiscountIndex((prevIndex) =>
+      prevIndex === Math.floor(discountProducts.length / itemsPerPage) - 1
+        ? 0
+        : prevIndex + 1
     );
   };
 
@@ -291,9 +349,28 @@ const HomePage = () => {
     };
   }, []);
 
+  // Фильтрация товаров для топ продаж и акций
+  const topSalesProducts = allProducts.filter(
+    (product) => product.topSale === true
+  );
+  console.log("top == " + topSalesProducts);
+
+  const discountProducts = allProducts.filter(
+    (product) => product.newPrice != null
+  );
+
+  // Пересчитываем отображаемые товары при изменении индекса
+  const displayedTopSales = topSalesProducts.slice(
+    topSalesIndex * itemsPerPage,
+    (topSalesIndex + 1) * itemsPerPage
+  );
+  const displayedDiscount = discountProducts.slice(
+    discountIndex * itemsPerPage,
+    (discountIndex + 1) * itemsPerPage
+  );
+
   const currentNews = newsData[currentNewsIndex];
   const currentTheme = TematicsData[currentThemeIndex].theme;
-  console.log("currentTheme = " + currentTheme);
 
   return (
     <div className={style.general}>
@@ -369,6 +446,24 @@ const HomePage = () => {
             buttonLink={item.link}
           />
         ))}
+      </div>
+      <div className={style.topSales_discountSection}>
+        <ProductScroll
+          title="АКЦІЙНІ ТОВАРИ"
+          products={displayedDiscount}
+          handlePrev={handlePrevDiscount}
+          handleNext={handleNextDiscount}
+          disabled={discountProducts.length <= itemsPerPage}
+        />
+      </div>
+      <div className={style.topSales_discountSection}>
+        <ProductScroll
+          title="ТОП ПРОДАЖ"
+          products={displayedTopSales}
+          handlePrev={handlePrevTopSales}
+          handleNext={handleNextTopSales}
+          disabled={topSalesProducts.length <= itemsPerPage}
+        />
       </div>
     </div>
   );

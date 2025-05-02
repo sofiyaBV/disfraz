@@ -43,7 +43,7 @@ const ProductCart = ({ product }) => {
     productData.newPrice !== null;
   const newPrice = discount ? `${productData.newPrice} грн` : null;
 
-  console.log("ProductCart product:", product);
+  // console.log("ProductCart product:", product);
 
   return (
     <div className={style.container}>

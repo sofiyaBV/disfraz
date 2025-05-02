@@ -199,7 +199,7 @@ export class ProductController {
   })
   @UseInterceptors(FilesInterceptor('images', 10))
   @Patch(':id')
-  @Roles(Role.Admin, Role.User)
+  // @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: any,
