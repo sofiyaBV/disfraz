@@ -1,10 +1,3 @@
-// src/utils/dataProvider.js
-console.log("Environment variables:", process.env);
-console.log(
-  "REACT_APP_JSON_SERVER_URL:",
-  process.env.REACT_APP_JSON_SERVER_URL
-);
-
 const apiUrl = process.env.REACT_APP_JSON_SERVER_URL;
 
 if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
@@ -25,15 +18,19 @@ const httpClient = async (url, options = {}) => {
   };
 
   try {
-    console.log("Sending request to:", url, "with options:", options);
     const response = await fetch(url, options);
     console.log("Response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(
-        `HTTP error! status: ${response.status}, message: ${errorText}`
-      );
+      let errorMessage;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || "Request failed";
+      } catch (e) {
+        errorMessage = errorText || "Request failed";
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
@@ -43,14 +40,14 @@ const httpClient = async (url, options = {}) => {
   }
 };
 
-export const getProducts = async (params = {}) => {
+const fetchProducts = async (params = {}) => {
   const {
     page = 1,
     perPage = 20,
     sortField = "id",
     sortOrder = "ASC",
     filter = {},
-  } = typeof params === "object" ? params : {};
+  } = params;
 
   console.log("Pagination params:", {
     page,
@@ -63,6 +60,12 @@ export const getProducts = async (params = {}) => {
   const queryFilter = {};
   if (filter.theme) {
     queryFilter["attribute.theme"] = filter.theme;
+  }
+  if (filter.attributeId) {
+    queryFilter["attributeId"] = filter.attributeId;
+  }
+  if (filter.productIds) {
+    queryFilter.id = filter.productIds.join(",");
   }
 
   const query = new URLSearchParams({
@@ -78,7 +81,7 @@ export const getProducts = async (params = {}) => {
 
   try {
     const response = await httpClient(url);
-    console.log("API response for products:", response); // Отладка
+    console.log("API response for products:", response);
 
     const total = Array.isArray(response)
       ? response.length
@@ -89,21 +92,180 @@ export const getProducts = async (params = {}) => {
       total,
     };
   } catch (error) {
-    console.error("Error in getProducts:", error);
+    console.error("Error in fetchProducts:", error);
     throw new Error(error.message || "Ошибка при загрузке товаров");
   }
 };
 
-export const getProductById = async (id) => {
+const fetchProductById = async (id) => {
   const url = `${apiUrl}/products/${id}`;
   console.log("Fetching product from:", url);
 
   try {
     const response = await httpClient(url);
     console.log("API response:", response);
-    return response;
+    return { data: response };
   } catch (error) {
-    console.error("Error in getProductById:", error);
+    console.error("Error in fetchProductById:", error);
     throw new Error(error.message || "Ошибка при загрузке товара");
   }
 };
+
+const fetchProductAttributes = async (params = {}) => {
+  const {
+    page = 1,
+    perPage = 20,
+    sortField = "id",
+    sortOrder = "ASC",
+    filter = {},
+  } = params;
+
+  const queryFilter = {};
+  if (filter.productId) {
+    queryFilter.productId = filter.productId;
+  }
+  if (filter.attributeId) {
+    queryFilter.attributeId = filter.attributeId;
+  }
+  if (filter.theme) {
+    const attributesResponse = await fetchAttributes({
+      filter: { theme: filter.theme },
+    });
+    const attributeIds = attributesResponse.data.map((attr) => attr.id);
+    if (attributeIds.length === 0) {
+      return { data: [], total: 0 };
+    }
+    queryFilter.attributeId = attributeIds.join(",");
+  }
+
+  const query = new URLSearchParams({
+    page: page.toString(),
+    limit: perPage.toString(),
+    sort: sortField,
+    order: sortOrder.toLowerCase(),
+    ...queryFilter,
+  });
+
+  const url = `${apiUrl}/product-attribute?${query.toString()}`;
+  console.log("Fetching product-attributes from:", url);
+
+  try {
+    const response = await httpClient(url);
+    console.log("API response for product-attributes:", response);
+
+    const total = Array.isArray(response)
+      ? response.length
+      : response.total || 0;
+
+    return {
+      data: Array.isArray(response) ? response : response.data || [],
+      total,
+    };
+  } catch (error) {
+    console.error("Error in fetchProductAttributes:", error);
+    throw new Error(
+      error.message || "Ошибка при загрузке связей продукт-атрибут"
+    );
+  }
+};
+
+const fetchAttributes = async (params = {}) => {
+  const {
+    page = 1,
+    perPage = 20,
+    sortField = "id",
+    sortOrder = "ASC",
+    filter = {},
+  } = params;
+
+  const queryFilter = {};
+  if (filter.theme) {
+    queryFilter.theme = filter.theme;
+  }
+
+  const query = new URLSearchParams({
+    page: page.toString(),
+    limit: perPage.toString(),
+    sort: sortField,
+    order: sortOrder.toLowerCase(),
+    ...queryFilter,
+  });
+
+  const url = `${apiUrl}/attributes?${query.toString()}`;
+  console.log("Fetching attributes from:", url);
+
+  try {
+    const response = await httpClient(url);
+    console.log("API response for attributes:", response);
+
+    const total = Array.isArray(response)
+      ? response.length
+      : response.total || 0;
+
+    return {
+      data: Array.isArray(response) ? response : response.data || [],
+      total,
+    };
+  } catch (error) {
+    console.error("Error in fetchAttributes:", error);
+    throw new Error(error.message || "Ошибка при загрузке атрибутов");
+  }
+};
+
+const createUser = async (params) => {
+  const { email, phone, password } = params;
+
+  const response = await httpClient(`${apiUrl}/auth/register`, {
+    method: "POST",
+    body: JSON.stringify({ email, phone, password }),
+  });
+
+  return { data: response };
+};
+
+const signinUser = async (params) => {
+  const { email, phone, password } = params;
+
+  const response = await httpClient(`${apiUrl}/auth/signin`, {
+    method: "POST",
+    body: JSON.stringify({ email, phone, password }),
+  });
+
+  return { data: response };
+};
+
+const dataProvider = {
+  getList: async (resource, params) => {
+    switch (resource) {
+      case "products":
+        return fetchProducts(params);
+      case "product-attributes":
+        return fetchProductAttributes(params);
+      case "attributes":
+        return fetchAttributes(params);
+      default:
+        throw new Error(`Unsupported resource: ${resource}`);
+    }
+  },
+  getOne: async (resource, params) => {
+    switch (resource) {
+      case "products":
+        return fetchProductById(params.id);
+      default:
+        throw new Error(`Unsupported resource: ${resource}`);
+    }
+  },
+  create: async (resource, params) => {
+    switch (resource) {
+      case "users":
+        return createUser(params.data);
+      default:
+        throw new Error(`Unsupported resource: ${resource}`);
+    }
+  },
+  signin: async (params) => {
+    return signinUser(params);
+  },
+};
+
+export default dataProvider;

@@ -1,4 +1,3 @@
-// src/pages/HomePage.js
 import React, { useEffect, useRef, useState } from "react";
 import style from "../style/pagesStyle/homePage.module.css";
 import Offers from "../components/homePage/Offers";
@@ -11,7 +10,7 @@ import TematicsData from "../utils/TematicsData";
 import CategoriesScrole from "../components/CategoriesScrole";
 import categoriesData from "../utils/CategoriesData";
 import ThematicProducts from "../components/Products/ThematicProducts";
-import { getProducts } from "../utils/dataProvider";
+import dataProvider from "../utils/dataProvider";
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
@@ -26,21 +25,17 @@ const HomePage = () => {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const currentTematicsIndexRef = useRef(0);
 
-  // Состояние для хранения товаров по тематикам
-  const [thematicProducts, setThematicProducts] = useState({});
+  const [thematicProductAttributes, setThematicProductAttributes] = useState(
+    {}
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Состояние для текущей выбранной тематики (индекс в TematicsData)
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
-
-  // Список тематик для загрузки (берём из TematicsData)
   const themesToLoad = TematicsData.map((item) => item.theme);
 
-  // Функция для загрузки товаров по тематике
-  const fetchProductsByTheme = async (theme) => {
+  const fetchProductAttributesByTheme = async (theme) => {
     try {
-      // Маппинг тем на украинский для API (обновляем в соответствии с данными API)
       const themeMapping = {
         "sci-fi-cyberpunk": "Sci-fi та кіберпанк",
         "battle-costumes": "Бойові костюми",
@@ -55,44 +50,52 @@ const HomePage = () => {
         "decor-props": "Декорації та реквізит",
       };
       const apiTheme = themeMapping[theme] || theme;
-      const response = await getProducts({
-        page: 1,
-        perPage: 6,
-        sortField: "id",
-        sortOrder: "ASC",
-        filter: { theme: apiTheme },
-      });
-      return response.data;
+
+      const productAttributesResponse = await dataProvider.getList(
+        "product-attributes",
+        {
+          filter: { theme: apiTheme },
+        }
+      );
+
+      const productAttributes = productAttributesResponse.data;
+      return productAttributes || [];
     } catch (err) {
-      console.error(`Error fetching products for theme ${theme}:`, err);
+      console.error(
+        `Error fetching product-attributes for theme ${theme}:`,
+        err
+      );
       throw err;
     }
   };
 
-  // Загружаем товары при монтировании страницы
   useEffect(() => {
-    const loadAllProducts = async () => {
+    const loadAllProductAttributes = async () => {
       setLoading(true);
       try {
-        const productsByTheme = {};
+        const productAttributesByTheme = {};
         for (const theme of themesToLoad) {
-          if (!thematicProducts[theme]) {
-            const products = await fetchProductsByTheme(theme);
-            productsByTheme[theme] = products;
+          if (!thematicProductAttributes[theme]) {
+            const productAttributes = await fetchProductAttributesByTheme(
+              theme
+            );
+            productAttributesByTheme[theme] = productAttributes;
           }
         }
-        setThematicProducts((prev) => ({ ...prev, ...productsByTheme }));
+        setThematicProductAttributes((prev) => ({
+          ...prev,
+          ...productAttributesByTheme,
+        }));
         setLoading(false);
       } catch (err) {
-        setError(err.message || "Ошибка при загрузке товаров");
+        setError(err.message || "Ошибка при загрузке данных");
         setLoading(false);
       }
     };
 
-    loadAllProducts();
-  }, []); // Пустой массив зависимостей — запросы выполняются только при монтировании
+    loadAllProductAttributes();
+  }, []);
 
-  // Функции для переключения тематик
   const handlePrevTheme = () => {
     setCurrentThemeIndex((prevIndex) =>
       prevIndex === 0 ? TematicsData.length - 1 : prevIndex - 1
@@ -105,7 +108,6 @@ const HomePage = () => {
     );
   };
 
-  // Автопрокрутка для Offers
   useEffect(() => {
     let mounted = true;
     const scrollContainer = scrollRef.current;
@@ -144,7 +146,6 @@ const HomePage = () => {
     };
   }, []);
 
-  // Циклическая смена новостей
   useEffect(() => {
     let mounted = true;
 
@@ -172,7 +173,6 @@ const HomePage = () => {
     };
   }, []);
 
-  // Автопрокрутка для TematicsScrole (по 2 карточки)
   useEffect(() => {
     let mounted = true;
     const tematicsContainer = tematicsScrollRef1.current;
@@ -253,7 +253,6 @@ const HomePage = () => {
     };
   }, []);
 
-  // Автопрокрутка для CategoriesScrole (по 5 карточек)
   useEffect(() => {
     let mounted = true;
     const categoriesContainer = categoriesScrollRef.current;
@@ -294,6 +293,7 @@ const HomePage = () => {
 
   const currentNews = newsData[currentNewsIndex];
   const currentTheme = TematicsData[currentThemeIndex].theme;
+  console.log("currentTheme = " + currentTheme);
 
   return (
     <div className={style.general}>
@@ -350,20 +350,15 @@ const HomePage = () => {
           ))}
         </div>
       </div>
-      {/* Секция с товарами и стрелками */}
       <div className={style.themeNavigation}>
-        <button onClick={handlePrevTheme} className={style.navArrow}>
-          {"<"}
-        </button>
         <ThematicProducts
           theme={currentTheme}
-          products={thematicProducts[currentTheme] || []}
+          productAttributes={thematicProductAttributes[currentTheme] || []}
           loading={loading}
           error={error}
+          handlePrevTheme={handlePrevTheme}
+          handleNextTheme={handleNextTheme}
         />
-        <button onClick={handleNextTheme} className={style.navArrow}>
-          {">"}
-        </button>
       </div>
       <div className={style.scrol_tematic} ref={tematicsScrollRef2}>
         {TematicsData.map((item, index) => (
