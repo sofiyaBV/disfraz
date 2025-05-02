@@ -169,6 +169,10 @@
   color: #333;
 }
 
+.topSales_discountSection{
+
+}
+
 @media (max-width: 1020px) {
   .general {
     margin: 3rem 1rem 0 1rem;

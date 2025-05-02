@@ -89,6 +89,7 @@ export const dataProvider = {
       httpClient(`${apiUrl}/${resource}/${params.id}`, {
           method: "PATCH",
           body: JSON.stringify(params.data),
+          
       }).then(({ json }) => ({ data: json })),
 
       delete: (resource: string, params: any) =>
