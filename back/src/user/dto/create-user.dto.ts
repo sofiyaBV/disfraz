@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsEmail, MinLength, IsPhoneNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsEmail, MinLength, IsPhoneNumber } from 'class-validator';
 import { Role } from '../../auth/enums/role.enum';
 
 export class CreateUserDto {
@@ -14,6 +14,13 @@ export class CreateUserDto {
     description: 'Номер телефону користувача',
   })
   phone: string;
+
+  @IsOptional()
+  @ApiPropertyOptional({
+    example: ['user'],
+    description: 'Ролі користувача',
+  })
+  roles?: Role[];
 
   @ApiProperty({
     example: 'password123',
