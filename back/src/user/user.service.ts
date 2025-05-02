@@ -39,7 +39,6 @@ export class UserService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { email, password, phone } = createUserDto;
 
-    // Проверяем, передан ли email и существует ли пользователь с таким email
     if (email) {
       const existingUserByEmail = await this.userRepository.findOne({
         where: { email },
@@ -49,7 +48,6 @@ export class UserService {
       }
     }
 
-    // Проверяем, передан ли phone и существует ли пользователь с таким номером телефона
     if (phone) {
       const existingUserByPhone = await this.userRepository.findOne({
         where: { phone },
@@ -65,9 +63,9 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = this.userRepository.create({
-      email: email || null, // Если email не передан, сохраняем как null
-      phone: phone || null, // Если phone не передан, сохраняем как null
-      password: hashedPassword,
+      email: email || null,
+      phone: phone || null,
+      password: hashedPassword || '', // Порожній пароль для Google
       roles: [Role.User],
     });
 
@@ -138,14 +136,14 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User | null> {
     if (!email) {
-      return null; // Если email не передан, возвращаем null
+      return null;
     }
     return this.userRepository.findOneBy({ email });
   }
 
   async findByPhone(phone: string): Promise<User | null> {
     if (!phone) {
-      return null; // Если phone не передан, возвращаем null
+      return null;
     }
     return this.userRepository.findOneBy({ phone });
   }
