@@ -1,65 +1,66 @@
 .container {
-  width: 22.5rem;
+  width: clamp(12rem, 22.5rem, 25vw);
 }
 
 .container_img {
-  width: 22.5rem;
-  height: 23rem;
+  width: clamp(12rem, 20rem, 25vw);
+  height: clamp(19rem, 23rem, 25vh);
   display: flex;
-  padding: 1.7rem 0 1.7rem;
+  padding: clamp(0.5rem, 1.7rem, 2vw) 0;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: clamp(5px, 10px, 1vw);
   border: 1px solid #ddd;
   border-radius: 10px;
   background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .container_imgs {
-  width: 80%; /* Ограничиваем ширину для центрирования */
+  width: 80%;
   display: flex;
   align-items: center;
-  padding: 2px; /* Внутренний отступ */
+  justify-content: space-between;
+  padding: clamp(1px, 2px, 0.3vw);
   border-radius: 4px;
 }
 
 .container_imgs img {
-  width: 1.13rem;
-  height: 1.25rem;
-  flex-shrink: 0; /* Значок акции не сжимается */
+  width: clamp(0.8rem, 1.13rem, 1.5vw);
+  height: clamp(0.9rem, 1.25rem, 1.5vw);
+  flex-shrink: 0;
 }
 
 .container_imgs .message {
-  flex: 1; /* Текст занимает всё доступное пространство */
-  margin: 0 8px; /* Отступ 2px между значком акции и сердечком */
-  font-size: 0.7rem;
-  opacity: 0; /* Скрыт по умолчанию */
-  transition: opacity 0.3s ease; /* Плавный переход */
+  flex: 1;
+  margin: 0 clamp(4px, 8px, 1vw);
+  font-size: clamp(0.6rem, 0.7rem, 1vw);
+  opacity: 0;
+  transition: opacity 0.3s ease;
   text-align: center;
   background-color: rgb(205, 212, 212);
   border-radius: 5px;
 }
 
 .container_imgs .message.visible {
-  opacity: 1; /* Показываем текст */
+  opacity: 1;
 }
 
 .image {
-  width: auto;
-  height: 21rem;
+  width: 100%;
+  height: clamp(17rem, 21rem, 22vh);
+  object-fit: contain;
 }
 
 .icon {
-  width: 1.13rem;
-  height: 1.25rem;
-  flex-shrink: 0; /* Сердечко не сжимается */
+  width: clamp(0.8rem, 1.13rem, 1.5vw);
+  height: clamp(0.9rem, 1.25rem, 1.5vw);
+  flex-shrink: 0;
   transition: all 0.3s ease;
 }
 
 .icon path {
-  stroke: #292D32; /* Цвет обводки по умолчанию */
-  fill: none; /* Без заливки по умолчанию */
+  stroke: #292D32;
+  fill: none;
   transition: all 0.3s ease;
 }
 
@@ -73,56 +74,70 @@
 }
 
 .container_text {
-  margin-top: 0.5rem;
+  margin-top: clamp(0.25rem, 0.5rem, 1vw);
 }
 
 .name {
-  font-size: 0.9rem;
+  font-size: clamp(0.7rem, 0.9rem, 1.2vw);
   font-weight: 400;
   margin: 0;
 }
 
 .price {
-  margin-top: 0.5rem;
-  font-size: 1.5rem;
-  margin-bottom: 1.375rem;
+  margin-top: clamp(0.25rem, 0.5rem, 1vw);
+  font-size: clamp(0.8rem, 1.5rem, 2vw);
+  margin-bottom: clamp(0.5rem, 1.375rem, 2vw);
+  display: flex;
+  justify-content: flex-start;
+  gap: clamp(4px, 8px, 1vw);
 }
 
 .price span {
-  margin-top: 0.5rem;
-  font-size: 1rem;
+  margin-top: clamp(0.25rem, 0.5rem, 1vw);
+  font-size: clamp(0.7rem, 1rem, 1.5vw);
   font-weight: 300;
 }
 
-@media (max-width: 1020px) {
+.basePrice {
+  font-size: clamp(0.7rem, 1rem, 1.5vw);
+  font-weight: 300;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  color: #888;
+  font-size: clamp(0.6rem, 0.9rem, 1.2vw);
+}
+
+.newPrice {
+  color: red;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
   .container {
-    width: 11.3rem;
+    width: clamp(10rem, 11.3rem, 20vw);
   }
 
-  .name {
-    font-size: 1.1rem;
+  .container_img {
+    height: clamp(12rem, 10.5rem, 20vh);
   }
 
-  .price {
-    font-size: 0.9rem;
+  .image {
+    height: clamp(10rem, 10.5rem, 18vh);
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    width: 150px;
-    height: 250px;
+    width: clamp(8rem, 150px, 18vw);
+  }
+
+  .container_img {
+    height: clamp(10rem, 250px, 25vh);
   }
 
   .image {
-    height: 110px;
-  }
-
-  .name {
-    font-size: 1rem;
-  }
-
-  .price {
-    font-size: 0.8rem;
+    height: clamp(8rem, 110px, 15vh);
   }
 }

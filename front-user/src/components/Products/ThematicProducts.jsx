@@ -1,12 +1,21 @@
-// src/components/homePage/ThematicProducts.js
 import React from "react";
 import style from "../../style/products/thematicProducts.module.css";
 import ProductCard from "../cart/ProductCart";
 import TematicsData from "../../utils/TematicsData";
 
-const ThematicProducts = ({ theme, products, loading, error }) => {
+const ThematicProducts = ({
+  theme,
+  productAttributes,
+  loading,
+  error,
+  handlePrevTheme,
+  handleNextTheme,
+}) => {
   const thematicData = TematicsData.find((item) => item.theme === theme) || {};
-  const displayedProducts = products.slice(0, 6);
+  const filteredProductAttributes = productAttributes.filter(
+    (pa) => pa.attribute?.theme === theme
+  );
+  const displayedProductAttributes = filteredProductAttributes.slice(0, 6);
 
   return (
     <div className={style.thematicSection}>
@@ -16,14 +25,24 @@ const ThematicProducts = ({ theme, products, loading, error }) => {
             <img src={thematicData.img} alt={thematicData.title} />
           </div>
         )}
-        <div>
-          <h3 className={style.h3}>{thematicData.title || theme}</h3>
+        <div className={style.div_th}>
+          <h3 className={style.h3}>
+            {thematicData.title || theme}
+            <span className={style.navigationArrows}>
+              <button onClick={handlePrevTheme} className={style.navArrow}>
+                &lt;
+              </button>
+              <button onClick={handleNextTheme} className={style.navArrow}>
+                &gt;
+              </button>
+            </span>
+          </h3>
           <div className={style.productsList}>
             {loading && <p>Завантаження...</p>}
             {error && <p>Помилка: {error}</p>}
-            {!loading && !error && displayedProducts.length > 0
-              ? displayedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+            {!loading && !error && displayedProductAttributes.length > 0
+              ? displayedProductAttributes.map((pa) => (
+                  <ProductCard key={pa.id} product={pa.product} />
                 ))
               : !loading &&
                 !error && <p>Товарів за цією тематикою не знайдено.</p>}

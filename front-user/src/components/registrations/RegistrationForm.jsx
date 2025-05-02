@@ -1,8 +1,7 @@
-// components/registrations/RegistrationForm.js
 import React, { useState } from "react";
 import styles from "../../style/pagesStyle/registration.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import dataProvider from "../../utils/userDataProvider";
+import dataProvider from "../../utils/dataProvider";
 
 const RegistrationForm = () => {
   const [method, setMethod] = useState("phone");
@@ -81,9 +80,7 @@ const RegistrationForm = () => {
         password: formData.password,
       };
 
-      await dataProvider.create("users", {
-        data: requestData,
-      });
+      await dataProvider.create("users", { data: requestData });
       setServerMessage("Реєстрація успішна!");
       setFormData({
         phone: "",
@@ -232,13 +229,15 @@ const RegistrationForm = () => {
           {errors.agree && <span className={styles.error}>{errors.agree}</span>}
         </div>
         <ButtonGeneral
-          initialColor="#151515"
+          initial
+          dérColor="#151515"
           text={isSubmitting ? "Реєстрація..." : "Підтвердити"}
           width="100%"
           height="3rem"
           textColor="#F2F2F2"
           type="submit"
           disabled={isSubmitting}
+          link="/"
         />
         {serverMessage && (
           <div className={styles.serverMessage}>

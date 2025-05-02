@@ -1,25 +1,22 @@
-// src/components/cart/ProductCart.js
 import React, { useState } from "react";
 import style from "../../style/cart/productCart.module.css";
 import { ReactSVG } from "react-svg";
 import heart from "../../assets/svg/heartborder.svg";
 import discount_icon from "../../assets/svg/discount.svg";
 
-const ProductCart = ({ discount = false, product }) => {
+const ProductCart = ({ product }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
-  console.log("Product in ProductCart:", product);
+  const [showMessage, setShowMessage] = useState(false);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
-    setIsHovered(true);
+    setShowMessage(true);
+    setTimeout(() => setShowMessage(false), 2000);
   };
 
   const handleMouseEnter = () => {
-    if (isClicked) {
-      setIsHovered(true);
-    }
+    setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
@@ -28,26 +25,43 @@ const ProductCart = ({ discount = false, product }) => {
 
   const message = isClicked
     ? "Товар додано в обране"
-    : "Товар видалено с обраних";
+    : "Товар видалено з обраних";
 
-  // Извлекаем данные из структуры API
-  const productData = product.product || product; // Если product уже содержит данные на верхнем уровне
+  const productData = product || {};
   const imageUrl =
     productData.images && productData.images.length > 0
       ? productData.images[0].url
       : null;
+  const productName = productData.name || "Без назви";
+  const basePrice =
+    productData.price !== null && productData.price !== undefined
+      ? `${productData.price} грн`
+      : null;
+  const discount =
+    productData.discount !== null &&
+    productData.discount !== undefined &&
+    productData.newPrice !== null;
+  const newPrice = discount ? `${productData.newPrice} грн` : null;
+
+  console.log("ProductCart product:", product);
 
   return (
     <div className={style.container}>
       <div className={style.container_img}>
         <div className={style.container_imgs}>
-          {discount && <img src={discount_icon} alt="Акция" />}
+          {discount && (
+            <img
+              src={discount_icon}
+              alt="Акція"
+              className={style.discount_icon}
+            />
+          )}
           <p
-            className={`${style.message} ${isHovered ? style.visible : ""}`}
+            className={`${style.message} ${showMessage ? style.visible : ""}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            {isClicked && isHovered ? message : ""}
+            {showMessage ? message : ""}
           </p>
           <ReactSVG
             src={heart}
@@ -59,17 +73,25 @@ const ProductCart = ({ discount = false, product }) => {
           />
         </div>
         {imageUrl ? (
-          <img src={imageUrl} alt={productData.name} className={style.image} />
+          <img src={imageUrl} alt={productName} className={style.image} />
         ) : (
-          <div className={style.image_placeholder}>Нет изображения</div>
+          <div className={style.image_placeholder}>Немає зображення</div>
         )}
       </div>
       <div className={style.container_text}>
-        <p className={style.name}>{productData.name}</p>
-        <h3 className={style.price}>
-          {productData.price}
-          <span> грн</span>
-        </h3>
+        <p className={style.name}>{productName}</p>
+        {basePrice ? (
+          <h3 className={style.price}>
+            {discount ? (
+              <>
+                <span className={style.newPrice}>{newPrice}</span>
+                <span className={style.oldPrice}>{basePrice}</span>
+              </>
+            ) : (
+              <span className={style.basePrice}>{basePrice}</span>
+            )}
+          </h3>
+        ) : null}
       </div>
     </div>
   );
