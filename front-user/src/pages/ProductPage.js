@@ -11,6 +11,7 @@ import icon_novaPay from "../img/icon/NovaPay.png";
 import icon_monobank from "../img/icon/monobank.png";
 import icon_PrivatBank from "../img/icon/privat.png";
 import vector from "../img/Vector.png";
+import CommentSection from "../components/CommentSection";
 
 const ProductPage = () => {
   const { theme, productName } = useParams();
@@ -28,6 +29,8 @@ const ProductPage = () => {
   const [cartError, setCartError] = useState(null);
   const [showMessage, setShowMessage] = useState(false);
   const [activeInfo, setActiveInfo] = useState(null);
+  const [refreshComments, setRefreshComments] = useState(0); // Для обновления комментариев
+
   const infoRefs = {
     description: useRef(null),
     delivery: useRef(null),
@@ -177,6 +180,7 @@ const ProductPage = () => {
       setCartError(null);
       setShowReviewModal(false);
       setReviewContent("");
+      setRefreshComments((prev) => prev + 1); // Обновляем комментарии
     } catch (err) {
       console.error("Помилка при надсиланні коментаря:", err);
       setCartError(
@@ -229,14 +233,12 @@ const ProductPage = () => {
     product.product.discount !== undefined &&
     product.product.newPrice !== null;
   const sizes = product.attribute.size ? product.attribute.size.split(" ") : [];
-
   const favoriteMessage = isFavorite
     ? "Товар додано в обране"
     : "Товар видалено з обраних";
 
   return (
     <div>
-      {" "}
       <div className={styles.productPage}>
         <div className={styles.imageSection}>
           {imageUrl ? (
@@ -409,7 +411,6 @@ const ProductPage = () => {
               </div>
               <p>{product.attribute.description}</p>
             </div>
-
             <div
               className={`${styles.infoTitle} ${
                 activeInfo === "delivery" ? styles.infoTitleActive : ""
@@ -434,7 +435,6 @@ const ProductPage = () => {
             >
               {product.product.delivery_and_returns}
             </div>
-
             <div
               className={`${styles.infoTitle} ${
                 activeInfo === "payment" ? styles.infoTitleActive : ""
@@ -461,7 +461,6 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
-
         {showReviewModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.modal}>
@@ -489,7 +488,6 @@ const ProductPage = () => {
             </div>
           </div>
         )}
-
         {showSizeTableModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.sizeTableModal}>
@@ -507,7 +505,6 @@ const ProductPage = () => {
             </div>
           </div>
         )}
-
         <div className={styles.messageContainer}>
           {cartMessage && (
             <div className={styles.cartMessage}>{cartMessage}</div>
@@ -515,10 +512,27 @@ const ProductPage = () => {
           {cartError && <div className={styles.cartError}>{cartError}</div>}
         </div>
       </div>
-      <div>
-        <div className={styles.section_2}>
-          <h2>ВІДГУКИ</h2>
-          <img src={vector} alt="" className={styles.img_vector} />
+      <div className={styles.section_2}>
+        <h2>ВІДГУКИ</h2>
+        <img src={vector} alt="" className={styles.img_vector} />
+      </div>
+      <div className={styles.comment_section}>
+        <div className={styles.comment_section2}>
+          <CommentSection
+            productAttributeId={product.id}
+            refresh={refreshComments}
+            setShowReviewModal={setShowReviewModal}
+            showReviewModal={showReviewModal}
+            reviewContent={reviewContent}
+            setReviewContent={setReviewContent}
+            handleSubmitComment={handleSubmitComment}
+          />
+        </div>
+        <div>
+          <ButtonGeneral
+            text="Надіслати"
+            onClick={() => setShowReviewModal(true)}
+          />
         </div>
       </div>
     </div>

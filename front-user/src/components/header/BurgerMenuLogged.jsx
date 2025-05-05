@@ -96,7 +96,7 @@ const BurgerMenuLogged = ({ onClose }) => {
               textColor="#F2F2F2"
             />
           </div>
-          <div style={{ margin: "10px 0" }}>
+          {/* <div style={{ margin: "10px 0" }}>
             <ButtonGeneral
               initialColor="#ff0000"
               borderColor="#ff0000"
@@ -106,7 +106,7 @@ const BurgerMenuLogged = ({ onClose }) => {
               textColor="#ffffff"
               onClick={resetAuthState}
             />
-          </div>
+          </div> */}
           {!isAuthenticated && (
             <div>
               <img src={vector} alt="" className={styles.img_border} />

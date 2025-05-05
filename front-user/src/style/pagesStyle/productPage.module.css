@@ -396,3 +396,16 @@
    margin-top: 1.4%;
    margin-left: 1.4%;
   }
+
+  .comment_section{
+    display: flex;
+    margin-left:10% ;
+  }
+  .comment_section2 {
+    margin-right: 40%;
+    
+  }
+
+  .comment{
+    margin: 10px;
+  }
