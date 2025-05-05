@@ -1,0 +1,268 @@
+.productPage {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  .imageSection {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .imagePlaceholder {
+    width: 100%;
+    height: 300px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    border-radius: 8px;
+  }
+  
+  .thumbnailGallery {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .detailsSection {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .titleSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .reviewButton {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .priceSection {
+    margin-top: 1rem;
+  }
+  
+  .price, .newPrice {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .oldPrice {
+    text-decoration: line-through;
+    color: #888;
+    margin-left: 0.5rem;
+  }
+  
+  .discount {
+    color: #e63946;
+    margin-left: 0.5rem;
+  }
+  
+  .selectSection {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .sizeSelect, .sizeTable {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .quantitySection {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .quantityButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .quantity {
+    font-size: 1rem;
+  }
+  
+  .actionButtons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .addToCartButton {
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .favoriteButton {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .favoriteActive {
+    color: #e63946;
+    border-color: #e63946;
+  }
+  
+  .paymentInfo {
+    margin-top: 1rem;
+    color: #555;
+  }
+  
+  .paymentOption {
+    color: #007bff;
+    cursor: pointer;
+  }
+  
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+  }
+  
+  .reviewTextarea {
+    width: 100%;
+    height: 100px;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .modalButtons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .submitReviewButton {
+    background-color: #000000; /* Чорний фон */
+    color: white; /* Білий текст */
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Анімація */
+  }
+  
+  .submitReviewButton:hover {
+    background-color: white; /* Білий фон при наведенні */
+    color: #000000; /* Чорний текст при наведенні */
+    border: 1px solid #000000; /* Чорна рамка для контрасту */
+  }
+  
+  .closeModalButton {
+    background-color: white; /* Білий фон */
+    color: #000000; /* Чорний текст */
+    padding: 0.5rem 1rem;
+    border: 1px solid #000000; /* Чорна рамка */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Анімація */
+  }
+  
+  .closeModalButton:hover {
+    background-color: #000000; /* Чорний фон при наведенні */
+    color: white; /* Білий текст при наведенні */
+  }
+  
+  .sizeTableModal {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+  }
+  
+  .sizeTableImage {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .loading, .error {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+  }
+  
+  .messageContainer {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 1000;
+  }
+  
+  .cartMessage {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .cartError {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    display: inline-block;
+  }

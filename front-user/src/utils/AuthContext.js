@@ -1,25 +1,33 @@
-// utils/AuthContext.js
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("authToken")
+    !!localStorage.getItem("token")
   );
 
-  console.log("isAuthenticated on init:", isAuthenticated); // Добавляем отладку
+  console.log("isAuthenticated on init:", isAuthenticated);
+
+  useEffect(() => {
+    // Синхронизация с localStorage при изменении
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem("token"));
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const login = (token) => {
-    localStorage.setItem("authToken", token);
+    localStorage.setItem("token", token);
     setIsAuthenticated(true);
-    console.log("isAuthenticated after login:", true); // Отладка
+    console.log("isAuthenticated after login:", true);
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("token");
     setIsAuthenticated(false);
-    console.log("isAuthenticated after logout:", false); // Отладка
+    console.log("isAuthenticated after logout:", false);
   };
 
   return (

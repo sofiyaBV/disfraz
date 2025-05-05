@@ -3,13 +3,16 @@ import style from "../../style/cart/productCart.module.css";
 import { ReactSVG } from "react-svg";
 import heart from "../../assets/svg/heartborder.svg";
 import discount_icon from "../../assets/svg/discount.svg";
+import { useNavigate } from "react-router-dom";
 
-const ProductCart = ({ product }) => {
+const ProductCart = ({ product, theme }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.stopPropagation();
     setIsClicked(!isClicked);
     setShowMessage(true);
     setTimeout(() => setShowMessage(false), 2000);
@@ -21,6 +24,58 @@ const ProductCart = ({ product }) => {
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+  };
+
+  const handleCardClick = () => {
+    const formattedTheme = theme
+      ? theme.toLowerCase().replace(/\s+/g, "-")
+      : "default-theme";
+    const productName = product?.name || "default-product";
+    const transliteratedName = productName
+      .toLowerCase()
+      .replace(
+        /[а-яіїє]/g,
+        (match) =>
+          ({
+            а: "a",
+            б: "b",
+            в: "v",
+            г: "h",
+            ґ: "g",
+            д: "d",
+            е: "e",
+            є: "ye",
+            ж: "zh",
+            з: "z",
+            и: "y",
+            і: "i",
+            ї: "yi",
+            й: "y",
+            к: "k",
+            л: "l",
+            м: "m",
+            н: "n",
+            о: "o",
+            п: "p",
+            р: "r",
+            с: "s",
+            т: "t",
+            у: "u",
+            ф: "f",
+            х: "kh",
+            ц: "ts",
+            ч: "ch",
+            ш: "sh",
+            щ: "shch",
+            ь: "",
+            ю: "yu",
+            я: "ya",
+          }[match] || match)
+      )
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    const productUrl = `/${formattedTheme}/${transliteratedName}`;
+    navigate(productUrl);
   };
 
   const message = isClicked
@@ -43,10 +98,8 @@ const ProductCart = ({ product }) => {
     productData.newPrice !== null;
   const newPrice = discount ? `${productData.newPrice} грн` : null;
 
-  // console.log("ProductCart product:", product);
-
   return (
-    <div className={style.container}>
+    <div className={style.container} onClick={handleCardClick}>
       <div className={style.container_img}>
         <div className={style.container_imgs}>
           {discount && (

@@ -60,9 +60,14 @@ const Authorization = ({ onClose }) => {
       const response = await dataProvider.signin(params);
       console.log("Signin successful:", response.data);
 
-      login(response.data.token || "some-token");
-
-      onClose("Авторизація пройшла успішно!");
+      // Извлекаем access_token из ответа
+      const token = response.data.access_token;
+      if (token) {
+        login(token); // Сохраняем токен через AuthContext
+        onClose("Авторизація пройшла успішно!");
+      } else {
+        setError("Токен не отриманий від сервера");
+      }
     } catch (err) {
       setError(err.message || "Не удалось авторизоваться. Попробуйте снова.");
     } finally {
@@ -152,7 +157,7 @@ const Authorization = ({ onClose }) => {
           colorHover="red"
           disabled={loading}
           onClick={handleSubmit}
-          link=""
+          link="#"
         />
         <p>Або</p>
         <ButtonGeneral
@@ -165,7 +170,7 @@ const Authorization = ({ onClose }) => {
           transitionDuration="0.3s"
           type="button"
           onClick={() => onClose()}
-          link=""
+          link="#"
         />
       </div>
     </div>

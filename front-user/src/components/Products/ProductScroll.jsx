@@ -1,6 +1,6 @@
 import React from "react";
 import style from "../../style/products/productScroll.module.css";
-import ProductCard from "../cart/ProductCart";
+import ProductCart from "../cart/ProductCart";
 
 const ProductScroll = ({
   title,
@@ -34,8 +34,12 @@ const ProductScroll = ({
       </div>
       <div className={style.productsScroll}>
         {products.length > 0 ? (
-          products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          products.map((item) => (
+            <ProductCart
+              key={item.id}
+              product={item.product}
+              theme={item.attribute.theme}
+            />
           ))
         ) : (
           <p>Товарів не знайдено.</p>

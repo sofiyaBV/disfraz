@@ -7,15 +7,20 @@ if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
 }
 
 const httpClient = async (url, options = {}) => {
-  const defaultHeaders = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  };
+  if (!options.headers) {
+    options.headers = new Headers({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    });
+  }
 
-  options.headers = {
-    ...defaultHeaders,
-    ...options.headers,
-  };
+  const token = localStorage.getItem("token");
+  if (token) {
+    options.headers.set("Authorization", `Bearer ${token}`);
+    console.log("Authorization header set:", `Bearer ${token}`);
+  } else {
+    console.log("No token found in localStorage");
+  }
 
   try {
     const response = await fetch(url, options);
@@ -33,7 +38,7 @@ const httpClient = async (url, options = {}) => {
       throw new Error(errorMessage);
     }
 
-    return response.json();
+    return await response.json();
   } catch (error) {
     console.error("Fetch error:", error);
     throw error;
@@ -220,6 +225,17 @@ const createUser = async (params) => {
     body: JSON.stringify({ email, phone, password }),
   });
 
+  // Сохраняем токен из ответа после регистрации
+  if (response.access_token) {
+    localStorage.setItem("token", response.access_token);
+    console.log(
+      "Token saved to localStorage after registration:",
+      response.access_token
+    );
+  } else {
+    console.warn("No access_token in registration response:", response);
+  }
+
   return { data: response };
 };
 
@@ -229,6 +245,53 @@ const signinUser = async (params) => {
   const response = await httpClient(`${apiUrl}/auth/signin`, {
     method: "POST",
     body: JSON.stringify({ email, phone, password }),
+  });
+  console.log("Signin response:", response);
+
+  // Сохраняем токен из ответа
+  if (response.access_token) {
+    localStorage.setItem("token", response.access_token);
+    console.log("Token saved to localStorage:", response.access_token);
+  } else {
+    console.warn("No access_token in signin response:", response);
+  }
+
+  return { data: response };
+};
+
+const createCartItem = async (params) => {
+  const token = localStorage.getItem("token");
+  console.log("Token for cart:", token);
+  if (!token) {
+    throw new Error("Необхідна авторизація для додавання до кошика");
+  }
+
+  const { productAttributeId, quantity } = params.data;
+  const url = `${apiUrl}/cart`;
+  console.log("Creating cart item with payload:", params.data);
+
+  const response = await httpClient(url, {
+    method: "POST",
+    body: JSON.stringify({ productAttributeId, quantity }),
+  });
+
+  return { data: response };
+};
+
+const createComment = async (params) => {
+  const token = localStorage.getItem("token");
+  console.log("Token for comment:", token);
+  if (!token) {
+    throw new Error("Необхідна авторизація для надсилання коментаря");
+  }
+
+  const { productAttributeId, content } = params.data;
+  const url = `${apiUrl}/comments`;
+  console.log("Creating comment with payload:", params.data);
+
+  const response = await httpClient(url, {
+    method: "POST",
+    body: JSON.stringify({ productAttributeId, content }),
   });
 
   return { data: response };
@@ -259,6 +322,10 @@ const dataProvider = {
     switch (resource) {
       case "users":
         return createUser(params.data);
+      case "cart":
+        return createCartItem(params);
+      case "comments":
+        return createComment(params);
       default:
         throw new Error(`Unsupported resource: ${resource}`);
     }
