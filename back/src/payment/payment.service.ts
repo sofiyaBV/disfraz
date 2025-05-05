@@ -34,7 +34,7 @@ export class PaymentService {
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
+      throw new NotFoundException(`Користувача з ID ${userId} не знайдено`);
     }
 
     const order = await this.orderRepository.findOne({
@@ -45,7 +45,7 @@ export class PaymentService {
 
     if (!order) {
       throw new NotFoundException(
-        `Заказ для пользователя с ID ${userId} не найден`,
+        `Замовлення для користувача з ID ${userId} не знайдено`,
       );
     }
 
@@ -54,19 +54,19 @@ export class PaymentService {
       paymentMethod =
         await this.stripe.paymentMethods.retrieve(paymentMethodId);
       if (paymentMethod.type !== 'card') {
-        throw new Error('Метод оплаты должен быть картой');
+        throw new Error('Метод оплати має бути карткою');
       }
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      throw new Error(`Ошибка при получении метода оплаты: ${errorMessage}`);
+      throw new Error(`Помилка при отриманні методу оплати: ${errorMessage}`);
     }
 
     const payment = this.paymentRepository.create({
       orderId: order.id,
-      amount: order.price, // Используем order.price вместо amount из DTO
+      amount: order.price, // Використовуємо order.price замість amount із DTO
       currency: currency || 'UAH',
-      description: description || `Оплата заказа #${order.id}`,
+      description: description || `Оплата замовлення #${order.id}`,
       status: 'pending',
       stripePaymentIntentId: null,
       last4: paymentMethod.card?.last4,
@@ -79,15 +79,15 @@ export class PaymentService {
     } catch (error: any) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      throw new Error(`Ошибка при сохранении платежа: ${errorMessage}`);
+      throw new Error(`Помилка при збереженні платежу: ${errorMessage}`);
     }
 
     let paymentIntent: Stripe.PaymentIntent;
     try {
       paymentIntent = await this.stripe.paymentIntents.create({
-        amount: Math.round(order.price * 100), // Используем order.price
+        amount: Math.round(order.price * 100), // Використовуємо order.price
         currency: currency || 'UAH',
-        description: description || `Оплата заказа #${order.id}`,
+        description: description || `Оплата замовлення #${order.id}`,
         metadata: { orderId: order.id.toString(), paymentId: savedPayment.id },
         payment_method: paymentMethodId,
         confirm: true,
@@ -104,7 +104,7 @@ export class PaymentService {
       await this.paymentRepository.delete(savedPayment.id);
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      throw new Error(`Ошибка при создании PaymentIntent: ${errorMessage}`);
+      throw new Error(`Помилка при створенні PaymentIntent: ${errorMessage}`);
     }
 
     return {
@@ -122,7 +122,7 @@ export class PaymentService {
   async findOne(id: number) {
     const payment = await this.paymentRepository.findOne({ where: { id } });
     if (!payment) {
-      throw new NotFoundException(`Платёж с ID ${id} не найден`);
+      throw new NotFoundException(`Платіж з ID ${id} не знайдено`);
     }
     return payment;
   }
@@ -131,7 +131,7 @@ export class PaymentService {
     const payment = await this.findOne(id);
 
     if (updatePaymentDto.amount && updatePaymentDto.amount !== payment.amount) {
-      throw new Error('Обновление суммы платежа не допускается после создания');
+      throw new Error('Оновлення суми платежу не допускається після створення');
     }
 
     await this.paymentRepository.update(id, updatePaymentDto);
@@ -141,14 +141,14 @@ export class PaymentService {
   async remove(id: number) {
     const payment = await this.findOne(id);
     await this.paymentRepository.delete(id);
-    return { message: `Платеж #${id} удалён` };
+    return { message: `Платіж #${id} видалено` };
   }
 
   async handleCallback(data: { paymentIntentId: string }) {
     const { paymentIntentId } = data;
 
     if (!paymentIntentId) {
-      throw new BadRequestException('paymentIntentId обязателен');
+      throw new BadRequestException('paymentIntentId є обов’язковим');
     }
 
     const payment = await this.paymentRepository.findOne({
@@ -156,7 +156,7 @@ export class PaymentService {
     });
 
     if (!payment) {
-      throw new NotFoundException('Платёж не найден');
+      throw new NotFoundException('Платіж не знайдено');
     }
 
     let paymentIntent: Stripe.PaymentIntent;
@@ -165,7 +165,7 @@ export class PaymentService {
         await this.stripe.paymentIntents.retrieve(paymentIntentId);
     } catch (error: any) {
       throw new BadRequestException(
-        `Ошибка при получении PaymentIntent: ${error.message}`,
+        `Помилка при отриманні PaymentIntent: ${error.message}`,
       );
     }
 
