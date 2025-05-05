@@ -1,11 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreatePaymentDto {
-  @ApiProperty({ description: 'Сумма платежа', example: 100.5 })
-  @IsNumber()
-  amount: number;
-
   @ApiProperty({
     description: 'Валюта платежа',
     example: 'UAH',

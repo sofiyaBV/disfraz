@@ -30,7 +30,7 @@ export class PaymentService {
   }
 
   async create(createPaymentDto: CreatePaymentDto, userId: number) {
-    const { amount, currency, description, paymentMethodId } = createPaymentDto;
+    const { currency, description, paymentMethodId } = createPaymentDto;
 
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
@@ -64,7 +64,7 @@ export class PaymentService {
 
     const payment = this.paymentRepository.create({
       orderId: order.id,
-      amount,
+      amount: order.price, // Используем order.price вместо amount из DTO
       currency: currency || 'UAH',
       description: description || `Оплата заказа #${order.id}`,
       status: 'pending',
@@ -85,12 +85,12 @@ export class PaymentService {
     let paymentIntent: Stripe.PaymentIntent;
     try {
       paymentIntent = await this.stripe.paymentIntents.create({
-        amount: Math.round(amount * 100),
+        amount: Math.round(order.price * 100), // Используем order.price
         currency: currency || 'UAH',
         description: description || `Оплата заказа #${order.id}`,
         metadata: { orderId: order.id.toString(), paymentId: savedPayment.id },
         payment_method: paymentMethodId,
-        confirm: true, // Подтверждаем сразу
+        confirm: true,
         automatic_payment_methods: {
           enabled: true,
           allow_redirects: 'never',
@@ -98,7 +98,7 @@ export class PaymentService {
       });
 
       savedPayment.stripePaymentIntentId = paymentIntent.id;
-      savedPayment.status = paymentIntent.status; // Статус сразу будет succeeded или failed
+      savedPayment.status = paymentIntent.status;
       await this.paymentRepository.save(savedPayment);
     } catch (error: any) {
       await this.paymentRepository.delete(savedPayment.id);
