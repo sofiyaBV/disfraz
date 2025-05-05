@@ -24,10 +24,10 @@ export class PaymentController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.User, Role.Admin)
-  @ApiOperation({ summary: 'Создать новый платёж' })
+  @ApiOperation({ summary: 'Створити новий платіж' })
   @ApiResponse({
     status: 201,
-    description: 'Платёж успешно создан',
+    description: 'Платіж успішно створено',
     type: Object,
   })
   create(@Body() createPaymentDto: CreatePaymentDto, @User() user: any) {
@@ -38,10 +38,10 @@ export class PaymentController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  @ApiOperation({ summary: 'Обработать callback для платежа' })
+  @ApiOperation({ summary: 'Обробити callback для платежу' })
   @ApiResponse({
     status: 200,
-    description: 'Callback успешно обработан',
+    description: 'Callback успішно оброблено',
     type: Payment,
   })
   handleCallback(@Body() handleCallbackDto: HandleCallbackDto) {
@@ -52,8 +52,8 @@ export class PaymentController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  @ApiOperation({ summary: 'Получить список всех платежей' })
-  @ApiResponse({ status: 200, description: 'Список платежей', type: [Payment] })
+  @ApiOperation({ summary: 'Отримати список усіх платежів' })
+  @ApiResponse({ status: 200, description: 'Список платежів', type: [Payment] })
   findAll() {
     return this.paymentService.findAll();
   }
@@ -62,9 +62,9 @@ export class PaymentController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.User, Role.Admin)
-  @ApiOperation({ summary: 'Получить платёж по ID' })
-  @ApiResponse({ status: 200, description: 'Платёж найден', type: Payment })
-  @ApiResponse({ status: 404, description: 'Платёж не найден' })
+  @ApiOperation({ summary: 'Отримати платіж за ID' })
+  @ApiResponse({ status: 200, description: 'Платіж знайдено', type: Payment })
+  @ApiResponse({ status: 404, description: 'Платіж не знайдено' })
   findOne(@Param('id') id: string) {
     return this.paymentService.findOne(+id);
   }
