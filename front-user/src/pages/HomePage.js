@@ -41,34 +41,17 @@ const HomePage = () => {
   const [discountIndex, setDiscountIndex] = useState(0);
 
   const themesToLoad = TematicsData.map((item) => item.theme);
-  const itemsPerPage = 4; // Отображаем по 4 товара за раз
+  const itemsPerPage = 4;
 
   const fetchProductAttributesByTheme = async (theme) => {
     try {
-      const themeMapping = {
-        "sci-fi-cyberpunk": "Sci-fi та кіберпанк",
-        "battle-costumes": "Бойові костюми",
-        halloween: "Хелловін",
-        "fantasy-medieval": "Фентезі та середньовіччя",
-        "anime-manga": "Аніме та манга",
-        "dresses-robes": "Сукні та мантії",
-        "masquerade-ball": "Маскаради та бальні образи",
-        "dc-universe": "Всесвіт DC",
-        "fairy-tale-characters": "Казкові персонажі",
-        "masks-makeup": "Маски та грим",
-        "decor-props": "Декорації та реквізит",
-      };
-      const apiTheme = themeMapping[theme] || theme;
-
       const productAttributesResponse = await dataProvider.getList(
         "product-attributes",
         {
-          filter: { theme: apiTheme },
+          filter: { "attribute.theme": theme },
         }
       );
-
-      const productAttributes = productAttributesResponse.data;
-      return productAttributes || [];
+      return productAttributesResponse.data || [];
     } catch (err) {
       console.error(
         `Error fetching product-attributes for theme ${theme}:`,
@@ -80,7 +63,7 @@ const HomePage = () => {
 
   const fetchAllProducts = async () => {
     try {
-      const response = await dataProvider.getList("products", {
+      const response = await dataProvider.getList("product-attributes", {
         filter: {},
       });
       return response.data || [];
@@ -94,7 +77,6 @@ const HomePage = () => {
     const loadAllData = async () => {
       setLoading(true);
       try {
-        // Загружаем тематические товары
         const productAttributesByTheme = {};
         for (const theme of themesToLoad) {
           if (!thematicProductAttributes[theme]) {
@@ -109,7 +91,6 @@ const HomePage = () => {
           ...productAttributesByTheme,
         }));
 
-        // Загружаем все товары для топ продаж и акций
         const products = await fetchAllProducts();
         setAllProducts(products);
         setLoading(false);
@@ -349,17 +330,14 @@ const HomePage = () => {
     };
   }, []);
 
-  // Фильтрация товаров для топ продаж и акций
   const topSalesProducts = allProducts.filter(
-    (product) => product.topSale === true
+    (product) => product.product?.topSale === true
   );
-  console.log("top == " + topSalesProducts);
 
   const discountProducts = allProducts.filter(
-    (product) => product.newPrice != null
+    (product) => product.product?.newPrice != null
   );
 
-  // Пересчитываем отображаемые товары при изменении индекса
   const displayedTopSales = topSalesProducts.slice(
     topSalesIndex * itemsPerPage,
     (topSalesIndex + 1) * itemsPerPage

@@ -1,6 +1,6 @@
 import React from "react";
 import style from "../../style/products/thematicProducts.module.css";
-import ProductCard from "../cart/ProductCart";
+import ProductCart from "../cart/ProductCart";
 import TematicsData from "../../utils/TematicsData";
 
 const ThematicProducts = ({
@@ -42,7 +42,11 @@ const ThematicProducts = ({
             {error && <p>Помилка: {error}</p>}
             {!loading && !error && displayedProductAttributes.length > 0
               ? displayedProductAttributes.map((pa) => (
-                  <ProductCard key={pa.id} product={pa.product} />
+                  <ProductCart
+                    key={pa.id}
+                    product={pa.product}
+                    theme={pa.attribute.theme}
+                  />
                 ))
               : !loading &&
                 !error && <p>Товарів за цією тематикою не знайдено.</p>}
