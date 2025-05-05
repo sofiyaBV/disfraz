@@ -3,7 +3,7 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class CreatePaymentDto {
   @ApiProperty({
-    description: 'Валюта платежа',
+    description: 'Валюта платежу',
     example: 'UAH',
     required: false,
   })
@@ -12,8 +12,8 @@ export class CreatePaymentDto {
   currency?: string;
 
   @ApiProperty({
-    description: 'Описание платежа',
-    example: 'Оплата заказа #12345',
+    description: 'Опис платежу',
+    example: 'Сплата замовлення #12345',
     required: false,
   })
   @IsString()
@@ -21,7 +21,7 @@ export class CreatePaymentDto {
   description?: string;
 
   @ApiProperty({
-    description: 'ID метода оплаты, созданного на клиенте через Stripe.js',
+    description: 'ID методу оплати, створеного на клієнті через Stripe.js',
     example: 'pm_card_visa',
   })
   @IsString()

@@ -11,7 +11,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000', 'http://localhost:4114'], // Дозволяємо запити з Swagger та фронтенду
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Дозволені методи
     allowedHeaders: ['Content-Type', 'Authorization'], // Дозволені заголовки
-    credentials: true, // Дозволяємо передачу cookies (якщо потрібно)
+    credentials: true, // Дозволяємо передачу cookies 
   });
 
   dotenv.config();
