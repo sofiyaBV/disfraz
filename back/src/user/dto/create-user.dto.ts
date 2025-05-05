@@ -16,10 +16,6 @@ export class CreateUserDto {
   phone: string;
 
   @IsOptional()
-  @ApiPropertyOptional({
-    example: ['user'],
-    description: 'Ролі користувача',
-  })
   roles?: Role[];
 
   @ApiProperty({
