@@ -12,6 +12,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Tests from "./pages/Tests";
 import { AuthProvider } from "./utils/AuthContext";
 import AllSectionPage from "./pages/AllSectionPage";
+import ProductPage from "./pages/ProductPage";
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/my_account/registration" element={<Registration />} />
+          <Route path="/:theme/:productName" element={<ProductPage />} />
+          <Route path="/:theme/" element={<Tests />} />
           <Route path="*" element={<ErrorPage />} />
           <Route path="*" element={<Navigate to="/error" replace />} />
           <Route path="/tematics" element={<AllSectionPage />} />

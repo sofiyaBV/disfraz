@@ -1,10 +1,11 @@
-// components/registrations/RegistrationForm.js
 import React, { useState } from "react";
 import styles from "../../style/pagesStyle/registration.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import dataProvider from "../../utils/userDataProvider";
+import dataProvider from "../../utils/dataProvider";
+import { useAuth } from "../../utils/AuthContext";
 
 const RegistrationForm = () => {
+  const { login } = useAuth(); // Добавляем useAuth для авторизации
   const [method, setMethod] = useState("phone");
   const [formData, setFormData] = useState({
     phone: "",
@@ -81,10 +82,22 @@ const RegistrationForm = () => {
         password: formData.password,
       };
 
-      await dataProvider.create("users", {
+      const response = await dataProvider.create("users", {
         data: requestData,
       });
-      setServerMessage("Реєстрація успішна!");
+      console.log("Registration successful:", response.data);
+
+      // Извлекаем access_token из ответа
+      const token = response.data.access_token;
+      if (token) {
+        login(token); // Автоматически авторизуем пользователя
+        setServerMessage(
+          "Реєстрація успішна! Ви автоматично увійшли в систему."
+        );
+      } else {
+        setServerMessage("Реєстрація успішна, але токен не отриманий.");
+      }
+
       setFormData({
         phone: "",
         email: "",
@@ -232,13 +245,15 @@ const RegistrationForm = () => {
           {errors.agree && <span className={styles.error}>{errors.agree}</span>}
         </div>
         <ButtonGeneral
-          initialColor="#151515"
+          initial
+          dérColor="#151515"
           text={isSubmitting ? "Реєстрація..." : "Підтвердити"}
           width="100%"
           height="3rem"
           textColor="#F2F2F2"
           type="submit"
           disabled={isSubmitting}
+          link="/"
         />
         {serverMessage && (
           <div className={styles.serverMessage}>

@@ -1,8 +1,7 @@
-// src/utils/useProduct.js
 import { useEffect, useState } from "react";
-import { getProducts } from "./dataProvider";
+import dataProvider from "./dataProvider";
 
-const useProduct = ({ theme } = {}) => {
+const useProduct = ({ theme, attributeId } = {}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,8 +10,11 @@ const useProduct = ({ theme } = {}) => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const filter = theme ? { theme } : {};
-        const response = await getProducts({
+        const filter = {};
+        if (theme) filter.theme = theme;
+        if (attributeId) filter.attributeId = attributeId;
+
+        const response = await dataProvider.getList("products", {
           page: 1,
           perPage: 6,
           sortField: "id",
@@ -29,7 +31,7 @@ const useProduct = ({ theme } = {}) => {
     };
 
     fetchProducts();
-  }, [theme]); // Зависимость теперь от примитивного значения theme
+  }, [theme, attributeId]);
 
   return { products, loading, error };
 };
