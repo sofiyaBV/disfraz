@@ -4,6 +4,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -35,12 +36,10 @@ export class AuthService {
   async register(createUserDto: CreateUserDto): Promise<void> {
     const { email, phone, password } = createUserDto;
 
-    // Проверяем, что хотя бы email или phone переданы
     if (!email && !phone) {
       throw new UnauthorizedException('Email or phone must be provided');
     }
 
-    // Проверяем, передан ли email и существует ли пользователь с таким email
     if (email) {
       const existingUserByEmail = await this.usersService.findByEmail(email);
       if (existingUserByEmail) {
@@ -48,7 +47,6 @@ export class AuthService {
       }
     }
 
-    // Проверяем, передан ли phone и существует ли пользователь с таким номером телефона
     if (phone) {
       const existingUserByPhone = await this.usersService.findByPhone(phone);
       if (existingUserByPhone) {
@@ -58,13 +56,35 @@ export class AuthService {
       }
     }
 
-    const newUser = {
-      email,
-      password,
-      phone,
-      roles: [Role.User],
-    };
+    await this.usersService.createUser(createUserDto);
+  }
 
-    await this.usersService.createUser(newUser);
+  async findOrCreateGoogleUser(data: {
+    email: string;
+    googleId: string;
+  }): Promise<User> {
+    const { email, googleId } = data;
+
+    let user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      const createUserDto: CreateUserDto = {
+        email,
+        password: '', // Пароль не потрібен для Google
+        phone: null,
+        roles: [Role.User], // Автоматично присвоюємо роль User
+      };
+      user = await this.usersService.createUser(createUserDto);
+    }
+
+    return user;
+  }
+
+  async generateJwtToken(payload: {
+    sub: number;
+    email: string;
+    roles: Role[];
+  }): Promise<string> {
+    return this.jwtService.sign(payload);
   }
 }
