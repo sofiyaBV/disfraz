@@ -7,12 +7,14 @@ export class CreateUserDto {
     example: 'user@example.com',
     description: 'Email користувача для авторизації',
   })
+  @IsOptional()
   email: string;
 
   @ApiProperty({
     example: '+380123456789',
     description: 'Номер телефону користувача',
   })
+  @IsOptional()
   phone: string;
 
   @IsOptional()
