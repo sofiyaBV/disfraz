@@ -15,10 +15,11 @@ const httpClient = async (url, options = {}) => {
   }
 
   const token = localStorage.getItem("token");
-  if (token) {
+  const skipAuth = options.skipAuth || false;
+  if (token && !skipAuth) {
     options.headers.set("Authorization", `Bearer ${token}`);
     console.log("Authorization header set:", `Bearer ${token}`);
-  } else {
+  } else if (!token) {
     console.log("No token found in localStorage");
   }
 
@@ -217,6 +218,49 @@ const fetchAttributes = async (params = {}) => {
   }
 };
 
+const fetchComments = async (params = {}) => {
+  const {
+    page = 1,
+    perPage = 20,
+    sortField = "id",
+    sortOrder = "ASC",
+    filter = {},
+  } = params;
+
+  const queryFilter = {};
+  if (filter.productAttributeId) {
+    queryFilter.productAttributeId = filter.productAttributeId;
+  }
+
+  const query = new URLSearchParams({
+    page: page.toString(),
+    limit: perPage.toString(),
+    sort: sortField,
+    order: sortOrder.toLowerCase(),
+    ...queryFilter,
+  });
+
+  const url = `${apiUrl}/comments?${query.toString()}`;
+  console.log("Fetching comments from:", url);
+
+  try {
+    const response = await httpClient(url, { skipAuth: true });
+    console.log("API response for comments:", response);
+
+    const total = Array.isArray(response)
+      ? response.length
+      : response.total || 0;
+
+    return {
+      data: Array.isArray(response) ? response : response.data || [],
+      total,
+    };
+  } catch (error) {
+    console.error("Error in fetchComments:", error);
+    throw new Error(error.message || "Ошибка при загрузке комментариев");
+  }
+};
+
 const createUser = async (params) => {
   const { email, phone, password } = params;
 
@@ -225,7 +269,6 @@ const createUser = async (params) => {
     body: JSON.stringify({ email, phone, password }),
   });
 
-  // Сохраняем токен из ответа после регистрации
   if (response.access_token) {
     localStorage.setItem("token", response.access_token);
     console.log(
@@ -248,7 +291,6 @@ const signinUser = async (params) => {
   });
   console.log("Signin response:", response);
 
-  // Сохраняем токен из ответа
   if (response.access_token) {
     localStorage.setItem("token", response.access_token);
     console.log("Token saved to localStorage:", response.access_token);
@@ -306,6 +348,8 @@ const dataProvider = {
         return fetchProductAttributes(params);
       case "attributes":
         return fetchAttributes(params);
+      case "comments":
+        return fetchComments(params);
       default:
         throw new Error(`Unsupported resource: ${resource}`);
     }
