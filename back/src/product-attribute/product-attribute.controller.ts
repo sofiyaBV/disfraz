@@ -46,7 +46,7 @@ export class ProductAttributeController {
   })
   @ApiBody({ type: CreateProductAttributeDto })
   @Post()
-  @Roles(Role.Admin, Role.User)
+  // @Roles(Role.Admin, Role.User)
   create(@Body() createProductAttributeDto: CreateProductAttributeDto) {
     return this.productAttributeService.create(createProductAttributeDto);
   }
@@ -82,7 +82,7 @@ export class ProductAttributeController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin)
+  // @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: string) {
     return this.productAttributeService.findOne(+id);
   }

@@ -37,8 +37,8 @@ import { BadRequestException } from '@nestjs/common';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiTags('Products')
 @Controller('products')
 export class ProductController {
@@ -199,7 +199,7 @@ export class ProductController {
   })
   @UseInterceptors(FilesInterceptor('images', 10))
   @Patch(':id')
-  @Roles(Role.Admin, Role.User)
+  // @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: any,
