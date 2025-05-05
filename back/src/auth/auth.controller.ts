@@ -7,6 +7,7 @@ import {
   Post,
   Request,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
@@ -23,7 +24,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
-import { User } from './decorators/user.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -75,5 +77,36 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Неавторизованный запрос' })
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Авторизация через Google' })
+  @ApiResponse({ status: 302, description: 'Перенаправлення на Google' })
+  async googleAuth() {}
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Callback для Google авторизації' })
+  @ApiResponse({
+    status: 200,
+    description: 'Успішна авторизація через Google',
+  })
+  async googleAuthCallback(@Request() req, @Res() res: Response) {
+    const user = req.user;
+    if (!user || !user.access_token) {
+      return res.status(401).json({ message: 'Google authentication failed' });
+    }
+
+    return res.json({
+      access_token: user.access_token,
+      user: {
+        id: user.id,
+        email: user.email,
+        roles: user.roles,
+      },
+    });
   }
 }

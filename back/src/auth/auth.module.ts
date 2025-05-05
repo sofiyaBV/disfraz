@@ -8,6 +8,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { GoogleStrategy } from './google.strategy';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,9 +23,10 @@ import { ConfigModule } from '@nestjs/config';
   providers: [
     AuthService,
     JwtStrategy,
+    GoogleStrategy,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard, // Глобально застосовуємо AuthGuard
+      useClass: AuthGuard,
     },
   ],
   controllers: [AuthController],
