@@ -58,7 +58,7 @@ export class PaymentController {
     return this.paymentService.findAll();
   }
 
-  @Get(':id')
+  @Get('')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.User, Role.Admin)

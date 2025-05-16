@@ -74,7 +74,7 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-  @Get(':id')
+  @Get('')
   @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(+id);
@@ -94,7 +94,7 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-  @Patch(':id')
+  @Patch('')
   @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
@@ -109,7 +109,7 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-  @Delete(':id')
+  @Delete('')
   @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.commentsService.remove(+id);

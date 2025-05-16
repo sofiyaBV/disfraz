@@ -35,14 +35,14 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  @ApiOperation({ summary: 'Авторизация пользователя' })
+  @ApiOperation({ summary: 'Авторизація користувача' })
   @ApiBody({ type: SignInDto })
   @ApiResponse({
     status: 200,
     type: SignInResponseDto,
-    description: 'Успешный вход',
+    description: 'Успішний вхід',
   })
-  @ApiResponse({ status: 401, description: 'Ошибка авторизации' })
+  @ApiResponse({ status: 401, description: 'Помилка авторизації' })
   async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
     return this.authService.signIn(
       signInDto.email,
@@ -54,27 +54,27 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  @ApiOperation({ summary: 'Регистрация нового пользователя' })
+  @ApiOperation({ summary: 'Реєстрація нового користувача' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
-    description: 'Пользователь успешно зарегистрирован',
+    description: 'Користувач успішно зареєстрований',
   })
-  @ApiResponse({ status: 400, description: 'Некорректные данные' })
+  @ApiResponse({ status: 400, description: 'Некоректні дані' })
   async register(
     @Body() createUserDto: CreateUserDto,
   ): Promise<{ message: string }> {
     await this.authService.register(createUserDto);
-    return { message: 'Пользователь успешно зарегистрирован' };
+    return { message: 'Користувач успішно зареєстрований' };
   }
 
   @Get('profile')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin, Role.User)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Получение профиля пользователя' })
-  @ApiResponse({ status: 200, description: 'Информация о пользователе' })
-  @ApiResponse({ status: 401, description: 'Неавторизованный запрос' })
+  @ApiOperation({ summary: 'Отримання профілю користувача' })
+  @ApiResponse({ status: 200, description: 'Інформація про користувача' })
+  @ApiResponse({ status: 401, description: 'Неавторизований запит' })
   getProfile(@Request() req) {
     return req.user;
   }
@@ -82,7 +82,7 @@ export class AuthController {
   @Public()
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Авторизация через Google' })
+  @ApiOperation({ summary: 'Авторизація через Google' })
   @ApiResponse({ status: 302, description: 'Перенаправлення на Google' })
   async googleAuth() {}
 
@@ -97,7 +97,9 @@ export class AuthController {
   async googleAuthCallback(@Request() req, @Res() res: Response) {
     const user = req.user;
     if (!user || !user.access_token) {
-      return res.status(401).json({ message: 'Google authentication failed' });
+      return res
+        .status(401)
+        .json({ message: 'Помилка авторизації через Google' });
     }
 
     return res.json({
