@@ -31,8 +31,6 @@ import { commentPaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Comment')
 @Controller('comments')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
@@ -43,6 +41,8 @@ export class CommentsController {
     type: Comment,
   })
   @ApiBody({ type: CreateCommentDto })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
   @Roles(Role.User, Role.Admin)
   async create(@Body() createCommentDto: CreateCommentDto, @User() user: any) {
@@ -56,7 +56,6 @@ export class CommentsController {
   })
   @PaginatedSwaggerDocs(CreateCommentDto, commentPaginateConfig)
   @Get()
-  @Roles(Role.Admin)
   async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Comment>> {
     return this.commentsService.findAllPag(query);
   }
@@ -74,7 +73,10 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-  @Get('')
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Get('')
   @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(+id);
@@ -94,6 +96,9 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Patch('')
   @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
@@ -109,7 +114,10 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
+
   @Delete('')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
   remove(@Param('id') id: string) {
     return this.commentsService.remove(+id);

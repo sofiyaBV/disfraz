@@ -1,16 +1,15 @@
-// Authorization.jsx
 import facebook from "../../img/icon/facebook_color.png";
 import google from "../../img/icon/google_color.png";
 import add from "../../assets/add.png";
 import add_hover from "../../assets/add_hover.png";
 import styles from "../../style/authorization.module.css";
-import dataProvider from "../../utils/userDataProvider";
+import dataProvider from "../../utils/dataProvider";
 import { useState } from "react";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import { useAuth } from "../../utils/AuthContext";
 
 const Authorization = ({ onClose }) => {
-  const { login } = useAuth(); // Теперь login должен быть функцией
+  const { login } = useAuth();
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
@@ -61,9 +60,14 @@ const Authorization = ({ onClose }) => {
       const response = await dataProvider.signin(params);
       console.log("Signin successful:", response.data);
 
-      login(response.data.token || "some-token"); // Теперь это должно работать
-
-      onClose("Авторизація пройшла успішно!");
+      // Извлекаем access_token из ответа
+      const token = response.data.access_token;
+      if (token) {
+        login(token); // Сохраняем токен через AuthContext
+        onClose("Авторизація пройшла успішно!");
+      } else {
+        setError("Токен не отриманий від сервера");
+      }
     } catch (err) {
       setError(err.message || "Не удалось авторизоваться. Попробуйте снова.");
     } finally {
@@ -153,6 +157,7 @@ const Authorization = ({ onClose }) => {
           colorHover="red"
           disabled={loading}
           onClick={handleSubmit}
+          link="#"
         />
         <p>Або</p>
         <ButtonGeneral
@@ -165,6 +170,7 @@ const Authorization = ({ onClose }) => {
           transitionDuration="0.3s"
           type="button"
           onClick={() => onClose()}
+          link="#"
         />
       </div>
     </div>

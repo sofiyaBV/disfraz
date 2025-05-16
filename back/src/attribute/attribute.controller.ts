@@ -31,8 +31,8 @@ import { attributePaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Attributes')
 @Controller('attributes')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 
@@ -59,7 +59,7 @@ export class AttributesController {
   })
   @PaginatedSwaggerDocs(CreateAttributeDto, attributePaginateConfig)
   @Get()
-  @Roles(Role.User, Role.Admin)
+  // @Roles(Role.User, Role.Admin)
   async findAll(
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<Attribute>> {
@@ -80,7 +80,7 @@ export class AttributesController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin)
+  // @Roles(Role.User, Role.Admin)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Attribute> {
     return this.attributesService.findOne(id);
   }
