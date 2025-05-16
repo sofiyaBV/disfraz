@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Create, Datagrid, Edit, ImageField, ImageInput, List, TextInput,  Show, SimpleForm, TextField, AutocompleteInput, useDataProvider, EditProps, SelectArrayInput, SimpleShowLayout, ArrayField, CreateProps, SimpleList, DeleteButton, required } from "react-admin";
+import { Create, Datagrid, Edit, ImageField, ImageInput, List, TextInput,  Show, SimpleForm, TextField, AutocompleteInput, useDataProvider, EditProps, SelectArrayInput, SimpleShowLayout, ArrayField, CreateProps, SimpleList, DeleteButton, required, BooleanField, BooleanInput } from "react-admin";
 import { productNameValidationFormat, productPriceValidationFormat } from "../../validations/validation";
 // Родительский компонент, который получает данные
 const productFilters = [
@@ -18,6 +18,8 @@ export const ProductList = () => (
             <TextField label="Назва товару" source="name" />
             <TextField label="Ціна" source="price" />
             <TextField label="Опис товару" source="description" />
+            <BooleanField label="Чи є товар топовим у продажу" source="topSale"/>
+            <TextField label="Знижка" source="discount"/>
             <ArrayField label="Фотографії" source="images">
                 <SimpleList primaryText={(record) => (
                     <img key={record.url} src={record.url} alt="Фотографія" style={{ maxWidth: '100px', maxHeight: '100px' }} />
@@ -31,11 +33,22 @@ export const ProductList = () => (
 
 
 export const ProductEdit = () => (
-        <Edit>
+    <Edit
+    transform={(data) => {
+      console.log("Данные перед отправкой на сервер:", data);
+      return {
+        ...data,
+        topSale: data.topSale === true ? 1 : 0, // Отправляем 1 или 0
+      };
+    }}
+    mutationMode="pessimistic"
+  >
             <SimpleForm>
                 <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
                 <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
                 <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
+                <TextInput label="Знижка на товар у відсотках " source="discount"/>
+                <BooleanInput label="Чи є товар топовим у продажу" source="topSale"  defaultValue={true}/>
             </SimpleForm>
         </Edit>
 );
@@ -47,6 +60,9 @@ export const ProductShow = () => (
             <TextField  source="name" label="Назва товару" />
             <TextField label="Ціна товару" source="price" />
             <TextField label="Опис товару" source="description" />
+            <TextField label="Знижка на товар" source="discount"/>
+            <TextField label="Нова ціна товару згідно знижки" source="newPrice"/>
+            <BooleanField label="Чи є товар топовим у продажу" source="topSale"/>
             <ArrayField label="Фотографії" source="images">
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     <SimpleList primaryText={(record) => (
@@ -117,6 +133,8 @@ export const ProductCreate = (props: CreateProps) => {
             <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
                 <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
                 <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
+                <TextInput label="Знижка на товар у відсотках " source="discount"/>
+                <BooleanInput label="Чи є товар топовим у продажу" source="topSale"/>
                 <ImageInput label="Фотогрвфії товару" source="images" multiple />
                 <SelectArrayInput
                     source="similarProducts"

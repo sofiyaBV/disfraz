@@ -3,7 +3,6 @@ import ButtonGeneral from "../buttons/ButtonGeneral";
 import style from "../../style/tematicsScrole.module.css";
 
 const TematicsScrole = ({ text, bacgraundImg, buttonLink }) => {
-  // Извлекаем URL из импортированного изображения
   const imageUrl =
     typeof bacgraundImg === "object" && bacgraundImg.default
       ? bacgraundImg.default
