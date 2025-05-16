@@ -28,7 +28,7 @@ export class Product {
   })
   price: number;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 }) // Знижка в процентах (0-100)
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   @ApiProperty({
     example: 25,
     description: 'Знижка на товар у відсотках',
