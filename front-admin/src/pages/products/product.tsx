@@ -106,6 +106,19 @@ export const ProductCreate = (props: CreateProps) => {
     return (
         <Create
             {...props}
+            transform={(data) => {
+                // Перетворення даних перед відправкою
+                console.log("Дані форми перед перетворенням:", data);
+                
+                const transformedData = {
+                    ...data,
+                    // Перетворюємо topSale в числове значення якщо потрібно
+                    topSale: data.topSale ? 1 : 0,
+                };
+                
+                console.log("Перетворені дані:", transformedData);
+                return transformedData;
+            }}
             save={async (values: any) => {
                 try {
                     // Логирование данных перед отправкой
@@ -115,6 +128,8 @@ export const ProductCreate = (props: CreateProps) => {
                     const productResponse = await dataProvider.createFormData("products", {
                         data: values,
                     });
+
+                    console.log("Ответ после создания продукта:", productResponse);
 
                     const productId = productResponse.data.id;
 

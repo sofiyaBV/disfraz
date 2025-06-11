@@ -20,6 +20,19 @@ const httpClient = (url: string, options: any = {}) => {
   return fetchUtils.fetchJson(url, options);
 };
 
+// Функция для проверки наличия файлов в данных
+const hasFiles = (data: any): boolean => {
+  if (!data || typeof data !== "object") return false;
+
+  // Проверяем images
+  if (data.images && Array.isArray(data.images)) {
+    return data.images.some((item: any) => item && item.rawFile);
+  }
+
+  // Можно добавить проверку других полей с файлами
+  return false;
+};
+
 export const dataProvider = {
   getList: (resource: string, params: any) => {
     const { page, perPage } = params.pagination;
@@ -105,24 +118,128 @@ export const dataProvider = {
         }
         return response.json();
       })
-      .then((json) => ({
-        data: { ...params.data, id: json.id },
-      }));
+      .then((json) => {
+        console.log("Ответ сервера после создания:", json);
+        return {
+          data: json, // Возвращаем данные от сервера, а не оригинальные данные формы
+        };
+      });
   },
 
-  create: (resource: string, params: any) =>
-    httpClient(`${apiUrl}/${resource}`, {
+  // Модифицируем create для автоматического выбора метода
+  create: (resource: string, params: any) => {
+    console.log(
+      "Create called for resource:",
+      resource,
+      "with params:",
+      params,
+    );
+
+    // Для продуктов проверяем наличие файлов
+    if (resource === "products" && hasFiles(params.data)) {
+      console.log("Detected files in product data, using createFormData");
+      return dataProvider.createFormData(resource, params);
+    }
+
+    // Для остальных случаев используем обычный JSON
+    console.log("Using standard JSON create");
+    return httpClient(`${apiUrl}/${resource}`, {
       method: "POST",
       body: JSON.stringify(params.data),
     }).then(({ json }) => ({
       data: { ...params.data, id: json.id },
-    })),
+    }));
+  },
 
-  update: (resource: string, params: any) =>
-    httpClient(`${apiUrl}/${resource}/${params.id}`, {
+  // Аналогично для update
+  updateFormData: (resource: string, params: any) => {
+    const formData = new FormData();
+
+    console.log("Обновление FormData с данными:", params.data);
+
+    for (const key in params.data) {
+      if (params.data.hasOwnProperty(key)) {
+        const value = params.data[key];
+
+        if (key === "images" && Array.isArray(value)) {
+          // Специальная обработка для изображений
+          value.forEach((file: any, index: number) => {
+            if (file && file.rawFile) {
+              // Это новый загруженный файл
+              console.log(
+                `Добавляем файл изображения ${index} для обновления:`,
+                file.rawFile,
+              );
+              formData.append(`images`, file.rawFile);
+            } else if (file && (typeof file === "string" || file.url)) {
+              // Это уже существующий URL изображения
+              const imageUrl = typeof file === "string" ? file : file.url;
+              formData.append(`images[${index}]`, imageUrl);
+            }
+          });
+        } else if (Array.isArray(value)) {
+          // Обработка других массивов
+          value.forEach((item: any, index: number) => {
+            formData.append(`${key}[${index}]`, item);
+          });
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      }
+    }
+
+    console.log("FormData содержимое для обновления:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
+    const options: any = {
+      method: "PATCH",
+      body: formData,
+    };
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      options.headers = new Headers();
+      options.headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    return fetch(`${apiUrl}/${resource}/${params.id}`, options)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        console.log("Ответ сервера после обновления:", json);
+        return {
+          data: json,
+        };
+      });
+  },
+
+  update: (resource: string, params: any) => {
+    console.log(
+      "Update called for resource:",
+      resource,
+      "with params:",
+      params,
+    );
+
+    // Для продуктов проверяем наличие файлов
+    if (resource === "products" && hasFiles(params.data)) {
+      console.log("Detected files in product data, using updateFormData");
+      return dataProvider.updateFormData(resource, params);
+    }
+
+    // Для остальных случаев используем обычный JSON
+    console.log("Using standard JSON update");
+    return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: "PATCH",
       body: JSON.stringify(params.data),
-    }).then(({ json }) => ({ data: json })),
+    }).then(({ json }) => ({ data: json }));
+  },
 
   delete: (resource: string, params: any) =>
     httpClient(`${apiUrl}/${resource}/${params.id}`, {
