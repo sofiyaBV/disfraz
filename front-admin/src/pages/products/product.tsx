@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Create, Datagrid, Edit, ImageField, ImageInput, List, TextInput,  Show, SimpleForm, TextField, AutocompleteInput, useDataProvider, EditProps, SelectArrayInput, SimpleShowLayout, ArrayField, CreateProps, SimpleList, DeleteButton, required, BooleanField, BooleanInput } from "react-admin";
 import { productNameValidationFormat, productPriceValidationFormat } from "../../validations/validation";
+
 // Родительский компонент, который получает данные
 const productFilters = [
     <TextInput
@@ -30,27 +31,29 @@ export const ProductList = () => (
     </List>
 );
 
-
-
 export const ProductEdit = () => (
     <Edit
-    transform={(data) => {
-      console.log("Данные перед отправкой на сервер:", data);
-      return {
-        ...data,
-        topSale: data.topSale === true ? 1 : 0, // Отправляем 1 или 0
-      };
-    }}
-    mutationMode="pessimistic"
-  >
-            <SimpleForm>
-                <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
-                <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
-                <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
-                <TextInput label="Знижка на товар у відсотках " source="discount"/>
-                <BooleanInput label="Чи є товар топовим у продажу" source="topSale"  defaultValue={true}/>
-            </SimpleForm>
-        </Edit>
+        transform={(data) => {
+            console.log("Данные перед отправкой на сервер:", data);
+            return {
+                ...data,
+                topSale: data.topSale === true ? 1 : 0, // Отправляем 1 или 0
+            };
+        }}
+        mutationMode="pessimistic"
+    >
+        <SimpleForm>
+            <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
+            <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
+            <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
+            <TextInput label="Знижка на товар у відсотках " source="discount"/>
+            <BooleanInput label="Чи є товар топовим у продажу" source="topSale"  defaultValue={true}/>
+            {/* Добавляем поле для редактирования изображений */}
+            <ImageInput label="Фотографії товару" source="images" multiple accept={{ 'image/*': [] }}>
+                <ImageField source="src" title="title" />
+            </ImageInput>
+        </SimpleForm>
+    </Edit>
 );
 
 export const ProductShow = () => (
@@ -105,6 +108,10 @@ export const ProductCreate = (props: CreateProps) => {
             {...props}
             save={async (values: any) => {
                 try {
+                    // Логирование данных перед отправкой
+                    console.log("Данные формы перед отправкой:", values);
+                    console.log("Изображения:", values.images);
+
                     const productResponse = await dataProvider.createFormData("products", {
                         data: values,
                     });
@@ -128,7 +135,7 @@ export const ProductCreate = (props: CreateProps) => {
                     throw error;
                 }
             }}
-            redirect="list" // Добавляем редирект на список после сохранения
+            redirect="list"
         >
             <SimpleForm>
                 <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
@@ -136,7 +143,18 @@ export const ProductCreate = (props: CreateProps) => {
                 <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
                 <TextInput label="Знижка на товар у відсотках " source="discount"/>
                 <BooleanInput label="Чи є товар топовим у продажу" source="topSale"/>
-                <ImageInput label="Фотогрвфії товару" source="images" multiple />
+                
+                {/* Исправленный ImageInput */}
+                <ImageInput 
+                    label="Фотографії товару" 
+                    source="images" 
+                    multiple 
+                    accept={{ 'image/*': [] }}
+                    options={{ onDropRejected: (files) => console.log('Rejected files:', files) }}
+                >
+                    <ImageField source="src" title="title" />
+                </ImageInput>
+                
                 <SelectArrayInput
                     source="similarProducts"
                     label="Схожі товари"

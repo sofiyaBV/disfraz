@@ -13,7 +13,6 @@ const httpClient = (url: string, options: any = {}) => {
   const token = localStorage.getItem("token");
   if (token) {
     options.headers.set("Authorization", `Bearer ${token}`);
-    // console.log("Authorization header set:", `Bearer ${token}`);
   } else {
     console.log("No token found in localStorage");
   }
@@ -31,9 +30,8 @@ export const dataProvider = {
       limit: JSON.stringify(perPage),
       page: JSON.stringify(page),
     };
-    // http://localhost:3000/cats?limit=5&page=2&sortBy=color:DESC&search=i&filter.age=$gte:3&select=id,name,color,age
-    const url = `${apiUrl}/${resource}?${stringify(query)}`;
 
+    const url = `${apiUrl}/${resource}?${stringify(query)}`;
     console.log("getList URL:", url);
 
     return httpClient(url).then(({ json }) => {
@@ -52,27 +50,64 @@ export const dataProvider = {
 
   createFormData: (resource: string, params: any) => {
     const formData = new FormData();
+
+    console.log("Создание FormData с данными:", params.data);
+
     for (const key in params.data) {
       if (params.data.hasOwnProperty(key)) {
-        if (Array.isArray(params.data[key])) {
-          params.data[key].forEach((item: any, index: number) => {
+        const value = params.data[key];
+
+        if (key === "images" && Array.isArray(value)) {
+          // Специальная обработка для изображений
+          value.forEach((file: any, index: number) => {
+            if (file && file.rawFile) {
+              // Это новый загруженный файл
+              console.log(`Добавляем файл изображения ${index}:`, file.rawFile);
+              formData.append(`images`, file.rawFile);
+            } else if (file && typeof file === "string") {
+              // Это уже существующий URL изображения
+              formData.append(`images[${index}]`, file);
+            }
+          });
+        } else if (Array.isArray(value)) {
+          // Обработка других массивов
+          value.forEach((item: any, index: number) => {
             formData.append(`${key}[${index}]`, item);
           });
-        } else {
-          formData.append(key, params.data[key]);
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value);
         }
       }
     }
 
-    console.log("ServerSend");
-    console.log(formData);
+    console.log("FormData содержимое:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
 
-    return httpClient(`${apiUrl}/${resource}`, {
+    // Для FormData не устанавливаем Content-Type заголовок
+    const options: any = {
       method: "POST",
       body: formData,
-    }).then(({ json }) => ({
-      data: { ...params.data, id: json.id },
-    }));
+    };
+
+    // Убираем Content-Type из заголовков для FormData
+    const token = localStorage.getItem("token");
+    if (token) {
+      options.headers = new Headers();
+      options.headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    return fetch(`${apiUrl}/${resource}`, options)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((json) => ({
+        data: { ...params.data, id: json.id },
+      }));
   },
 
   create: (resource: string, params: any) =>
