@@ -31,8 +31,8 @@ import { attributePaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Attributes')
 @Controller('attributes')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard('jwt'), RolesGuard)
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 

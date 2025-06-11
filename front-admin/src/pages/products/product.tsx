@@ -128,9 +128,10 @@ export const ProductCreate = (props: CreateProps) => {
                     throw error;
                 }
             }}
+            redirect="list" // Добавляем редирект на список после сохранения
         >
             <SimpleForm>
-            <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
+                <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
                 <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
                 <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
                 <TextInput label="Знижка на товар у відсотках " source="discount"/>
