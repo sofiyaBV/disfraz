@@ -37,6 +37,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
+
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiTags('Products')
@@ -98,25 +99,33 @@ export class ProductController {
     @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
+    console.log('=== CREATE PRODUCT ===');
     console.log('Received body:', body);
-    console.log('Uploaded files:', files);
+    console.log('Uploaded files:', files?.length || 0);
 
     const createProductDto = plainToClass(CreateProductDto, {
       ...body,
       price: body.price ? parseFloat(body.price) : undefined,
       discount: body.discount ? parseFloat(body.discount) : undefined,
-      topSale: body.topSale ? body.topSale === 'true' : undefined,
+      topSale:
+        body.topSale !== undefined
+          ? body.topSale === 'true' || body.topSale === true
+          : undefined,
     });
+
+    console.log('Transformed createProductDto:', createProductDto);
 
     const errors = await validate(createProductDto);
     if (errors.length > 0) {
+      console.error('Validation errors:', errors);
       throw new BadRequestException(
         'Validation failed: ' + JSON.stringify(errors),
       );
     }
 
-    console.log('Transformed createProductDto:', createProductDto);
-    return this.productService.create(createProductDto, files);
+    const result = await this.productService.create(createProductDto, files);
+    console.log('Create result:', result);
+    return result;
   }
 
   @ApiOperation({ summary: 'Отримати всі Products' })
@@ -205,24 +214,37 @@ export class ProductController {
     @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
+    console.log(`=== UPDATE PRODUCT ${id} ===`);
+    console.log('Raw body:', body);
+    console.log('Files count:', files?.length || 0);
+
     const updateProductDto = plainToClass(UpdateProductDto, {
       ...body,
       price: body.price ? parseFloat(body.price) : undefined,
       discount: body.discount ? parseFloat(body.discount) : undefined,
-      topSale: body.topSale ? body.topSale === 'true' : undefined,
+      topSale:
+        body.topSale !== undefined
+          ? body.topSale === 'true' || body.topSale === true
+          : undefined,
     });
+
+    console.log('Transformed DTO:', updateProductDto);
 
     const errors = await validate(updateProductDto);
     if (errors.length > 0) {
+      console.error('Validation errors:', errors);
       throw new BadRequestException(
         'Validation failed: ' + JSON.stringify(errors),
       );
     }
 
-    console.log(`Отримано тіло для оновлення: ${id}, body:`, updateProductDto);
-    console.log('Uploaded files:', files);
-
-    return this.productService.update(id, updateProductDto, files);
+    const result = await this.productService.update(
+      id,
+      updateProductDto,
+      files,
+    );
+    console.log('Update result:', result);
+    return result;
   }
 
   @ApiOperation({ summary: 'Видалити Product за ID' })
@@ -237,6 +259,9 @@ export class ProductController {
   @Delete(':id')
   @Roles(Role.Admin)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.productService.remove(id);
+    console.log(`=== DELETE PRODUCT ${id} ===`);
+    const result = await this.productService.remove(id);
+    console.log('Delete completed');
+    return result;
   }
 }

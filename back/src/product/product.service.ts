@@ -213,60 +213,84 @@ export class ProductService {
         throw new NotFoundException(`Продукт з ID ${id} не знайдено`);
       }
 
-      if (files.length > 0 && product.images && product.images.length > 0) {
-        for (const image of product.images) {
-          await this.deleteFromImgBB(image.deleteHash);
-        }
-      }
+      // Обработка новых изображений
+      let updatedImages = product.images || [];
 
-      const newImageData: { url: string; deleteHash: string }[] = [];
       if (files.length > 0) {
+        // Если загружаются новые файлы, удаляем старые изображения из ImgBB
+        if (product.images && product.images.length > 0) {
+          for (const image of product.images) {
+            await this.deleteFromImgBB(image.deleteHash);
+          }
+        }
+
+        // Загружаем новые изображения
+        const newImageData: { url: string; deleteHash: string }[] = [];
         for (const file of files) {
           const { url, deleteHash } = await this.uploadToImgBB(file);
           newImageData.push({ url, deleteHash });
         }
+        updatedImages = newImageData;
       }
 
-      // Оновлюємо схожі продукти, якщо передано нові ID
-      if (updateProductDto.similarProductIds) {
-        const similarProducts = await this.productRepository.find({
-          where: updateProductDto.similarProductIds.map((id) => ({ id })),
-        });
+      // Обновляем схожие продукты, если передано новые ID
+      if (updateProductDto.similarProductIds !== undefined) {
+        if (updateProductDto.similarProductIds.length > 0) {
+          const similarProducts = await this.productRepository.find({
+            where: updateProductDto.similarProductIds.map((id) => ({ id })),
+          });
 
-        const foundIds = similarProducts.map((p) => p.id);
-        const missingIds = updateProductDto.similarProductIds.filter(
-          (id) => !foundIds.includes(id),
-        );
-        if (missingIds.length > 0) {
-          throw new NotFoundException(
-            `Продукты с ID ${missingIds.join(', ')} не найдены`,
+          const foundIds = similarProducts.map((p) => p.id);
+          const missingIds = updateProductDto.similarProductIds.filter(
+            (id) => !foundIds.includes(id),
           );
-        }
+          if (missingIds.length > 0) {
+            throw new NotFoundException(
+              `Продукты с ID ${missingIds.join(', ')} не найдены`,
+            );
+          }
 
-        product.similarProducts = similarProducts;
+          product.similarProducts = similarProducts;
+        } else {
+          // Если передан пустой массив, очищаем связи
+          product.similarProducts = [];
+        }
       }
 
-      // Визначаємо ціну для розрахунку нової ціни (беремо оновлену або стару)
+      // Определяем цену для расчета новой цены (берем обновленную или старую)
       const priceForCalculation = updateProductDto.price ?? product.price;
-      // Визначаємо знижку для розрахунку (беремо оновлену або стару)
+      // Определяем скидку для расчета (берем обновленную или старую)
       const discountForCalculation =
         updateProductDto.discount ?? product.discount;
-      // Розраховуємо нову ціну
+      // Рассчитываем новую цену
       const newPrice = this.calculateNewPrice(
         priceForCalculation,
         discountForCalculation,
       );
 
-      // Оновлюємо продукт
-      manager.merge(Product, product, {
-        ...updateProductDto,
-        images: newImageData.length > 0 ? newImageData : product.images,
-        discount: updateProductDto.discount ?? product.discount, // Зберігаємо старе значення, якщо не передано нове
-        topSale: updateProductDto.topSale ?? product.topSale, // Зберігаємо старе значення, якщо не передано нове
-        newPrice, // Оновлюємо нову ціну
-      });
+      // Обновляем только переданные поля
+      if (updateProductDto.name !== undefined) {
+        product.name = updateProductDto.name;
+      }
+      if (updateProductDto.price !== undefined) {
+        product.price = updateProductDto.price;
+      }
+      if (updateProductDto.description !== undefined) {
+        product.description = updateProductDto.description;
+      }
+      if (updateProductDto.discount !== undefined) {
+        product.discount = updateProductDto.discount;
+      }
+      if (updateProductDto.topSale !== undefined) {
+        product.topSale = updateProductDto.topSale;
+      }
 
-      const updatedProduct = await manager.save(product);
+      // Обновляем изображения и новую цену
+      product.images = updatedImages;
+      product.newPrice = newPrice;
+
+      // Сохраняем обновленный продукт
+      const updatedProduct = await manager.save(Product, product);
       console.log(`Updated product with ID ${id}:`, updatedProduct);
       return updatedProduct;
     });
