@@ -8,10 +8,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:4114', 'http://localhost:4173'], // Дозволяємо запити з Swagger та фронтенду
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Дозволені методи
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:4114',
+      'http://localhost:4173',
+    ], // Дозволяємо запити з Swagger та фронтенду
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Дозволені методи
     allowedHeaders: ['Content-Type', 'Authorization'], // Дозволені заголовки
-    credentials: true, // Дозволяємо передачу cookies 
+    credentials: true, // Дозволяємо передачу cookies
   });
 
   dotenv.config();
