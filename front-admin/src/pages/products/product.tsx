@@ -95,7 +95,7 @@ export const ProductCreate = (props: CreateProps) => {
 
     useEffect(() => {
         dataProvider.getList('products', {
-            pagination: { page: 1, perPage: 100 }, // Получаем все товары
+            pagination: { page: 1, perPage: 100 }, 
             sort: { field: 'name', order: 'ASC' },
             filter: {},
         }).then(({ data }) => {
@@ -107,14 +107,19 @@ export const ProductCreate = (props: CreateProps) => {
         <Create
             {...props}
             transform={(data) => {
-                // Перетворення даних перед відправкою
+              
                 console.log("Дані форми перед перетворенням:", data);
                 
                 const transformedData = {
                     ...data,
-                    // Перетворюємо topSale в числове значення якщо потрібно
+                 
                     topSale: data.topSale ? 1 : 0,
+                   
+                    similarProductIds: data.similarProducts || [],
                 };
+                
+           
+                delete transformedData.similarProducts;
                 
                 console.log("Перетворені дані:", transformedData);
                 return transformedData;
@@ -131,18 +136,7 @@ export const ProductCreate = (props: CreateProps) => {
 
                     console.log("Ответ после создания продукта:", productResponse);
 
-                    const productId = productResponse.data.id;
 
-                    if (values.similarProducts && values.similarProducts.length > 0) {
-                        for (const similarProductId of values.similarProducts) {
-                            await dataProvider.create("product_similar", {
-                                data: {
-                                    product_id: productId,
-                                    similar_product_id: similarProductId,
-                                },
-                            });
-                        }
-                    }
 
                     return productResponse;
                 } catch (error) {
