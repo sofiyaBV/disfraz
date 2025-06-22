@@ -37,7 +37,8 @@ export const ProductEdit = () => (
             console.log("Данные перед отправкой на сервер:", data);
             return {
                 ...data,
-                topSale: data.topSale === true ? 1 : 0, // Отправляем 1 или 0
+                // Убираем преобразование в числа - оставляем boolean
+                topSale: data.topSale, // или Boolean(data.topSale) если нужно явно привести к boolean
             };
         }}
         mutationMode="pessimistic"
@@ -47,8 +48,7 @@ export const ProductEdit = () => (
             <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
             <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
             <TextInput label="Знижка на товар у відсотках " source="discount"/>
-            <BooleanInput label="Чи є товар топовим у продажу" source="topSale"  defaultValue={true}/>
-            {/* Добавляем поле для редактирования изображений */}
+            <BooleanInput label="Чи є товар топовим у продажу" source="topSale" defaultValue={false}/>
             <ImageInput label="Фотографії товару" source="images" multiple accept={{ 'image/*': [] }}>
                 <ImageField source="src" title="title" />
             </ImageInput>
@@ -107,18 +107,15 @@ export const ProductCreate = (props: CreateProps) => {
         <Create
             {...props}
             transform={(data) => {
-              
                 console.log("Дані форми перед перетворенням:", data);
                 
                 const transformedData = {
                     ...data,
-                 
-                    topSale: data.topSale ? 1 : 0,
-                   
+                    // Убираем преобразование в числа - оставляем boolean
+                    topSale: Boolean(data.topSale), // явно приводим к boolean
                     similarProductIds: data.similarProducts || [],
                 };
                 
-           
                 delete transformedData.similarProducts;
                 
                 console.log("Перетворені дані:", transformedData);
@@ -126,18 +123,15 @@ export const ProductCreate = (props: CreateProps) => {
             }}
             save={async (values: any) => {
                 try {
-                    // Логирование данных перед отправкой
                     console.log("Данные формы перед отправкой:", values);
                     console.log("Изображения:", values.images);
+                    console.log("topSale значение:", values.topSale, typeof values.topSale);
 
                     const productResponse = await dataProvider.createFormData("products", {
                         data: values,
                     });
 
                     console.log("Ответ после создания продукта:", productResponse);
-
-
-
                     return productResponse;
                 } catch (error) {
                     console.error("Error creating product:", error);
@@ -151,9 +145,8 @@ export const ProductCreate = (props: CreateProps) => {
                 <TextInput label="Ціна товару" source="price" validate={[required("Некоректна ціна"), productPriceValidationFormat]}/>
                 <TextInput label="Опис товару" source="description" validate={required("Опис товару не може містити пусте поле")}/>
                 <TextInput label="Знижка на товар у відсотках " source="discount"/>
-                <BooleanInput label="Чи є товар топовим у продажу" source="topSale"/>
+                <BooleanInput label="Чи є товар топовим у продажу" source="topSale" defaultValue={false}/>
                 
-                {/* Исправленный ImageInput */}
                 <ImageInput 
                     label="Фотографії товару" 
                     source="images" 
