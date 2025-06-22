@@ -21,8 +21,8 @@ function App() {
         <Header />
         <Breadcrumbs />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/my_account/registration" element={<Registration />} />
+          <Route path="/" element={<Registration />} />
+          {/* <Route path="/my_account/registration" element={<Registration />} /> */}
           <Route path="/:theme/:productName" element={<ProductPage />} />
           <Route path="/:theme/" element={<Tests />} />
           <Route path="*" element={<ErrorPage />} />

@@ -20,15 +20,12 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Cart } from './entities/cart.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../auth/decorators/user.decorator';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { cartPaginateConfig } from '../config/pagination.config';
 
 @ApiTags('Cart')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
