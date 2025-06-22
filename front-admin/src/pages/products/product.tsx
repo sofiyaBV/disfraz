@@ -106,8 +106,9 @@ export const ProductCreate = (props: CreateProps) => {
     return (
         <Create
             {...props}
-            transform={(data) => {
+            transform={async (data) => {
                 console.log("Дані форми перед перетворенням:", data);
+                console.log("topSale значение:", data.topSale, "тип:", typeof data.topSale);
                 
                 const transformedData = {
                     ...data,
@@ -119,26 +120,31 @@ export const ProductCreate = (props: CreateProps) => {
                 delete transformedData.similarProducts;
                 
                 console.log("Перетворені дані:", transformedData);
-                return transformedData;
-            }}
-            save={async (values: any) => {
+                
                 try {
-                    console.log("Данные формы перед отправкой:", values);
-                    console.log("Изображения:", values.images);
-                    console.log("topSale значение:", values.topSale, typeof values.topSale);
-
-                    const productResponse = await dataProvider.createFormData("products", {
-                        data: values,
-                    });
-
-                    console.log("Ответ после создания продукта:", productResponse);
-                    return productResponse;
+                    // Используем dataProvider напрямую для создания с файлами
+                    if (transformedData.images && Array.isArray(transformedData.images) && 
+                        transformedData.images.some((img: any) => img && img.rawFile)) {
+                        console.log("Detected files, using createFormData");
+                        
+                        const productResponse = await dataProvider.createFormData("products", {
+                            data: transformedData,
+                        });
+                        
+                        console.log("Ответ после создания продукта:", productResponse);
+                        return productResponse.data;
+                    } else {
+                        // Если нет файлов, используем обычный create
+                        console.log("No files detected, using standard create");
+                        return transformedData;
+                    }
                 } catch (error) {
-                    console.error("Error creating product:", error);
+                    console.error("Error in transform during create:", error);
                     throw error;
                 }
             }}
             redirect="list"
+            mutationMode="pessimistic"
         >
             <SimpleForm>
                 <TextInput label="Назва товару" source="name" validate={[required("Некоректна назва товару"), productNameValidationFormat]}/>
