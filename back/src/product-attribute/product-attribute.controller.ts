@@ -31,8 +31,6 @@ import { ProductAttributeDto } from './dto/product-attribute.dto';
 
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class ProductAttributeController {
   constructor(
     private readonly productAttributeService: ProductAttributeService,
@@ -46,6 +44,8 @@ export class ProductAttributeController {
   })
   @ApiBody({ type: CreateProductAttributeDto })
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin, Role.User)
   create(@Body() createProductAttributeDto: CreateProductAttributeDto) {
     return this.productAttributeService.create(createProductAttributeDto);
@@ -58,7 +58,6 @@ export class ProductAttributeController {
   })
   @PaginatedSwaggerDocs(ProductAttributeDto, productAttributePaginateConfig)
   @Get()
-  @Roles(Role.User, Role.Admin)
   async findAll(
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<ProductAttribute>> {
@@ -82,7 +81,6 @@ export class ProductAttributeController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin)
   findOne(@Param('id') id: string) {
     return this.productAttributeService.findOne(+id);
   }
@@ -107,6 +105,8 @@ export class ProductAttributeController {
     example: 1,
   })
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
   update(
     @Param('id') id: string,
@@ -132,6 +132,8 @@ export class ProductAttributeController {
   })
   @Delete(':id')
   @Roles(Role.Admin)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   remove(@Param('id') id: string) {
     return this.productAttributeService.remove(+id);
   }

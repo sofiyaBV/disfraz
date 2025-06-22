@@ -38,8 +38,6 @@ import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
 
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiTags('Products')
 @Controller('products')
 export class ProductController {
@@ -51,6 +49,7 @@ export class ProductController {
     description: 'Product успішно створений',
     type: Product,
   })
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Створити Product із зображеннями',
@@ -93,8 +92,9 @@ export class ProductController {
     },
   })
   @UseInterceptors(FilesInterceptor('images', 10))
-  @Post()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
+  @Post()
   async create(
     @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[],
@@ -149,7 +149,6 @@ export class ProductController {
     example: 1,
   })
   @Get(':id')
-  @Roles(Role.User, Role.Admin)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.productService.findOne(id);
   }
@@ -161,6 +160,7 @@ export class ProductController {
     type: Product,
   })
   @ApiResponse({ status: 404, description: 'Product не знайдений' })
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Оновити Product із зображеннями',
@@ -207,8 +207,9 @@ export class ProductController {
     },
   })
   @UseInterceptors(FilesInterceptor('images', 10))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.Admin)
   @Patch(':id')
-  @Roles(Role.Admin, Role.User)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: any,
@@ -250,14 +251,16 @@ export class ProductController {
   @ApiOperation({ summary: 'Видалити Product за ID' })
   @ApiResponse({ status: 200, description: 'Product успішно видалений' })
   @ApiResponse({ status: 404, description: 'Product не знайдений' })
+  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     required: true,
     description: 'ID Product',
     example: 1,
   })
-  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
+  @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     console.log(`=== DELETE PRODUCT ${id} ===`);
     const result = await this.productService.remove(id);

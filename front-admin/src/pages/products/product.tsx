@@ -106,42 +106,23 @@ export const ProductCreate = (props: CreateProps) => {
     return (
         <Create
             {...props}
-            transform={async (data) => {
+            transform={(data) => {
                 console.log("Дані форми перед перетворенням:", data);
                 console.log("topSale значение:", data.topSale, "тип:", typeof data.topSale);
                 
                 const transformedData = {
                     ...data,
-                    // Убираем преобразование в числа - оставляем boolean
-                    topSale: Boolean(data.topSale), // явно приводим к boolean
+                    topSale: Boolean(data.topSale),
                     similarProductIds: data.similarProducts || [],
                 };
                 
+                // Удаляем поле similarProducts, так как отправляем similarProductIds
                 delete transformedData.similarProducts;
                 
                 console.log("Перетворені дані:", transformedData);
                 
-                try {
-                    // Используем dataProvider напрямую для создания с файлами
-                    if (transformedData.images && Array.isArray(transformedData.images) && 
-                        transformedData.images.some((img: any) => img && img.rawFile)) {
-                        console.log("Detected files, using createFormData");
-                        
-                        const productResponse = await dataProvider.createFormData("products", {
-                            data: transformedData,
-                        });
-                        
-                        console.log("Ответ после создания продукта:", productResponse);
-                        return productResponse.data;
-                    } else {
-                        // Если нет файлов, используем обычный create
-                        console.log("No files detected, using standard create");
-                        return transformedData;
-                    }
-                } catch (error) {
-                    console.error("Error in transform during create:", error);
-                    throw error;
-                }
+              
+                return transformedData;
             }}
             redirect="list"
             mutationMode="pessimistic"
