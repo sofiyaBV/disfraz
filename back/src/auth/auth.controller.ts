@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Request,
   UseGuards,
   Res,
@@ -26,6 +27,13 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+
+// DTO для обновления профиля
+export class UpdateProfileDto {
+  email?: string;
+  phone?: string;
+  password?: string;
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -63,8 +71,24 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Некоректні дані' })
   async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<{ message: string }> {
-    await this.authService.register(createUserDto);
+  ): Promise<{ message: string; access_token?: string }> {
+    const user = await this.authService.register(createUserDto);
+
+    // Если пользователь успешно создан, сразу выдаем токен
+    if (user) {
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        roles: user.roles,
+      };
+      const access_token = await this.authService.generateJwtToken(payload);
+
+      return {
+        message: 'Користувач успішно зареєстрований',
+        access_token,
+      };
+    }
+
     return { message: 'Користувач успішно зареєстрований' };
   }
 
@@ -77,6 +101,22 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Неавторизований запит' })
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Put('profile')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin, Role.User)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Оновлення профілю користувача' })
+  @ApiBody({ type: UpdateProfileDto })
+  @ApiResponse({ status: 200, description: 'Профіль успішно оновлено' })
+  @ApiResponse({ status: 401, description: 'Неавторизований запит' })
+  async updateProfile(
+    @Request() req,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    const userId = req.user.id;
+    return this.authService.updateProfile(userId, updateProfileDto);
   }
 
   @Public()
