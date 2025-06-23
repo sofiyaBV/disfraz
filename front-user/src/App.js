@@ -22,14 +22,12 @@ function App() {
         <Breadcrumbs />
         <Routes>
           <Route path="/" element={<Registration />} />
-          {/* <Route path="/my_account/registration" element={<Registration />} /> */}
+          <Route path="/home" element={<HomePage />} />
           <Route path="/:theme/:productName" element={<ProductPage />} />
           <Route path="/:theme/" element={<Tests />} />
-          <Route path="*" element={<ErrorPage />} />
-          <Route path="*" element={<Navigate to="/error" replace />} />
           <Route path="/tematics" element={<AllSectionPage />} />
-
           <Route path="/test" element={<Tests />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
         <Footer />
       </div>
