@@ -148,3 +148,73 @@
   font-size: 1rem;
   font-weight: 500;
 }
+
+
+/* Добавьте в ваш registration.module.css */
+
+.socialAuth {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.socialButton {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.socialButton:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.googleButton {
+  border-color: #4285f4;
+}
+
+.googleButton:hover {
+  background: #f8f9ff;
+}
+
+.facebookButton {
+  background: #1877f2;
+  color: white;
+  border-color: #1877f2;
+}
+
+.facebookButton:hover {
+  background: #166fe5;
+}
+
+.divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.dividerText {
+  background: #fff;
+  padding: 0 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.dividerLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+  z-index: -1;
+}

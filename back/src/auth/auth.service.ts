@@ -62,19 +62,26 @@ export class AuthService {
   async findOrCreateGoogleUser(data: {
     email: string;
     googleId: string;
+    firstName?: string;
+    lastName?: string;
   }): Promise<User> {
-    const { email, googleId } = data;
+    const { email, googleId, firstName, lastName } = data;
 
+    // Сначала ищем пользователя по email
     let user = await this.usersService.findByEmail(email);
 
     if (!user) {
+      // Если пользователя нет, создаем нового
       const createUserDto: CreateUserDto = {
         email,
-        password: '', // Пароль не потрібен для Google
+        password: '', // Пароль не нужен для Google OAuth
         phone: null,
-        roles: [Role.User], // Автоматично присвоюємо роль User
+        roles: [Role.User],
       };
+
       user = await this.usersService.createUser(createUserDto);
+
+      await this.usersService.updateUser(user.id, user);
     }
 
     return user;

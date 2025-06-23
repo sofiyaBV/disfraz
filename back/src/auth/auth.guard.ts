@@ -22,6 +22,8 @@ export class AuthGuard implements CanActivate {
     { method: 'GET', path: '/products' },
     { method: 'GET', path: '/product-attribute' },
     { method: 'GET', path: '/attributes' },
+    { method: 'GET', path: '/auth/google' },
+    { method: 'GET', path: '/auth/google/callback' },
     { method: 'POST', path: '/cart' },
     { method: 'GET', path: '/cart' },
     { method: 'DELETE', path: '/cart' },

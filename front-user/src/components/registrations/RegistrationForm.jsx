@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../style/pagesStyle/registration.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import dataProvider from "../../utils/dataProvider";
 import { useAuth } from "../../utils/AuthContext";
 
 const RegistrationForm = () => {
-  const { login } = useAuth(); // Добавляем useAuth для авторизации
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [method, setMethod] = useState("phone");
   const [formData, setFormData] = useState({
     phone: "",
@@ -19,6 +21,25 @@ const RegistrationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState(null);
   const [serverMessage, setServerMessage] = useState(null);
+
+  // Обработка Google OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    const error = urlParams.get("error");
+
+    if (token) {
+      // Успешная авторизация через Google
+      login(token);
+      setServerMessage("Авторизація через Google успішна! Перенаправлення...");
+      setTimeout(() => {
+        navigate("/home");
+      }, 1500);
+    } else if (error) {
+      // Ошибка авторизации через Google
+      setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
+    }
+  }, [login, navigate]);
 
   const handleMethodChange = (e) => {
     setMethod(e.target.value);
@@ -85,17 +106,38 @@ const RegistrationForm = () => {
       const response = await dataProvider.create("users", {
         data: requestData,
       });
-      console.log("Registration successful:", response.data);
 
-      // Извлекаем access_token из ответа
-      const token = response.data.access_token;
+      console.log("Full registration response:", response);
+      console.log("Response data:", response.data);
+
+      const token =
+        response.data?.access_token ||
+        response.data?.token ||
+        response.access_token ||
+        response.token;
+
       if (token) {
-        login(token); // Автоматически авторизуем пользователя
+        login(token);
         setServerMessage(
-          "Реєстрація успішна! Ви автоматично увійшли в систему."
+          "Реєстрація успішна! Перенаправлення на головну сторінку..."
         );
+
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
       } else {
-        setServerMessage("Реєстрація успішна, але токен не отриманий.");
+        setServerMessage(
+          "Реєстрація успішна! Перенаправлення на головну сторінку..."
+        );
+
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
+
+        console.warn(
+          "Токен не знайдено в відповіді сервера. Структура відповіді:",
+          response
+        );
       }
 
       setFormData({
@@ -116,10 +158,101 @@ const RegistrationForm = () => {
     }
   };
 
+  // Функция для авторизации через Google
+  const handleGoogleAuth = () => {
+    // Перенаправляем на бэкенд endpoint для Google OAuth
+    window.location.href = `${
+      process.env.REACT_APP_API_URL || "http://localhost:3000"
+    }/auth/google`;
+  };
+
+  // Функция для перехода на главную страницу без регистрации
+  const handleSkipRegistration = () => {
+    navigate("/home");
+  };
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Реєстрація</h2>
       <p className={styles.subtitle}>Оберіть спосіб реєстрації</p>
+
+      {/* Кнопки социальных сетей */}
+      <div className={styles.socialAuth} style={{ marginBottom: "2rem" }}>
+        <button
+          type="button"
+          onClick={handleGoogleAuth}
+          style={{
+            width: "48%",
+            padding: "0.75rem",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            background: "#fff",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            fontSize: "0.9rem",
+            marginRight: "4%",
+          }}
+        >
+          <span style={{ color: "#4285f4" }}>G</span>
+          GOOGLE
+        </button>
+
+        <button
+          type="button"
+          style={{
+            width: "48%",
+            padding: "0.75rem",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            background: "#1877f2",
+            color: "white",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+            fontSize: "0.9rem",
+          }}
+        >
+          <span>f</span>
+          FACEBOOK
+        </button>
+      </div>
+
+      {/* Разделитель */}
+      <div
+        style={{
+          textAlign: "center",
+          margin: "1.5rem 0",
+          position: "relative",
+        }}
+      >
+        <span
+          style={{
+            background: "#fff",
+            padding: "0 1rem",
+            color: "#666",
+            fontSize: "0.9rem",
+          }}
+        >
+          За допомогою електронної пошти
+        </span>
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: 0,
+            right: 0,
+            height: "1px",
+            background: "#ddd",
+            zIndex: -1,
+          }}
+        ></div>
+      </div>
+
       <div className={styles.methodOptions}>
         <label className={styles.methodLabel}>
           <input
@@ -244,6 +377,7 @@ const RegistrationForm = () => {
           </label>
           {errors.agree && <span className={styles.error}>{errors.agree}</span>}
         </div>
+
         <ButtonGeneral
           initial
           dérColor="#151515"
@@ -253,8 +387,26 @@ const RegistrationForm = () => {
           textColor="#F2F2F2"
           type="submit"
           disabled={isSubmitting}
-          link="/"
         />
+
+        {/* Кнопка для пропуска регистрации */}
+        <button
+          type="button"
+          onClick={handleSkipRegistration}
+          style={{
+            marginTop: "1rem",
+            background: "transparent",
+            border: "none",
+            color: "#666",
+            textDecoration: "underline",
+            cursor: "pointer",
+            width: "100%",
+            textAlign: "center",
+          }}
+        >
+          Пропустити реєстрацію та перейти до каталогу
+        </button>
+
         {serverMessage && (
           <div className={styles.serverMessage}>
             <span>{serverMessage}</span>
