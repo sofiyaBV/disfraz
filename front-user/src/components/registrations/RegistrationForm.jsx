@@ -22,21 +22,19 @@ const RegistrationForm = () => {
   const [serverError, setServerError] = useState(null);
   const [serverMessage, setServerMessage] = useState(null);
 
-  // Обработка Google OAuth callback
+  // Обробка Google OAuth callback
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     const error = urlParams.get("error");
 
     if (token) {
-      // Успешная авторизация через Google
       login(token);
       setServerMessage("Авторизація через Google успішна! Перенаправлення...");
       setTimeout(() => {
         navigate("/home");
       }, 1500);
     } else if (error) {
-      // Ошибка авторизации через Google
       setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
     }
   }, [login, navigate]);
@@ -158,15 +156,15 @@ const RegistrationForm = () => {
     }
   };
 
-  // Функция для авторизации через Google
+  // Функція для авторизації через Google
   const handleGoogleAuth = () => {
-    // Перенаправляем на бэкенд endpoint для Google OAuth
+    // Перенаправляємо на бекенд endpoint для Google OAuth
     window.location.href = `${
       process.env.REACT_APP_API_URL || "http://localhost:3000"
     }/auth/google`;
   };
 
-  // Функция для перехода на главную страницу без регистрации
+  // Функція для переходу на головну сторінку без реєстрації
   const handleSkipRegistration = () => {
     navigate("/home");
   };
@@ -389,7 +387,6 @@ const RegistrationForm = () => {
           disabled={isSubmitting}
         />
 
-        {/* Кнопка для пропуска регистрации */}
         <button
           type="button"
           onClick={handleSkipRegistration}

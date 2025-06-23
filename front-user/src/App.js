@@ -8,7 +8,7 @@ import Header from "./components/header/Header";
 import general from "./style/general_style.css";
 import Breadcrumbs from "./components/Breadcrumbs";
 import ErrorPage from "./pages/ErrorPage";
-
+import ProfilePage from "./components/profile/profilePage";
 import Tests from "./pages/Tests";
 import { AuthProvider } from "./utils/AuthContext";
 import AllSectionPage from "./pages/AllSectionPage";
@@ -23,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Registration />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/:theme/:productName" element={<ProductPage />} />
           <Route path="/:theme/" element={<Tests />} />
           <Route path="/tematics" element={<AllSectionPage />} />
