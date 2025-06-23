@@ -2,6 +2,7 @@ import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Registration from "./pages/Registration";
+import Authorization from "./components/registrations/Authorization";
 import Footer from "./components/footer/Footer";
 import Header from "./components/header/Header";
 // import Navigation from "./components/Navigation";
@@ -21,7 +22,9 @@ function App() {
         <Header />
         <Breadcrumbs />
         <Routes>
-          <Route path="/" element={<Registration />} />
+          <Route path="/" element={<Authorization />} />
+          <Route path="/authorization" element={<Authorization />} />
+          <Route path="/registration" element={<Registration />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/:theme/:productName" element={<ProductPage />} />
