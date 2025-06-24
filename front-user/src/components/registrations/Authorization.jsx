@@ -28,12 +28,11 @@ const Authorization = ({ onClose }) => {
       onClose(message);
     } else {
       console.warn("onClose is not a function, redirecting to home");
-      // Перенаправляем на главную страницу
       navigate("/home");
     }
   };
 
-  // Обработка Google OAuth callback (если пользователь вернулся с Google)
+  // Обработка Google OAuth callback
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
@@ -43,7 +42,6 @@ const Authorization = ({ onClose }) => {
       login(token);
       setSuccessMessage("Авторизація через Google успішна!");
 
-      // Очищаем URL от параметров
       const newUrl =
         window.location.protocol +
         "//" +
@@ -52,13 +50,11 @@ const Authorization = ({ onClose }) => {
       window.history.replaceState({}, document.title, newUrl);
 
       setTimeout(() => {
-        // Перенаправляем на главную страницу после успешной авторизации через Google
         navigate("/home");
       }, 1500);
     } else if (error) {
       setError("Помилка авторизації через Google. Спробуйте ще раз.");
 
-      // Очищаем URL от параметров ошибки
       const newUrl =
         window.location.protocol +
         "//" +
@@ -79,7 +75,6 @@ const Authorization = ({ onClose }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-    // Очищаем ошибку при изменении полей
     if (error) {
       setError(null);
     }
@@ -141,12 +136,12 @@ const Authorization = ({ onClose }) => {
 
       console.log("Attempting signin with params:", params);
       const response = await dataProvider.signin(params);
-      console.log("Signin successful:", response.data);
+      console.log("Signin successful:", response);
 
       // Извлекаем access_token из ответа
-      const token = response.data.access_token;
+      const token = response.data?.access_token || response.access_token;
       if (token) {
-        login(token); // Сохраняем токен через AuthContext
+        login(token);
         setSuccessMessage("Авторизація пройшла успішно!");
 
         // Очищаем форму
@@ -162,233 +157,237 @@ const Authorization = ({ onClose }) => {
         }, 1500);
       } else {
         setError("Токен не отриманий від сервера");
+        console.warn("Токен не знайдено в відповіді:", response);
       }
     } catch (err) {
       console.error("Signin error:", err);
-      setError(err.message || "Не вдалося авторизуватися. Спробуйте ще раз.");
+
+      // Обработка различных типов ошибок
+      let errorMessage = "Не вдалося авторизуватися. Спробуйте ще раз.";
+
+      if (err.message) {
+        if (err.message.includes("Invalid credentials")) {
+          errorMessage = "Неправильний email/телефон або пароль";
+        } else if (err.message.includes("User not found")) {
+          errorMessage = "Користувача з такими даними не знайдено";
+        } else if (
+          err.message.includes("network") ||
+          err.message.includes("fetch")
+        ) {
+          errorMessage = "Помилка з'єднання з сервером";
+        } else {
+          errorMessage = err.message;
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Функция для авторизации через Google
   const handleGoogleAuth = () => {
     setError(null);
     setSuccessMessage(null);
 
-    // Перенаправляем на бекенд endpoint для Google OAuth
+    // Используем тот же URL что и в dataProvider
     const apiUrl =
       process.env.REACT_APP_JSON_SERVER_URL || "http://localhost:3000";
     window.location.href = `${apiUrl}/auth/google`;
   };
 
-  // Функция для авторизации через Facebook (заглушка)
   const handleFacebookAuth = () => {
     setError("Авторизація через Facebook поки не реалізована");
   };
 
-  // Функция для пропуска авторизации и перехода на главную
   const handleSkipAuth = () => {
     navigate("/home");
   };
 
   return (
-    <div className={styles.component}>
-      <img
-        className={styles.add}
-        src={add}
-        alt="Close"
-        onMouseEnter={(e) => (e.currentTarget.src = add_hover)}
-        onMouseLeave={(e) => (e.currentTarget.src = add)}
+    <div className={styles.container}>
+      {/* Кнопка закрытия */}
+      <button
+        className={styles.closeButton}
         onClick={() => safeClose()}
-      />
+        type="button"
+      >
+        <img
+          className={styles.closeIcon}
+          src={add}
+          alt="Close"
+          onMouseEnter={(e) => (e.currentTarget.src = add_hover)}
+          onMouseLeave={(e) => (e.currentTarget.src = add)}
+        />
+      </button>
 
-      <h2>Вхід</h2>
-      <p>Увійти за допомогою профілю</p>
+      {/* Заголовок */}
+      <h2 className={styles.title}>Вхід</h2>
+      <p className={styles.subtitle}>Увійти за допомогою профілю</p>
 
-      {/* Кнопки социальных сетей */}
-      <div className={styles.buttons}>
+      {/* Социальные кнопки */}
+      <div className={styles.socialAuth}>
         <button
           type="button"
+          className={`${styles.socialButton} ${styles.facebookButton}`}
           onClick={handleFacebookAuth}
           disabled={loading}
-          style={{ opacity: loading ? 0.6 : 1 }}
         >
-          <img src={facebook} alt="Facebook" />
+          <img src={facebook} alt="Facebook" className={styles.socialIcon} />
           <span>FACEBOOK</span>
         </button>
         <button
           type="button"
+          className={`${styles.socialButton} ${styles.googleButton}`}
           onClick={handleGoogleAuth}
           disabled={loading}
-          style={{ opacity: loading ? 0.6 : 1 }}
         >
-          <img src={google} alt="Google" />
+          <img src={google} alt="Google" className={styles.socialIcon} />
           <span>GOOGLE</span>
         </button>
       </div>
 
       {/* Разделитель */}
-      <div
-        style={{
-          textAlign: "center",
-          margin: "1.5rem 0",
-          position: "relative",
-        }}
-      >
-        <span
-          style={{
-            background: "#fff",
-            padding: "0 1rem",
-            color: "#666",
-            fontSize: "0.9rem",
-          }}
-        >
-          Або за допомогою
-        </span>
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: 0,
-            right: 0,
-            height: "1px",
-            background: "#ddd",
-            zIndex: -1,
-          }}
-        ></div>
+      <div className={styles.divider}>
+        <span className={styles.dividerText}>Або за допомогою</span>
+        <div className={styles.dividerLine}></div>
       </div>
 
-      <div className={styles.form}>
-        <p>
-          {isPhoneLogin
-            ? "За номером телефону"
-            : "Увійти за допомогою електронної пошти"}
-        </p>
+      {/* Переключатель метода входа */}
+      <div className={styles.methodOptions}>
+        <label className={styles.methodLabel}>
+          <input
+            type="radio"
+            name="loginMethod"
+            value="phone"
+            checked={isPhoneLogin}
+            onChange={() => setIsPhoneLogin(true)}
+            className={styles.radio}
+            disabled={loading}
+          />
+          За номером телефону
+        </label>
+        <label className={styles.methodLabel}>
+          <input
+            type="radio"
+            name="loginMethod"
+            value="email"
+            checked={!isPhoneLogin}
+            onChange={() => setIsPhoneLogin(false)}
+            className={styles.radio}
+            disabled={loading}
+          />
+          По e-mail
+        </label>
+      </div>
 
+      {/* Форма */}
+      <div className={styles.form}>
         <form onSubmit={handleSubmit}>
-          <div>
-            <label>
-              <input
-                type={isPhoneLogin ? "tel" : "email"}
-                name={isPhoneLogin ? "phone" : "email"}
-                placeholder={isPhoneLogin ? "38 (___) ___ - __ -__" : "Email"}
-                value={isPhoneLogin ? formData.phone : formData.email}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                style={{ opacity: loading ? 0.6 : 1 }}
-              />
+          {/* Поле телефона или email */}
+          <div className={styles.inputGroup}>
+            <label htmlFor={isPhoneLogin ? "phone" : "email"}>
+              {isPhoneLogin ? "Телефон" : "Email"}
             </label>
+            <input
+              type={isPhoneLogin ? "tel" : "email"}
+              id={isPhoneLogin ? "phone" : "email"}
+              name={isPhoneLogin ? "phone" : "email"}
+              placeholder={isPhoneLogin ? "38 (___) ___ - __ -__" : "Email"}
+              value={isPhoneLogin ? formData.phone : formData.email}
+              onChange={handleChange}
+              disabled={loading}
+              required
+              className={styles.input}
+            />
           </div>
-          <div>
-            <label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Пароль"
-                value={formData.password}
-                onChange={handleChange}
-                disabled={loading}
-                required
-                style={{ opacity: loading ? 0.6 : 1 }}
-              />
-            </label>
+
+          {/* Поле пароля */}
+          <div className={styles.inputGroup}>
+            <label htmlFor="password">Пароль</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Пароль"
+              value={formData.password}
+              onChange={handleChange}
+              disabled={loading}
+              required
+              className={styles.input}
+            />
           </div>
 
           {/* Сообщения об ошибках и успехе */}
-          {error && (
-            <div
-              style={{
-                color: "red",
-                fontSize: "0.9rem",
-                marginTop: "0.5rem",
-                padding: "0.5rem",
-                backgroundColor: "#ffe6e6",
-                borderRadius: "4px",
-              }}
-            >
-              {error}
-            </div>
-          )}
+          {error && <div className={styles.errorMessage}>{error}</div>}
 
           {successMessage && (
-            <div
-              style={{
-                color: "green",
-                fontSize: "0.9rem",
-                marginTop: "0.5rem",
-                padding: "0.5rem",
-                backgroundColor: "#e6ffe6",
-                borderRadius: "4px",
-              }}
-            >
-              {successMessage}
-            </div>
+            <div className={styles.successMessage}>{successMessage}</div>
           )}
 
-          <p>
-            <a href="#" style={{ color: loading ? "#ccc" : "#007bff" }}>
-              Не пам'ятаю пароль
-            </a>
-          </p>
-          <p>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                if (!loading) toggleLoginMethod();
-              }}
-              style={{ color: loading ? "#ccc" : "#007bff" }}
+          {/* Ссылки */}
+          <div className={styles.formLinks}>
+            <div className={styles.formLink}>
+              <a
+                href="#"
+                className={loading ? styles.disabled : ""}
+                onClick={(e) => e.preventDefault()}
+              >
+                Не пам'ятаю пароль
+              </a>
+            </div>
+            <div className={styles.formLink}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!loading) toggleLoginMethod();
+                }}
+                className={loading ? styles.disabled : ""}
+              >
+                {isPhoneLogin
+                  ? "Увійти за допомогою електронної пошти"
+                  : "Увійти за номером телефону"}
+              </a>
+            </div>
+          </div>
+
+          {/* Кнопки действий */}
+          <div className={styles.actionButtons}>
+            <div className={styles.actionButton}>
+              <ButtonGeneral
+                initialColor="#151515"
+                borderColor="#151515"
+                textColor="#F2F2F2"
+                text={loading ? "Завантаження..." : "Увійти"}
+                width="100%"
+                height="3rem"
+                transitionDuration="0.3s"
+                type="submit"
+                colorHover="#333"
+                disabled={loading}
+                onClick={handleSubmit}
+                link="#"
+              />
+            </div>
+
+            <div className={styles.orText}>Або</div>
+
+            <button
+              type="button"
+              className={styles.skipButton}
+              disabled={loading}
+              onClick={handleSkipAuth}
             >
-              {isPhoneLogin
-                ? "Увійти за допомогою електронної пошти"
-                : "Увійти за номером телефону"}
-            </a>
-          </p>
+              ПРОДОВЖИТИ БЕЗ АВТОРИЗАЦІЇ
+            </button>
+          </div>
         </form>
 
-        <p>
-          <a
-            href="/registration"
-            style={{ color: loading ? "#ccc" : "#007bff" }}
-          >
-            Я ще не маю акаунта
-          </a>
-        </p>
-      </div>
-
-      <div className={styles.buttonsG}>
-        <ButtonGeneral
-          initialColor="black"
-          borderColor="black"
-          textColor="white"
-          text={loading ? "Завантаження..." : "Увійти"}
-          width="100%"
-          height="3.4rem"
-          transitionDuration="0.3s"
-          type="submit"
-          colorHover="red"
-          disabled={loading}
-          onClick={handleSubmit}
-          link="#"
-        />
-
-        <p style={{ margin: "1rem 0", color: "#666" }}>Або</p>
-
-        <ButtonGeneral
-          initialColor="white"
-          borderColor="black"
-          textColor="black"
-          text="ПРОДОВЖИТИ БЕЗ АВТОРИЗАЦІЇ"
-          width="100%"
-          height="3.4rem"
-          transitionDuration="0.3s"
-          type="button"
-          disabled={loading}
-          onClick={handleSkipAuth}
-          link="#"
-        />
+        {/* Дополнительные ссылки */}
+        <div className={styles.additionalLinks}>
+          <a href="/registration">Я ще не маю акаунта</a>
+        </div>
       </div>
     </div>
   );
