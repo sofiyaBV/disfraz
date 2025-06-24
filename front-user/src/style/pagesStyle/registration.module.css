@@ -1,4 +1,4 @@
-
+/* Основной контейнер */
 .container {
   max-width: 400px;
   margin: 0 auto;
@@ -9,7 +9,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Заголовки */
 .title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -23,132 +23,10 @@
   font-weight: 500;
   color: #151515;
   margin-bottom: 1rem;
-}
-
-
-.methodOptions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.methodLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #151515;
-}
-
-.radio {
-  accent-color: #151515;
-}
-
-
-.inputGroup {
-  margin-bottom: 1.5rem;
-}
-
-.inputGroup label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #151515;
-  margin-bottom: 0.5rem;
-}
-
-.input {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  background-color: #fff;
-  transition: border-color 0.2s;
-}
-
-.input:focus {
-  outline: none;
-  border-color: #151515;
-}
-
-.inputError {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #dc3545;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
-.passwordWrapper {
-  position: relative;
-}
-
-.eyeIcon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-/* Сообщения об ошибках */
-.error {
-  display: block;
-  font-size: 0.8rem;
-  color: #dc3545;
-  margin-top: 0.25rem;
-}
-
-/* Чекбоксы */
-.checkboxGroup {
-  margin-bottom: 1rem;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #151515;
-}
-
-.checkbox {
-  accent-color: #151515;
-}
-
-.link {
-  color: #ff6200;
-  text-decoration: none;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-/* Сообщения сервера */
-.serverMessage {
-  margin-top: 1rem;
   text-align: center;
-  color: #28a745;
-  font-size: 1rem;
-  font-weight: 500;
 }
 
-.serverError {
-  margin-top: 1rem;
-  text-align: center;
-  color: #dc3545;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-
-
-
+/* Социальные кнопки */
 .socialAuth {
   display: flex;
   gap: 1rem;
@@ -167,6 +45,7 @@
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.9rem;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
@@ -175,12 +54,22 @@
   border-color: #ccc;
 }
 
+.socialButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .googleButton {
   border-color: #4285f4;
 }
 
-.googleButton:hover {
+.googleButton:hover:not(:disabled) {
   background: #f8f9ff;
+}
+
+.googleIcon {
+  color: #4285f4;
+  font-weight: bold;
 }
 
 .facebookButton {
@@ -189,10 +78,16 @@
   border-color: #1877f2;
 }
 
-.facebookButton:hover {
+.facebookButton:hover:not(:disabled) {
   background: #166fe5;
 }
 
+.facebookIcon {
+  color: white;
+  font-weight: bold;
+}
+
+/* Разделитель */
 .divider {
   text-align: center;
   margin: 1.5rem 0;
@@ -214,4 +109,222 @@
   height: 1px;
   background: #ddd;
   z-index: -1;
+}
+
+/* Переключатель метода регистрации */
+.methodOptions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.methodLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #151515;
+  cursor: pointer;
+}
+
+.radio {
+  accent-color: #151515;
+}
+
+/* Форма */
+.form {
+  margin-bottom: 1.5rem;
+}
+
+/* Группы полей ввода */
+.inputGroup {
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #151515;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #151515;
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inputError {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* Обертка для пароля с иконкой */
+.passwordWrapper {
+  position: relative;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+}
+
+/* Сообщения об ошибках */
+.error {
+  display: block;
+  font-size: 0.8rem;
+  color: #dc3545;
+  margin-top: 0.25rem;
+}
+
+/* Чекбоксы */
+.checkboxGroup {
+  margin-bottom: 1rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #151515;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.checkbox {
+  accent-color: #151515;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+/* Ссылки */
+.link {
+  color: #ff6200;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Кнопки действий */
+.actionButtons {
+  margin-top: 1.5rem;
+}
+
+.submitButton {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.skipButton {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #666;
+  color: #666;
+  padding: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.skipButton:hover:not(:disabled) {
+  background: #666;
+  color: #fff;
+  text-decoration: none;
+}
+
+.skipButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Сообщения сервера */
+.serverMessage {
+  margin-top: 1rem;
+  text-align: center;
+  color: #28a745;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  background-color: #e6ffe6;
+  border-radius: 4px;
+}
+
+.serverError {
+  margin-top: 1rem;
+  text-align: center;
+  color: #dc3545;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  background-color: #ffe6e6;
+  border-radius: 4px;
+}
+
+/* Дополнительные ссылки */
+.additionalLinks {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.additionalLinks a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.additionalLinks a:hover {
+  text-decoration: underline;
+}
+
+/* Респонсивность */
+@media (max-width: 480px) {
+  .container {
+    margin: 0 1rem;
+    padding: 1.5rem;
+  }
+  
+  .socialAuth {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .methodOptions {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
 }
