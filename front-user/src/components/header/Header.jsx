@@ -61,7 +61,7 @@ const Header = () => {
               <img src={menuImage} alt="Menu" className={styles.menu_image} />
             </div>
           </div>
-          <Link to="/">
+          <Link to="/home">
             <img src={logoImage} alt="Logo" className={styles.logo} />
           </Link>
         </div>
