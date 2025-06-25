@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Request,
   UseGuards,
   Res,
@@ -26,6 +27,13 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+
+// DTO для обновления профиля
+export class UpdateProfileDto {
+  email?: string;
+  phone?: string;
+  password?: string;
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -63,8 +71,24 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Некоректні дані' })
   async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<{ message: string }> {
-    await this.authService.register(createUserDto);
+  ): Promise<{ message: string; access_token?: string }> {
+    const user = await this.authService.register(createUserDto);
+
+    // Если пользователь успешно создан, сразу выдаем токен
+    if (user) {
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        roles: user.roles,
+      };
+      const access_token = await this.authService.generateJwtToken(payload);
+
+      return {
+        message: 'Користувач успішно зареєстрований',
+        access_token,
+      };
+    }
+
     return { message: 'Користувач успішно зареєстрований' };
   }
 
@@ -79,12 +103,30 @@ export class AuthController {
     return req.user;
   }
 
+  @Put('profile')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin, Role.User)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Оновлення профілю користувача' })
+  @ApiBody({ type: UpdateProfileDto })
+  @ApiResponse({ status: 200, description: 'Профіль успішно оновлено' })
+  @ApiResponse({ status: 401, description: 'Неавторизований запит' })
+  async updateProfile(
+    @Request() req,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    const userId = req.user.id;
+    return this.authService.updateProfile(userId, updateProfileDto);
+  }
+
   @Public()
   @Get('google')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Авторизація через Google' })
   @ApiResponse({ status: 302, description: 'Перенаправлення на Google' })
-  async googleAuth() {}
+  async googleAuth(@Request() req) {
+    // Этот метод автоматически перенаправит на Google
+  }
 
   @Public()
   @Get('google/callback')
@@ -96,19 +138,15 @@ export class AuthController {
   })
   async googleAuthCallback(@Request() req, @Res() res: Response) {
     const user = req.user;
+
     if (!user || !user.access_token) {
-      return res
-        .status(401)
-        .json({ message: 'Помилка авторизації через Google' });
+      // Перенаправляем на фронтенд с ошибкой
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4114';
+      return res.redirect(`${frontendUrl}/?error=google_auth_failed`);
     }
 
-    return res.json({
-      access_token: user.access_token,
-      user: {
-        id: user.id,
-        email: user.email,
-        roles: user.roles,
-      },
-    });
+    // Перенаправляем на фронтенд с токеном
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4114';
+    return res.redirect(`${frontendUrl}/?token=${user.access_token}`);
   }
 }

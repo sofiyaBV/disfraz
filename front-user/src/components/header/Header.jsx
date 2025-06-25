@@ -61,7 +61,7 @@ const Header = () => {
               <img src={menuImage} alt="Menu" className={styles.menu_image} />
             </div>
           </div>
-          <Link to="/">
+          <Link to="/home">
             <img src={logoImage} alt="Logo" className={styles.logo} />
           </Link>
         </div>
@@ -119,7 +119,7 @@ const Header = () => {
           <Link to="/profile" className={styles.icon_link}>
             <img src={FaUser} alt="Profile" />
           </Link>
-          <Link to="/favorites" className={styles.icon_link}>
+          <Link to="/registration" className={styles.icon_link}>
             <img src={FaHeart} alt="Favorites" />
           </Link>
           <div className={styles.icon_link}>

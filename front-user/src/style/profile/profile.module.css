@@ -1,0 +1,336 @@
+/* profile.module.css - Fixed sidebar navigation */
+
+.profileContainer {
+  min-height: calc(100vh - 80px);
+  background-color: #f5f5f5;
+  display: flex;
+  margin-top: 80px; /* Отступ для существующего header */
+}
+
+/* Sidebar - Fixed navigation list */
+.sidebar {
+  width: 468px;
+  background-color: white;
+  border-right: 1px solid #e9ecef;
+  height: 869px;
+  position: absolute;
+  left: 0;
+  top: 280px;
+  overflow-y: auto;
+}
+
+.sidebarHeader {
+  padding: 2rem 0;
+  border-bottom: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.sidebarTitle {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.5px;
+}
+
+.sidebarNav {
+  padding: 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.2rem 2rem;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-right: 3px solid transparent;
+  width: 100%;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.menuItem:hover {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.menuItem.active {
+  background-color: #f8f9fa;
+  border-right-color: #007bff;
+  color: #007bff;
+}
+
+.menuIcon {
+  font-size: 1.1rem;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Main Content */
+.mainContent {
+  margin-left: 280px;
+  flex: 1;
+  background-color: white;
+  min-height: calc(100vh - 80px);
+}
+
+.contentArea {
+  padding: 3rem;
+  max-width: 900px;
+}
+
+.contentPlaceholder {
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+}
+
+.contentPlaceholder h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* Messages */
+.errorMessage {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #f5c6cb;
+  font-weight: 500;
+}
+
+.successMessage {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border: 1px solid #c3e6cb;
+  font-weight: 500;
+}
+
+/* Form */
+.profileForm {
+  max-width: 100%;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formLabel {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.formInput {
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.formInput.error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.formError {
+  color: #dc3545;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.helpText {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Submit Area */
+.submitArea {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #007bff;
+  margin-top: 2rem;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 1rem 2rem;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #333;
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Loading */
+.loadingSpinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .contentArea {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 250px;
+  }
+  
+  .mainContent {
+    margin-left: 250px;
+  }
+  
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .contentArea {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileContainer {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+  
+  .sidebar {
+    width: 100%;
+    position: relative;
+    top: 0;
+    height: auto;
+    order: 1;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .mainContent {
+    margin-left: 0;
+    order: 2;
+  }
+  
+  .contentArea {
+    padding: 1rem;
+  }
+  
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .submitArea {
+    padding: 1.5rem;
+  }
+  
+  .sidebarNav {
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+  }
+  
+  .menuItem {
+    white-space: nowrap;
+    min-width: 120px;
+    justify-content: center;
+    border-right: none;
+    border-bottom: 3px solid transparent;
+    border-left: none;
+    padding: 1rem 0.5rem;
+    flex-shrink: 0;
+  }
+  
+  .menuItem.active {
+    border-right: none;
+    border-bottom-color: #007bff;
+    border-left: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .contentArea {
+    padding: 0.5rem;
+  }
+  
+  .sidebarTitle {
+    font-size: 1.2rem;
+  }
+  
+  .menuItem {
+    padding: 0.8rem 0.3rem;
+    font-size: 0.7rem;
+    min-width: 100px;
+  }
+  
+  .submitArea {
+    padding: 1rem;
+  }
+  
+  .formInput {
+    padding: 0.75rem;
+  }
+}

@@ -1,93 +1,314 @@
-.component{
-    background-color: white;
-    width: 36.29rem;
-    text-align: center;
-    border-radius: 20px;
-    padding: 2rem;
-}
-.add{
-    margin-left: 97%;
-}
-h2 {
-    font-size: 2rem;
-    font-weight: 500;
-    color: #151515;
-    margin-bottom: 2rem;
-}
-.buttons{
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
+/* Основной контейнер */
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  margin-bottom: 1.9rem;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
-.buttons span{
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #151515;
-    margin-left: 1rem;
-}
-.buttons button{
-    width: 16.3rem;
-    height: 3.4rem;
-    border-radius: 5px;
-    border-color: #797F83;
-    background-color: white;
-}
-
-.buttons button:hover{
-    border-color: #eacd5b;
-    background-color: white;
-
-}
-.form{
-    margin-top: 2rem;
-    
+/* Кнопка закрытия */
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-
-.form input {
-    margin-top: 10px;
-    width: 90%;
-    height: 3.4rem;
-    padding: 0 0 0 1rem;
-    font-size: 1.2rem;
-    color: #151515;
-    font-weight: 600;
-    border-radius: 5px;
+.closeButton:hover {
+  background-color: #f5f5f5;
 }
 
-.form input:hover {
-    outline: none;
-    border-color: #E48D41;
+.closeIcon {
+  width: 20px;
+  height: 20px;
+  transition: opacity 0.2s;
 }
 
-.component a {
-    text-decoration: none;
-    color: #E48D41;
-    font-weight: 500;
+/* Заголовки */
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #151515;
 }
 
-.component a:hover {
-    text-decoration: underline;
+.subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #151515;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
-.component p{
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #151515;
-    margin-top: 1rem;
+/* Социальные кнопки */
+.socialAuth {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-
-.buttonsG{
-    display: block;
-    margin-left: 5%;
-    margin-top: 10px;
-    margin-bottom: 20px;
+.socialButton {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.buttonsG p{
-    margin-left: -11%;
-    margin-bottom: 10px;
+.socialButton:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.socialButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.googleButton {
+  border-color: #4285f4;
+}
+
+.googleButton:hover:not(:disabled) {
+  background: #f8f9ff;
+}
+
+.facebookButton {
+  background: #1877f2;
+  color: white;
+  border-color: #1877f2;
+}
+
+.facebookButton:hover:not(:disabled) {
+  background: #166fe5;
+}
+
+.socialIcon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Разделитель */
+.divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.dividerText {
+  background: #fff;
+  padding: 0 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.dividerLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+  z-index: -1;
+}
+
+/* Форма */
+.form {
+  margin-bottom: 1.5rem;
+}
+
+.formTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #151515;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Переключатель метода входа */
+.methodOptions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.methodLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #151515;
+  cursor: pointer;
+}
+
+.radio {
+  accent-color: #151515;
+}
+
+/* Группы полей ввода */
+.inputGroup {
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #151515;
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #151515;
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inputError {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* Ссылки в форме */
+.formLinks {
+  margin: 1rem 0;
+}
+
+.formLink {
+  display: block;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.formLink a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.formLink a:hover {
+  text-decoration: underline;
+}
+
+.formLink a:disabled,
+.formLink a.disabled {
+  color: #ccc;
+  pointer-events: none;
+}
+
+/* Сообщения об ошибках и успехе */
+.errorMessage {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: #ffe6e6;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.successMessage {
+  color: #28a745;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background-color: #e6ffe6;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Кнопки действий */
+.actionButtons {
+  margin-top: 1.5rem;
+}
+
+.actionButton {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.orText {
+  text-align: center;
+  margin: 1rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.skipButton {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #151515;
+  color: #151515;
+  padding: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.skipButton:hover:not(:disabled) {
+  background: #151515;
+  color: #fff;
+}
+
+.skipButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Дополнительные ссылки */
+.additionalLinks {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.additionalLinks a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.additionalLinks a:hover {
+  text-decoration: underline;
 }
