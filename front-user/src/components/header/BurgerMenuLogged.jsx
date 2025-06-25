@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../style/burgerMenu.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import Authorization from "../registrations/Authorization";
 import { useAuth } from "../../utils/AuthContext";
 import CatalogMenu from "./CatalogMenu";
-
-// React Icons импорты
 import {
   FaHome,
   FaUser,
@@ -36,6 +34,7 @@ const BurgerMenuLogged = ({ onClose }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
 
   const openAuthModal = () => {
     setIsAuthModalOpen(true);
@@ -70,9 +69,17 @@ const BurgerMenuLogged = ({ onClose }) => {
     setIsCatalogMenuOpen(false);
   };
 
+  // Функция для плавного закрытия меню
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Время анимации закрытия
+  };
+
   // Данные для социальных сетей
   const socialNetworks = [
-    { Icon: FaYoutube, name: "YouTube", link: "https://www.youtube.com" },
+    { Icon: FaYoutube, name: "YouTube", link: "#" },
     { Icon: FaFacebook, name: "Facebook", link: "#" },
     { Icon: FaInstagram, name: "Instagram", link: "#" },
     { Icon: FaTelegram, name: "Telegram", link: "#" },
@@ -84,14 +91,14 @@ const BurgerMenuLogged = ({ onClose }) => {
 
   return (
     <>
-      <div className={styles.container}>
+      <div className={`${styles.container} ${isClosing ? styles.closing : ""}`}>
         <div className={styles.header}>
           <img src={LOGO} alt="LOGO" />
           <div>
             <span>
               UA <FaChevronDown className={styles.arrow_icon} />
             </span>
-            <span onClick={onClose} className={styles.close_icon}>
+            <span onClick={handleClose} className={styles.close_icon}>
               <FaTimes />
             </span>
           </div>
@@ -142,23 +149,35 @@ const BurgerMenuLogged = ({ onClose }) => {
           <img src={vector} alt="" className={styles.img_border} />
 
           <div className={styles.links_group_1}>
-            <Link to="/home" className={styles.link_item}>
+            <Link to="/home" className={styles.link_item} onClick={handleClose}>
               <FaHome className={styles.icon} />
               <h3>Головна сторінка</h3>
             </Link>
-            <Link to="/profile" className={styles.link_item}>
+            <Link
+              to="/profile"
+              className={styles.link_item}
+              onClick={handleClose}
+            >
               <FaUser className={styles.icon} />
               <h3>Особистий кабінет</h3>
             </Link>
-            <Link to="/cart" className={styles.link_item}>
+            <Link to="/cart" className={styles.link_item} onClick={handleClose}>
               <FaShoppingCart className={styles.icon} />
               <h3>Кошик</h3>
             </Link>
-            <Link to="/track_package" className={styles.link_item}>
+            <Link
+              to="/track_package"
+              className={styles.link_item}
+              onClick={handleClose}
+            >
               <FaBox className={styles.icon} />
               <h3>Відстежити посилку</h3>
             </Link>
-            <Link to="/chat_with_disfraz" className={styles.link_item}>
+            <Link
+              to="/chat_with_disfraz"
+              className={styles.link_item}
+              onClick={handleClose}
+            >
               <FaComments className={styles.icon} />
               <h3>Чат з Disfraz</h3>
             </Link>
@@ -168,41 +187,75 @@ const BurgerMenuLogged = ({ onClose }) => {
 
           <div className={styles.links_group_2}>
             <h3>Інформація про компанію</h3>
-            <Link to="/about_us">Про нас</Link>
-            <Link to="/terms_of_use">Умови використання сайту</Link>
-            <Link to="/vacancies">Вакансії</Link>
-            <Link to="/contacts">Контакти</Link>
-            <Link to="/all_categories">Всі категорії</Link>
+            <Link to="/about_us" onClick={handleClose}>
+              Про нас
+            </Link>
+            <Link to="/terms_of_use" onClick={handleClose}>
+              Умови використання сайту
+            </Link>
+            <Link to="/vacancies" onClick={handleClose}>
+              Вакансії
+            </Link>
+            <Link to="/contacts" onClick={handleClose}>
+              Контакти
+            </Link>
+            <Link to="/all_categories" onClick={handleClose}>
+              Всі категорії
+            </Link>
           </div>
 
           <img src={vector} alt="" className={styles.img_border} />
 
           <div className={styles.links_group_2}>
             <h3>Допомога</h3>
-            <Link to="/delivery_and_payment">Доставка та оплата</Link>
-            <Link to="/credit">Кредит</Link>
-            <Link to="/warranty">Гарантія</Link>
-            <Link to="/returns">Повернення товару</Link>
+            <Link to="/delivery_and_payment" onClick={handleClose}>
+              Доставка та оплата
+            </Link>
+            <Link to="/credit" onClick={handleClose}>
+              Кредит
+            </Link>
+            <Link to="/warranty" onClick={handleClose}>
+              Гарантія
+            </Link>
+            <Link to="/returns" onClick={handleClose}>
+              Повернення товару
+            </Link>
           </div>
 
           <img src={vector} alt="" className={styles.img_border} />
 
           <div className={styles.links_group_2}>
             <h3>Сервіси</h3>
-            <Link to="/bonus_account">Бонусний рахунок</Link>
-            <Link to="/gift_certificates">Подарункові сертифікати</Link>
-            <Link to="/disfraz_exchange">Disfraz обмін</Link>
-            <Link to="/corporate_clients">Корпоративним клієнтам</Link>
+            <Link to="/bonus_account" onClick={handleClose}>
+              Бонусний рахунок
+            </Link>
+            <Link to="/gift_certificates" onClick={handleClose}>
+              Подарункові сертифікати
+            </Link>
+            <Link to="/disfraz_exchange" onClick={handleClose}>
+              Disfraz обмін
+            </Link>
+            <Link to="/corporate_clients" onClick={handleClose}>
+              Корпоративним клієнтам
+            </Link>
           </div>
 
           <img src={vector} alt="" className={styles.img_border} />
 
           <div className={styles.links_group_2}>
             <h3>Партнерам</h3>
-            <Link to="/sell_on_disfraz">Продавати на Disfraz</Link>
-            <Link to="/cooperation">Співпраця з нами</Link>
-            <Link to="/franchising">Франчайзинг</Link>
-            <Link to="/advertising_space_rental">Оренда рекламних площ</Link>
+            <Link to="/sell_on_disfraz" onClick={handleClose}>
+              Продавати на Disfraz
+            </Link>
+            <Link to="/cooperation" onClick={handleClose}>
+              Співпраця з нами
+            </Link>
+            <Link to="/franchising" onClick={handleClose}>
+              Франчайзинг
+            </Link>
+            <Link to="/advertising_space_rental" onClick={handleClose}>
+              Оренда рекламних площ
+            </Link>
           </div>
 
           <img src={vector} alt="" className={styles.img_border} />
