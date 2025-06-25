@@ -1,5 +1,5 @@
 import { List, Datagrid, TextField, Create, Edit, ReferenceInput, SelectInput, Show, SimpleForm, SimpleShowLayout, NumberField, useRecordContext, ArrayField, BooleanField, SimpleList, required } from "react-admin";
-import { Grid, Typography, Card, CardContent } from "@mui/material";
+import {  Typography, Card, CardContent, Box } from "@mui/material";
 
 export const ProductAttributeList = () => (
     <List>
@@ -59,8 +59,10 @@ export const ProductAttributeShow = () => (
         <SimpleShowLayout>
             <NumberField source="id" label="ID" />
             <TextField source="inStock" label="Наявність" />
-            <Grid container spacing={2}>
-                <Grid item xs={6}>
+            
+            {/* Используем Box вместо Grid для избежания проблем с версиями */}
+            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                <Box sx={{ flex: 1 }}>
                     <Card>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>
@@ -81,8 +83,8 @@ export const ProductAttributeShow = () => (
                             </ArrayField>
                         </CardContent>
                     </Card>
-                </Grid>
-                <Grid item xs={6}>
+                </Box>
+                <Box sx={{ flex: 1 }}>
                     <Card>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>
@@ -102,8 +104,8 @@ export const ProductAttributeShow = () => (
                             <TextField source="attribute.description" fullWidth />
                         </CardContent>
                     </Card>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </SimpleShowLayout>
     </Show>
 );

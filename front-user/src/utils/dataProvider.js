@@ -46,6 +46,39 @@ const httpClient = async (url, options = {}) => {
   }
 };
 
+// Функция для получения профиля пользователя
+const fetchUserProfile = async () => {
+  const url = `${apiUrl}/auth/profile`;
+  console.log("Fetching user profile from:", url);
+
+  try {
+    const response = await httpClient(url);
+    console.log("Profile response:", response);
+    return { data: response };
+  } catch (error) {
+    console.error("Error in fetchUserProfile:", error);
+    throw new Error(error.message || "Ошибка при загрузке профиля");
+  }
+};
+
+// Функция для обновления профиля пользователя
+const updateUserProfile = async (params) => {
+  const url = `${apiUrl}/auth/profile`;
+  console.log("Updating user profile with payload:", params.data);
+
+  try {
+    const response = await httpClient(url, {
+      method: "PUT",
+      body: JSON.stringify(params.data),
+    });
+    console.log("Profile update response:", response);
+    return { data: response };
+  } catch (error) {
+    console.error("Error in updateUserProfile:", error);
+    throw new Error(error.message || "Ошибка при обновлении профиля");
+  }
+};
+
 const fetchProducts = async (params = {}) => {
   const {
     page = 1,
@@ -358,6 +391,8 @@ const dataProvider = {
     switch (resource) {
       case "products":
         return fetchProductById(params.id);
+      case "user/profile":
+        return fetchUserProfile();
       default:
         throw new Error(`Unsupported resource: ${resource}`);
     }
@@ -370,6 +405,14 @@ const dataProvider = {
         return createCartItem(params);
       case "comments":
         return createComment(params);
+      default:
+        throw new Error(`Unsupported resource: ${resource}`);
+    }
+  },
+  update: async (resource, params) => {
+    switch (resource) {
+      case "user/profile":
+        return updateUserProfile(params);
       default:
         throw new Error(`Unsupported resource: ${resource}`);
     }

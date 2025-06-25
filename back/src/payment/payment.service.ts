@@ -64,7 +64,7 @@ export class PaymentService {
 
     const payment = this.paymentRepository.create({
       orderId: order.id,
-      amount: order.price, // Використовуємо order.price замість amount із DTO
+      amount: order.price,
       currency: currency || 'UAH',
       description: description || `Оплата замовлення #${order.id}`,
       status: 'pending',

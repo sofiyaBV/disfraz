@@ -6,6 +6,12 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 import { User } from '../user/entities/user.entity';
 
+interface UpdateProfileDto {
+  email?: string;
+  phone?: string;
+  password?: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -33,7 +39,7 @@ export class AuthService {
     };
   }
 
-  async register(createUserDto: CreateUserDto): Promise<void> {
+  async register(createUserDto: CreateUserDto): Promise<User> {
     const { email, phone, password } = createUserDto;
 
     if (!email && !phone) {
@@ -56,25 +62,72 @@ export class AuthService {
       }
     }
 
-    await this.usersService.createUser(createUserDto);
+    return await this.usersService.createUser(createUserDto);
+  }
+
+  async updateProfile(
+    userId: number,
+    updateData: UpdateProfileDto,
+  ): Promise<User> {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Користувач не знайдений');
+    }
+
+    // Проверяем уникальность email, если он изменяется
+    if (updateData.email && updateData.email !== user.email) {
+      const existingUser = await this.usersService.findByEmail(
+        updateData.email,
+      );
+      if (existingUser && existingUser.id !== userId) {
+        throw new UnauthorizedException('Користувач з таким email вже існує');
+      }
+    }
+
+    // Проверяем уникальность телефона, если он изменяется
+    if (updateData.phone && updateData.phone !== user.phone) {
+      const existingUser = await this.usersService.findByPhone(
+        updateData.phone,
+      );
+      if (existingUser && existingUser.id !== userId) {
+        throw new UnauthorizedException(
+          'Користувач з таким номером телефону вже існує',
+        );
+      }
+    }
+
+    // Хешируем новый пароль, если он предоставлен
+    if (updateData.password) {
+      const saltRounds = 10;
+      updateData.password = await bcrypt.hash(updateData.password, saltRounds);
+    }
+
+    return await this.usersService.updateUser(userId, updateData);
   }
 
   async findOrCreateGoogleUser(data: {
     email: string;
     googleId: string;
+    firstName?: string;
+    lastName?: string;
   }): Promise<User> {
-    const { email, googleId } = data;
+    const { email, googleId, firstName, lastName } = data;
 
+    // Сначала ищем пользователя по email
     let user = await this.usersService.findByEmail(email);
 
     if (!user) {
+      // Если пользователя нет, создаем нового
       const createUserDto: CreateUserDto = {
         email,
-        password: '', // Пароль не потрібен для Google
+        password: '', // Пароль не нужен для Google OAuth
         phone: null,
-        roles: [Role.User], // Автоматично присвоюємо роль User
+        roles: [Role.User],
       };
+
       user = await this.usersService.createUser(createUserDto);
+
+      await this.usersService.updateUser(user.id, user);
     }
 
     return user;
