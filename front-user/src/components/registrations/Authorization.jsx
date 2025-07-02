@@ -9,6 +9,7 @@ import dataProvider from "../../utils/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import { useAuth } from "../../utils/AuthContext";
 
+// Компонент авторизації користувачів з підтримкою різних методів входу
 const Authorization = ({ onClose }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Authorization = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Функция безопасного закрытия модала с перенаправлением
+  // Безпечне закриття модального вікна з перенаправленням
   const safeClose = (message = null) => {
     if (typeof onClose === "function") {
       onClose(message);
@@ -32,7 +33,7 @@ const Authorization = ({ onClose }) => {
     }
   };
 
-  // Обработка Google OAuth callback
+  // Обробка callback від Google OAuth
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
@@ -42,6 +43,7 @@ const Authorization = ({ onClose }) => {
       login(token);
       setSuccessMessage("Авторизація через Google успішна!");
 
+      // Очищуємо URL від параметрів
       const newUrl =
         window.location.protocol +
         "//" +
@@ -64,6 +66,7 @@ const Authorization = ({ onClose }) => {
     }
   }, [login, navigate]);
 
+  // Перемикання між методами входу (телефон/email)
   const toggleLoginMethod = () => {
     setIsPhoneLogin(!isPhoneLogin);
     setFormData({ ...formData, email: "", phone: "" });
@@ -71,6 +74,7 @@ const Authorization = ({ onClose }) => {
     setSuccessMessage(null);
   };
 
+  // Обробка змін у полях форми
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -80,6 +84,7 @@ const Authorization = ({ onClose }) => {
     }
   };
 
+  // Валідація даних форми
   const validateForm = () => {
     const { email, phone, password } = formData;
 
@@ -116,6 +121,7 @@ const Authorization = ({ onClose }) => {
     return true;
   };
 
+  // Відправка форми авторизації
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -134,35 +140,32 @@ const Authorization = ({ onClose }) => {
         password: formData.password,
       };
 
-      console.log("Attempting signin with params:", params);
       const response = await dataProvider.signin(params);
-      console.log("Signin successful:", response);
 
-      // Извлекаем access_token из ответа
+      // Отримуємо токен з відповіді
       const token = response.data?.access_token || response.access_token;
       if (token) {
         login(token);
         setSuccessMessage("Авторизація пройшла успішно!");
 
-        // Очищаем форму
+        // Очищуємо форму
         setFormData({
           email: "",
           phone: "",
           password: "",
         });
 
-        // Перенаправляем на главную страницу через 1.5 секунды
+        // Перенаправляємо через 1.5 секунди
         setTimeout(() => {
           navigate("/home");
         }, 1500);
       } else {
         setError("Токен не отриманий від сервера");
-        console.warn("Токен не знайдено в відповіді:", response);
       }
     } catch (err) {
       console.error("Signin error:", err);
 
-      // Обработка различных типов ошибок
+      // Обробка різних типів помилок
       let errorMessage = "Не вдалося авторизуватися. Спробуйте ще раз.";
 
       if (err.message) {
@@ -186,27 +189,29 @@ const Authorization = ({ onClose }) => {
     }
   };
 
+  // Авторизація через Google
   const handleGoogleAuth = () => {
     setError(null);
     setSuccessMessage(null);
 
-    // Используем тот же URL что и в dataProvider
     const apiUrl =
       process.env.REACT_APP_JSON_SERVER_URL || "http://localhost:3000";
     window.location.href = `${apiUrl}/auth/google`;
   };
 
+  // Авторизація через Facebook (заглушка)
   const handleFacebookAuth = () => {
     setError("Авторизація через Facebook поки не реалізована");
   };
 
+  // Пропуск авторизації
   const handleSkipAuth = () => {
     navigate("/home");
   };
 
   return (
     <div className={styles.container}>
-      {/* Кнопка закрытия */}
+      {/* Кнопка закриття */}
       <button
         className={styles.closeButton}
         onClick={() => safeClose()}
@@ -225,7 +230,7 @@ const Authorization = ({ onClose }) => {
       <h2 className={styles.title}>Вхід</h2>
       <p className={styles.subtitle}>Увійти за допомогою профілю</p>
 
-      {/* Социальные кнопки */}
+      {/* Соціальні мережі */}
       <div className={styles.socialAuth}>
         <button
           type="button"
@@ -247,13 +252,13 @@ const Authorization = ({ onClose }) => {
         </button>
       </div>
 
-      {/* Разделитель */}
+      {/* Розділювач */}
       <div className={styles.divider}>
         <span className={styles.dividerText}>Або за допомогою</span>
         <div className={styles.dividerLine}></div>
       </div>
 
-      {/* Переключатель метода входа */}
+      {/* Вибір методу авторизації */}
       <div className={styles.methodOptions}>
         <label className={styles.methodLabel}>
           <input
@@ -281,10 +286,10 @@ const Authorization = ({ onClose }) => {
         </label>
       </div>
 
-      {/* Форма */}
+      {/* Форма авторизації */}
       <div className={styles.form}>
         <form onSubmit={handleSubmit}>
-          {/* Поле телефона или email */}
+          {/* Поле email/телефону */}
           <div className={styles.inputGroup}>
             <label htmlFor={isPhoneLogin ? "phone" : "email"}>
               {isPhoneLogin ? "Телефон" : "Email"}
@@ -318,14 +323,14 @@ const Authorization = ({ onClose }) => {
             />
           </div>
 
-          {/* Сообщения об ошибках и успехе */}
+          {/* Повідомлення про помилки та успіх */}
           {error && <div className={styles.errorMessage}>{error}</div>}
 
           {successMessage && (
             <div className={styles.successMessage}>{successMessage}</div>
           )}
 
-          {/* Ссылки */}
+          {/* Додаткові посилання */}
           <div className={styles.formLinks}>
             <div className={styles.formLink}>
               <a
@@ -352,7 +357,7 @@ const Authorization = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Кнопки действий */}
+          {/* Кнопки дій */}
           <div className={styles.actionButtons}>
             <div className={styles.actionButton}>
               <ButtonGeneral
@@ -384,7 +389,7 @@ const Authorization = ({ onClose }) => {
           </div>
         </form>
 
-        {/* Дополнительные ссылки */}
+        {/* Додаткові посилання */}
         <div className={styles.additionalLinks}>
           <a href="/registration">Я ще не маю акаунта</a>
         </div>

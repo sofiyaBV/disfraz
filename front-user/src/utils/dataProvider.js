@@ -1,12 +1,16 @@
+// Отримуємо URL API з змінних середовища
 const apiUrl = process.env.REACT_APP_JSON_SERVER_URL;
 
+// Перевіряємо налаштування URL API
 if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
   throw new Error(
     "REACT_APP_JSON_SERVER_URL is not defined or invalid in .env"
   );
 }
 
+// HTTP клієнт для роботи з API
 const httpClient = async (url, options = {}) => {
+  // Встановлюємо базові заголовки
   if (!options.headers) {
     options.headers = new Headers({
       Accept: "application/json",
@@ -14,6 +18,7 @@ const httpClient = async (url, options = {}) => {
     });
   }
 
+  // Додаємо токен авторизації з localStorage
   const token = localStorage.getItem("token");
   const skipAuth = options.skipAuth || false;
   if (token && !skipAuth) {
@@ -27,6 +32,7 @@ const httpClient = async (url, options = {}) => {
     const response = await fetch(url, options);
     console.log("Response status:", response.status);
 
+    // Обробляємо помилки запиту
     if (!response.ok) {
       const errorText = await response.text();
       let errorMessage;
@@ -46,7 +52,7 @@ const httpClient = async (url, options = {}) => {
   }
 };
 
-// Функция для получения профиля пользователя
+// Отримання профілю поточного користувача
 const fetchUserProfile = async () => {
   const url = `${apiUrl}/auth/profile`;
   console.log("Fetching user profile from:", url);
@@ -57,11 +63,11 @@ const fetchUserProfile = async () => {
     return { data: response };
   } catch (error) {
     console.error("Error in fetchUserProfile:", error);
-    throw new Error(error.message || "Ошибка при загрузке профиля");
+    throw new Error(error.message || "Помилка при завантаженні профілю");
   }
 };
 
-// Функция для обновления профиля пользователя
+// Оновлення даних профілю користувача
 const updateUserProfile = async (params) => {
   const url = `${apiUrl}/auth/profile`;
   console.log("Updating user profile with payload:", params.data);
@@ -75,10 +81,11 @@ const updateUserProfile = async (params) => {
     return { data: response };
   } catch (error) {
     console.error("Error in updateUserProfile:", error);
-    throw new Error(error.message || "Ошибка при обновлении профиля");
+    throw new Error(error.message || "Помилка при оновленні профілю");
   }
 };
 
+// Отримання списку товарів з підтримкою пагінації та фільтрації
 const fetchProducts = async (params = {}) => {
   const {
     page = 1,
@@ -96,6 +103,7 @@ const fetchProducts = async (params = {}) => {
     filter,
   });
 
+  // Формуємо параметри фільтрації
   const queryFilter = {};
   if (filter.theme) {
     queryFilter["attribute.theme"] = filter.theme;
@@ -132,10 +140,11 @@ const fetchProducts = async (params = {}) => {
     };
   } catch (error) {
     console.error("Error in fetchProducts:", error);
-    throw new Error(error.message || "Ошибка при загрузке товаров");
+    throw new Error(error.message || "Помилка при завантаженні товарів");
   }
 };
 
+// Отримання конкретного товару за ID
 const fetchProductById = async (id) => {
   const url = `${apiUrl}/products/${id}`;
   console.log("Fetching product from:", url);
@@ -146,10 +155,11 @@ const fetchProductById = async (id) => {
     return { data: response };
   } catch (error) {
     console.error("Error in fetchProductById:", error);
-    throw new Error(error.message || "Ошибка при загрузке товара");
+    throw new Error(error.message || "Помилка при завантаженні товару");
   }
 };
 
+// Отримання атрибутів товарів з фільтрацією по темі
 const fetchProductAttributes = async (params = {}) => {
   const {
     page = 1,
@@ -166,6 +176,7 @@ const fetchProductAttributes = async (params = {}) => {
   if (filter.attributeId) {
     queryFilter.attributeId = filter.attributeId;
   }
+  // Фільтрація по темі через запит атрибутів
   if (filter.theme) {
     const attributesResponse = await fetchAttributes({
       filter: { theme: filter.theme },
@@ -203,11 +214,12 @@ const fetchProductAttributes = async (params = {}) => {
   } catch (error) {
     console.error("Error in fetchProductAttributes:", error);
     throw new Error(
-      error.message || "Ошибка при загрузке связей продукт-атрибут"
+      error.message || "Помилка при завантаженні зв'язків продукт-атрибут"
     );
   }
 };
 
+// Отримання списку атрибутів
 const fetchAttributes = async (params = {}) => {
   const {
     page = 1,
@@ -247,10 +259,11 @@ const fetchAttributes = async (params = {}) => {
     };
   } catch (error) {
     console.error("Error in fetchAttributes:", error);
-    throw new Error(error.message || "Ошибка при загрузке атрибутов");
+    throw new Error(error.message || "Помилка при завантаженні атрибутів");
   }
 };
 
+// Отримання коментарів без авторизації
 const fetchComments = async (params = {}) => {
   const {
     page = 1,
@@ -277,6 +290,7 @@ const fetchComments = async (params = {}) => {
   console.log("Fetching comments from:", url);
 
   try {
+    // Пропускаємо авторизацію для читання коментарів
     const response = await httpClient(url, { skipAuth: true });
     console.log("API response for comments:", response);
 
@@ -290,10 +304,11 @@ const fetchComments = async (params = {}) => {
     };
   } catch (error) {
     console.error("Error in fetchComments:", error);
-    throw new Error(error.message || "Ошибка при загрузке комментариев");
+    throw new Error(error.message || "Помилка при завантаженні коментарів");
   }
 };
 
+// Реєстрація нового користувача
 const createUser = async (params) => {
   const { email, phone, password } = params;
 
@@ -302,6 +317,7 @@ const createUser = async (params) => {
     body: JSON.stringify({ email, phone, password }),
   });
 
+  // Зберігаємо токен після успішної реєстрації
   if (response.access_token) {
     localStorage.setItem("token", response.access_token);
     console.log(
@@ -315,6 +331,7 @@ const createUser = async (params) => {
   return { data: response };
 };
 
+// Авторизація користувача
 const signinUser = async (params) => {
   const { email, phone, password } = params;
 
@@ -324,6 +341,7 @@ const signinUser = async (params) => {
   });
   console.log("Signin response:", response);
 
+  // Зберігаємо токен після успішного входу
   if (response.access_token) {
     localStorage.setItem("token", response.access_token);
     console.log("Token saved to localStorage:", response.access_token);
@@ -334,6 +352,7 @@ const signinUser = async (params) => {
   return { data: response };
 };
 
+// Додавання товару до кошика
 const createCartItem = async (params) => {
   const token = localStorage.getItem("token");
   console.log("Token for cart:", token);
@@ -353,6 +372,7 @@ const createCartItem = async (params) => {
   return { data: response };
 };
 
+// Створення нового коментаря
 const createComment = async (params) => {
   const token = localStorage.getItem("token");
   console.log("Token for comment:", token);
@@ -372,7 +392,9 @@ const createComment = async (params) => {
   return { data: response };
 };
 
+// Головний провайдер даних для роботи з API
 const dataProvider = {
+  // Отримання списків даних
   getList: async (resource, params) => {
     switch (resource) {
       case "products":
@@ -387,6 +409,7 @@ const dataProvider = {
         throw new Error(`Unsupported resource: ${resource}`);
     }
   },
+  // Отримання одного запису
   getOne: async (resource, params) => {
     switch (resource) {
       case "products":
@@ -397,6 +420,7 @@ const dataProvider = {
         throw new Error(`Unsupported resource: ${resource}`);
     }
   },
+  // Створення нових записів
   create: async (resource, params) => {
     switch (resource) {
       case "users":
@@ -409,6 +433,7 @@ const dataProvider = {
         throw new Error(`Unsupported resource: ${resource}`);
     }
   },
+  // Оновлення існуючих записів
   update: async (resource, params) => {
     switch (resource) {
       case "user/profile":
@@ -417,6 +442,7 @@ const dataProvider = {
         throw new Error(`Unsupported resource: ${resource}`);
     }
   },
+  // Метод для авторизації
   signin: async (params) => {
     return signinUser(params);
   },

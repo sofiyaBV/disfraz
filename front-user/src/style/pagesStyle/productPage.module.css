@@ -1,4 +1,4 @@
-/* Main product page */
+
 .productPage {
   display: flex;
   max-width: 1200px;
@@ -7,7 +7,7 @@
   gap: 3rem;
 }
 
-/* Image section with new gallery layout */
+
 .imageSection {
   flex: 1;
   display: flex;
