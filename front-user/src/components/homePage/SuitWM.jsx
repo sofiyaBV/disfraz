@@ -4,13 +4,13 @@ import style from "../../style/newOnTheSite.module.css";
 import { useState } from "react";
 
 const SuitWM = ({ title = "Новинки на сайті", img1, img2, link, newsKey }) => {
-  const [isHovered, setIsHovered] = useState(false); // Состояние наведения
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
       className={style.general}
-      onMouseEnter={() => setIsHovered(true)} // При наведении
-      onMouseLeave={() => setIsHovered(false)} // При уходе курсора
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div>
         <h3 className={style.h3_suit}>{title}</h3>
@@ -26,9 +26,9 @@ const SuitWM = ({ title = "Новинки на сайті", img1, img2, link, ne
         <motion.img
           key={newsKey + (isHovered ? "-hovered" : "")}
           src={isHovered ? img2 : img1}
-          initial={{ opacity: 0, x: -20 }} // Сдвиг влево при появлении
+          initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }} // Сдвиг вправо при уходе
+          exit={{ opacity: 0, x: 20 }}
           transition={{ duration: 0.3 }}
         />
       </div>
