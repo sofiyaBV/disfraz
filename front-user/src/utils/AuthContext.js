@@ -1,14 +1,16 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
+// Контекст для управління авторизацією користувачів
 const AuthContext = createContext();
 
+// Провайдер авторизації для всього додатку
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Ініціалізація - перевіряємо наявність токена при завантаженні
   useEffect(() => {
-    // Инициализация - проверяем токен в localStorage
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
@@ -20,8 +22,8 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
+  // Синхронізація з localStorage при зміні в інших вкладках
   useEffect(() => {
-    // Синхронизация с localStorage при изменении
     const handleStorageChange = () => {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
@@ -36,6 +38,7 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // Функція входу користувача в систему
   const login = (newToken) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
@@ -43,6 +46,7 @@ export const AuthProvider = ({ children }) => {
     console.log("User logged in with token:", newToken);
   };
 
+  // Функція виходу користувача з системи
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
@@ -65,6 +69,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// Хук для використання контексту авторизації
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

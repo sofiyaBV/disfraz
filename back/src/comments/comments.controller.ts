@@ -41,10 +41,7 @@ export class CommentsController {
     type: Comment,
   })
   @ApiBody({ type: CreateCommentDto })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
-  @Roles(Role.User, Role.Admin)
   async create(@Body() createCommentDto: CreateCommentDto, @User() user: any) {
     return this.commentsService.create(createCommentDto, user.id);
   }
@@ -73,11 +70,7 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Get('')
-  @Roles(Role.User, Role.Admin)
+  @Get(':id') // ИСПРАВЛЕНО: было @Get(''), теперь @Get(':id')
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(+id);
   }
@@ -96,10 +89,9 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Patch('')
+  @Patch(':id') // ИСПРАВЛЕНО: было @Patch(''), теперь @Patch(':id')
   @Roles(Role.Admin)
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
@@ -114,8 +106,7 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-
-  @Delete('')
+  @Delete(':id') // ИСПРАВЛЕНО: было @Delete(''), теперь @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)

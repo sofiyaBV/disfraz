@@ -25,7 +25,7 @@ const useProduct = ({ theme, attributeId } = {}) => {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching products:", err);
-        setError(err.message || "Ошибка при загрузке товаров");
+        setError(err.message || "Помилка під час завантаження товарів");
         setLoading(false);
       }
     };
