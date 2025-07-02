@@ -71,10 +71,7 @@ const BurgerMenuLogged = ({ onClose }) => {
 
   // Функция для плавного закрытия меню
   const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-    }, 300); // Время анимации закрытия
+    onClose();
   };
 
   // Данные для социальных сетей

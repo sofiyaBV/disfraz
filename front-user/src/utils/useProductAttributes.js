@@ -23,7 +23,9 @@ const useProductAttributes = ({ productId } = {}) => {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching product attributes:", err);
-        setError(err.message || "Ошибка при загрузке связей продукт-атрибут");
+        setError(
+          err.message || "Помилка при завантаженні зв'язків продукт-атрибут"
+        );
         setLoading(false);
       }
     };

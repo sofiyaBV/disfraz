@@ -29,15 +29,15 @@ const ProductPage = () => {
   const [cartError, setCartError] = useState(null);
   const [showMessage, setShowMessage] = useState(false);
   const [activeInfo, setActiveInfo] = useState(null);
-  const [refreshComments, setRefreshComments] = useState(0); // Для обновления комментариев
+  const [refreshComments, setRefreshComments] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [similarProducts, setSimilarProducts] = useState([]);
 
   const infoRefs = {
     description: useRef(null),
     delivery: useRef(null),
     payment: useRef(null),
   };
-
-  console.log("isAuthenticated in ProductPage:", isAuthenticated);
 
   useEffect(() => {
     if (showMessage) {
@@ -121,6 +121,17 @@ const ProductPage = () => {
 
         setProduct(targetProduct);
         setSelectedSize(targetProduct.attribute.size.split(" ")[0] || "");
+
+        // Получаем похожие товары
+        const similar = products
+          .filter(
+            (item) =>
+              item.attribute.theme === targetProduct.attribute.theme &&
+              item.id !== targetProduct.id
+          )
+          .slice(0, 4);
+        setSimilarProducts(similar);
+
         setLoading(false);
       } catch (err) {
         setError(err.message || "Помилка при завантаженні товару");
@@ -180,7 +191,7 @@ const ProductPage = () => {
       setCartError(null);
       setShowReviewModal(false);
       setReviewContent("");
-      setRefreshComments((prev) => prev + 1); // Обновляем комментарии
+      setRefreshComments((prev) => prev + 1);
     } catch (err) {
       console.error("Помилка при надсиланні коментаря:", err);
       setCartError(
@@ -199,39 +210,27 @@ const ProductPage = () => {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        activeInfo &&
-        infoRefs.description.current &&
-        !infoRefs.description.current.contains(event.target) &&
-        infoRefs.delivery.current &&
-        !infoRefs.delivery.current.contains(event.target) &&
-        infoRefs.payment.current &&
-        !infoRefs.payment.current.contains(event.target)
-      ) {
-        setActiveInfo(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [activeInfo]);
+  const renderStars = (rating = 4) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <span
+        key={index}
+        className={`${styles.star} ${
+          index < rating ? styles.starFilled : styles.starEmpty
+        }`}
+      >
+        ★
+      </span>
+    ));
+  };
 
   if (loading) return <div className={styles.loading}>Завантаження...</div>;
   if (error) return <div className={styles.error}>Помилка: {error}</div>;
   if (!product) return <div className={styles.error}>Товар не знайдено</div>;
 
-  const imageUrl =
-    product.product.images && product.product.images.length > 0
-      ? product.product.images[0].url
-      : null;
-  const hasDiscount =
-    product.product.discount !== null &&
-    product.product.discount !== undefined &&
-    product.product.newPrice !== null;
+  const images = product.product.images || [];
+  const currentImage =
+    images[selectedImageIndex] || (images.length > 0 ? images[0] : null);
+  const hasDiscount = product.product.discount > 0 && product.product.newPrice;
   const sizes = product.attribute.size ? product.attribute.size.split(" ") : [];
   const favoriteMessage = isFavorite
     ? "Товар додано в обране"
@@ -241,77 +240,92 @@ const ProductPage = () => {
     <div>
       <div className={styles.productPage}>
         <div className={styles.imageSection}>
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={product.product.name}
-              className={styles.image}
-            />
-          ) : (
-            <div className={styles.imagePlaceholder}>Немає зображення</div>
-          )}
-          {product.product.images && product.product.images.length > 1 && (
-            <div className={styles.thumbnailGallery}>
-              {product.product.images.slice(1).map((img, index) => (
-                <img
-                  key={index}
-                  src={img.url}
-                  alt={`${product.product.name} thumbnail ${index + 1}`}
-                  className={styles.thumbnail}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-        <div className={styles.detailsSection}>
-          <div className={styles.titleSection}>
-            <h1 className={styles.title}>{product.product.name}</h1>
-            <button
-              className={styles.reviewButton}
-              onClick={() => setShowReviewModal(true)}
-            >
-              Написати відгук
-            </button>
+          <div className={styles.thumbnailColumn}>
+            {images.map((img, index) => (
+              <img
+                key={index}
+                src={img.url}
+                alt={`${product.product.name} ${index + 1}`}
+                className={`${styles.thumbnail} ${
+                  selectedImageIndex === index ? styles.thumbnailActive : ""
+                }`}
+                onClick={() => setSelectedImageIndex(index)}
+              />
+            ))}
           </div>
+          <div className={styles.mainImageContainer}>
+            {currentImage ? (
+              <img
+                src={currentImage.url}
+                alt={product.product.name}
+                className={styles.mainImage}
+              />
+            ) : (
+              <div className={styles.imagePlaceholder}>Немає зображення</div>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.detailsSection}>
+          <div className={styles.productHeader}>
+            <h1 className={styles.title}>{product.product.name}</h1>
+            <div className={styles.ratingSection}>
+              <div className={styles.stars}>{renderStars()}</div>
+              <span className={styles.ratingText}>відгук</span>
+              <button
+                className={styles.reviewButton}
+                onClick={() => setShowReviewModal(true)}
+              >
+                Написати відгук
+              </button>
+            </div>
+          </div>
+
           <div className={styles.priceSection}>
             {hasDiscount ? (
-              <>
+              <div className={styles.priceWithDiscount}>
                 <span className={styles.newPrice}>
                   {product.product.newPrice} грн
                 </span>
                 <span className={styles.oldPrice}>
                   {product.product.price} грн
                 </span>
-                <span className={styles.discount}>
+                <span className={styles.discountBadge}>
                   -{product.product.discount}%
                 </span>
-              </>
+              </div>
             ) : (
               <span className={styles.price}>{product.product.price} грн</span>
             )}
           </div>
-          <div className={styles.selectSection}>
-            <select
-              value={selectedSize}
-              onChange={(e) => setSelectedSize(e.target.value)}
-              className={styles.sizeSelect}
-            >
-              <option value="" disabled>
-                Виберіть розмір
-              </option>
-              {sizes.map((size, index) => (
-                <option key={index} value={size}>
-                  {size}
+
+          <div className={styles.optionsSection}>
+            <div className={styles.sizeSection}>
+              <label>Виберіть розмір</label>
+              <select
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                className={styles.sizeSelect}
+              >
+                <option value="" disabled>
+                  Розмір
                 </option>
-              ))}
-            </select>
-            <select
-              className={styles.sizeTable}
+                {sizes.map((size, index) => (
+                  <option key={index} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              className={styles.sizeTableButton}
               onClick={() => setShowSizeTableModal(true)}
             >
-              <option value="sizeTable">Таблиця розмірів</option>
-            </select>
+              Таблиця розмірів
+            </button>
           </div>
+
           <div className={styles.quantitySection}>
             <button
               onClick={() => handleQuantityChange(-1)}
@@ -327,6 +341,7 @@ const ProductPage = () => {
               +
             </button>
           </div>
+
           <div className={styles.actionButtons}>
             <ButtonGeneral
               textColor="white"
@@ -343,9 +358,7 @@ const ProductPage = () => {
               <ReactSVG src={heart} />
             </button>
           </div>
-          {showMessage && (
-            <div className={styles.favoriteMessage}>{favoriteMessage}</div>
-          )}
+
           <div className={styles.paymentInfo}>
             <p>
               Доступна покупка в кредит:{" "}
@@ -366,22 +379,18 @@ const ProductPage = () => {
               </span>
             </p>
           </div>
+
           <div className={styles.informations}>
             <div
               className={`${styles.infoTitle} ${
                 activeInfo === "description" ? styles.infoTitleActive : ""
               }`}
               onClick={() => toggleInfo("description")}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#8FBC8F")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color =
-                  activeInfo === "description" ? "#8FBC8F" : "")
-              }
               ref={infoRefs.description}
             >
               ПОВНИЙ ОПИС ТОВАРУ
               <span className={styles.infoIcon}>
-                {activeInfo === "description" ? "-" : "+"}
+                {activeInfo === "description" ? "−" : "+"}
               </span>
             </div>
             <div
@@ -389,7 +398,7 @@ const ProductPage = () => {
                 activeInfo === "description" ? styles.infoContentActive : ""
               }`}
             >
-              <h2>Характеристика та опис</h2>
+              <h3>Характеристика та опис</h3>
               <p>{product.product.description}</p>
               <div className={styles.productDescriptionWrapper}>
                 <div className={styles.productDescriptionLabels}>
@@ -411,21 +420,17 @@ const ProductPage = () => {
               </div>
               <p>{product.attribute.description}</p>
             </div>
+
             <div
               className={`${styles.infoTitle} ${
                 activeInfo === "delivery" ? styles.infoTitleActive : ""
               }`}
               onClick={() => toggleInfo("delivery")}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#8FBC8F")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color =
-                  activeInfo === "delivery" ? "#8FBC8F" : "")
-              }
               ref={infoRefs.delivery}
             >
               ДОСТАВКА ТА ПОВЕРНЕННЯ
               <span className={styles.infoIcon}>
-                {activeInfo === "delivery" ? "-" : "+"}
+                {activeInfo === "delivery" ? "−" : "+"}
               </span>
             </div>
             <div
@@ -435,21 +440,17 @@ const ProductPage = () => {
             >
               {product.product.delivery_and_returns}
             </div>
+
             <div
               className={`${styles.infoTitle} ${
                 activeInfo === "payment" ? styles.infoTitleActive : ""
               }`}
               onClick={() => toggleInfo("payment")}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#8FBC8F")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color =
-                  activeInfo === "payment" ? "#8FBC8F" : "")
-              }
               ref={infoRefs.payment}
             >
               ОПЛАТА
               <span className={styles.infoIcon}>
-                {activeInfo === "payment" ? "-" : "+"}
+                {activeInfo === "payment" ? "−" : "+"}
               </span>
             </div>
             <div
@@ -461,61 +462,64 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
-        {showReviewModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <h2>Написати відгук</h2>
-              <textarea
-                value={reviewContent}
-                onChange={(e) => setReviewContent(e.target.value)}
-                placeholder="Ваш відгук..."
-                className={styles.reviewTextarea}
-              />
-              <div className={styles.modalButtons}>
-                <button
-                  onClick={handleSubmitComment}
-                  className={styles.submitReviewButton}
-                >
-                  Надіслати
-                </button>
-                <button
-                  onClick={() => setShowReviewModal(false)}
-                  className={styles.closeModalButton}
-                >
-                  Закрити
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {showSizeTableModal && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.sizeTableModal}>
-              <img
-                src={sizesImg}
-                alt="Таблиця розмірів"
-                className={styles.sizeTableImage}
-              />
-              <button
-                onClick={() => setShowSizeTableModal(false)}
-                className={styles.closeModalButton}
-              >
-                Закрити
-              </button>
-            </div>
-          </div>
-        )}
-        <div className={styles.messageContainer}>
-          {cartMessage && (
-            <div className={styles.cartMessage}>{cartMessage}</div>
-          )}
-          {cartError && <div className={styles.cartError}>{cartError}</div>}
-        </div>
       </div>
+
+      {/* Похожие товары */}
+      {similarProducts.length > 0 && (
+        <div className={styles.similarProductsSection}>
+          <h2 className={styles.similarProductsTitle}>Схожі товари</h2>
+          <div className={styles.similarProductsGrid}>
+            {similarProducts.map((similarProduct) => (
+              <div
+                key={similarProduct.id}
+                className={styles.similarProductCard}
+              >
+                <div className={styles.similarProductImage}>
+                  {similarProduct.product.images &&
+                  similarProduct.product.images.length > 0 ? (
+                    <img
+                      src={similarProduct.product.images[0].url}
+                      alt={similarProduct.product.name}
+                    />
+                  ) : (
+                    <div className={styles.noImagePlaceholder}>Немає фото</div>
+                  )}
+                  <button className={styles.similarProductFavorite}>
+                    <ReactSVG src={heart} />
+                  </button>
+                </div>
+                <div className={styles.similarProductInfo}>
+                  <h3 className={styles.similarProductName}>
+                    {similarProduct.product.name}
+                  </h3>
+                  <div className={styles.similarProductPrice}>
+                    {similarProduct.product.newPrice ? (
+                      <>
+                        <span className={styles.similarNewPrice}>
+                          {similarProduct.product.newPrice} грн
+                        </span>
+                        <span className={styles.similarOldPrice}>
+                          {similarProduct.product.price} грн
+                        </span>
+                      </>
+                    ) : (
+                      <span className={styles.similarPrice}>
+                        {similarProduct.product.price} грн
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={styles.section_2}>
         <h2>ВІДГУКИ</h2>
         <img src={vector} alt="" className={styles.img_vector} />
       </div>
+
       <div className={styles.comment_section}>
         <div className={styles.comment_section2}>
           <CommentSection
@@ -534,6 +538,61 @@ const ProductPage = () => {
             onClick={() => setShowReviewModal(true)}
           />
         </div>
+      </div>
+
+      {/* Модальные окна */}
+      {showReviewModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h2>Написати відгук</h2>
+            <textarea
+              value={reviewContent}
+              onChange={(e) => setReviewContent(e.target.value)}
+              placeholder="Ваш відгук..."
+              className={styles.reviewTextarea}
+            />
+            <div className={styles.modalButtons}>
+              <button
+                onClick={handleSubmitComment}
+                className={styles.submitReviewButton}
+              >
+                Надіслати
+              </button>
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className={styles.closeModalButton}
+              >
+                Закрити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSizeTableModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.sizeTableModal}>
+            <img
+              src={sizesImg}
+              alt="Таблиця розмірів"
+              className={styles.sizeTableImage}
+            />
+            <button
+              onClick={() => setShowSizeTableModal(false)}
+              className={styles.closeModalButton}
+            >
+              Закрити
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.messageContainer}>
+        {cartMessage && <div className={styles.cartMessage}>{cartMessage}</div>}
+        {cartError && <div className={styles.cartError}>{cartError}</div>}
+        {showMessage && (
+          <div className={styles.favoriteMessage}>{favoriteMessage}</div>
+        )}
       </div>
     </div>
   );

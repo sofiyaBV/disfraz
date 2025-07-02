@@ -1,13 +1,13 @@
 // components/homePage/CategoriesScrole.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Для навигации
-import style from "../style/categoriesScrole.module.css"; // Импортируем CSS-модуль
+import { useNavigate } from "react-router-dom";
+import style from "../style/categoriesScrole.module.css";
 
 const CategoriesScrole = ({ img, link }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(link); // Переходим по ссылке при клике
+    navigate(link);
   };
 
   return (

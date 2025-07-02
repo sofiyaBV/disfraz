@@ -5,12 +5,14 @@ import heart from "../../assets/svg/heartborder.svg";
 import discount_icon from "../../assets/svg/discount.svg";
 import { useNavigate } from "react-router-dom";
 
+// Компонент картки товару з можливістю додавання в обране
 const ProductCart = ({ product, theme }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const navigate = useNavigate();
 
+  // Обробка кліку по іконці серця (додавання в обране)
   const handleClick = (e) => {
     e.stopPropagation();
     setIsClicked(!isClicked);
@@ -18,6 +20,7 @@ const ProductCart = ({ product, theme }) => {
     setTimeout(() => setShowMessage(false), 2000);
   };
 
+  // Обробка наведення миші
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -26,11 +29,14 @@ const ProductCart = ({ product, theme }) => {
     setIsHovered(false);
   };
 
+  // Обробка кліку по картці товару з перенаправленням на сторінку товару
   const handleCardClick = () => {
     const formattedTheme = theme
       ? theme.toLowerCase().replace(/\s+/g, "-")
       : "default-theme";
     const productName = product?.name || "default-product";
+
+    // Транслітерація української назви товару в латиницю для URL
     const transliteratedName = productName
       .toLowerCase()
       .replace(
@@ -74,14 +80,17 @@ const ProductCart = ({ product, theme }) => {
       )
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
+
     const productUrl = `/${formattedTheme}/${transliteratedName}`;
     navigate(productUrl);
   };
 
+  // Повідомлення про додавання/видалення з обраного
   const message = isClicked
     ? "Товар додано в обране"
     : "Товар видалено з обраних";
 
+  // Отримання даних товару з перевіркою на наявність
   const productData = product || {};
   const imageUrl =
     productData.images && productData.images.length > 0
@@ -92,6 +101,8 @@ const ProductCart = ({ product, theme }) => {
     productData.price !== null && productData.price !== undefined
       ? `${productData.price} грн`
       : null;
+
+  // Перевірка наявності знижки
   const discount =
     productData.discount !== null &&
     productData.discount !== undefined &&
@@ -102,6 +113,7 @@ const ProductCart = ({ product, theme }) => {
     <div className={style.container} onClick={handleCardClick}>
       <div className={style.container_img}>
         <div className={style.container_imgs}>
+          {/* Іконка знижки */}
           {discount && (
             <img
               src={discount_icon}
@@ -109,6 +121,8 @@ const ProductCart = ({ product, theme }) => {
               className={style.discount_icon}
             />
           )}
+
+          {/* Повідомлення про додавання в обране */}
           <p
             className={`${style.message} ${showMessage ? style.visible : ""}`}
             onMouseEnter={handleMouseEnter}
@@ -116,6 +130,8 @@ const ProductCart = ({ product, theme }) => {
           >
             {showMessage ? message : ""}
           </p>
+
+          {/* Іконка серця для обраного */}
           <ReactSVG
             src={heart}
             className={`${style.icon} ${isClicked ? style.clicked : ""}`}
@@ -125,12 +141,16 @@ const ProductCart = ({ product, theme }) => {
             wrapper="span"
           />
         </div>
+
+        {/* Зображення товару */}
         {imageUrl ? (
           <img src={imageUrl} alt={productName} className={style.image} />
         ) : (
           <div className={style.image_placeholder}>Немає зображення</div>
         )}
       </div>
+
+      {/* Інформація про товар */}
       <div className={style.container_text}>
         <p className={style.name}>{productName}</p>
         {basePrice ? (

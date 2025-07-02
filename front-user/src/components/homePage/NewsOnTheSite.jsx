@@ -25,13 +25,13 @@ const NewsOnTheSite = ({
       </div>
       <div>
         <motion.img
-          key={newsKey} // Ключ для перезапуска анимации при смене новости
+          key={newsKey}
           src={img}
           alt={productName}
-          initial={{ opacity: 0 }} // Начальное состояние (затухание)
-          animate={{ opacity: 1 }} // Конечное состояние (появление)
-          exit={{ opacity: 0 }} // Состояние при уходе
-          transition={{ duration: 0.5 }} // Длительность анимации
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
         />
       </div>
     </div>

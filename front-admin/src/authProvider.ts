@@ -1,21 +1,20 @@
 const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
 
+// Провайдер авторизації для React Admin
 export const authProvider = {
   async login({
     username,
     phone,
     password,
   }: {
-    username?: string; // Из формы react-admin приходит username
+    username?: string;
     phone?: string;
     password: string;
   }) {
-    // Проверяем, что хотя бы username (email) или phone переданы
     if (!username && !phone) {
-      throw new Error("Email or phone must be provided");
+      throw new Error("Потрібно вказати email або телефон");
     }
 
-    // Преобразуем username в email
     const email = username;
 
     const request = new Request(`${apiUrl}/auth/signin`, {
@@ -26,7 +25,7 @@ export const authProvider = {
 
     const response = await fetch(request);
     if (response.status < 200 || response.status >= 300) {
-      throw new Error("Login failed");
+      throw new Error("Помилка авторизації");
     }
 
     const { access_token } = await response.json();
@@ -41,14 +40,13 @@ export const authProvider = {
       localStorage.removeItem("token");
       localStorage.removeItem("email");
       localStorage.removeItem("phone");
-      throw new Error("Session expired");
+      throw new Error("Сесія закінчилася");
     }
-    // other error codes (404, 500, etc): no need to log out
   },
 
   async checkAuth() {
     if (!localStorage.getItem("token")) {
-      throw new Error("Not authenticated");
+      throw new Error("Користувач не авторизований");
     }
   },
 
@@ -60,7 +58,7 @@ export const authProvider = {
 
   async getIdentity() {
     const token = localStorage.getItem("token");
-    if (!token) throw new Error("No token found");
+    if (!token) throw new Error("Токен не знайдено");
 
     const request = new Request(`${apiUrl}/auth/profile`, {
       method: "GET",
@@ -69,7 +67,7 @@ export const authProvider = {
 
     const response = await fetch(request);
     if (response.status < 200 || response.status >= 300) {
-      throw new Error("Failed to fetch user identity");
+      throw new Error("Не вдалося отримати дані користувача");
     }
 
     const { id, fullName } = await response.json();

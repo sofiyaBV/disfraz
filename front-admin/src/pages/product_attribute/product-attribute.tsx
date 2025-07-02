@@ -60,7 +60,7 @@ export const ProductAttributeShow = () => (
             <NumberField source="id" label="ID" />
             <TextField source="inStock" label="Наявність" />
             
-            {/* Используем Box вместо Grid для избежания проблем с версиями */}
+            {/* Використовуємо Box замість Grid для уникнення проблем із версіями */}
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                 <Box sx={{ flex: 1 }}>
                     <Card>

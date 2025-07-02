@@ -5,6 +5,7 @@ import ButtonGeneral from "../buttons/ButtonGeneral";
 import dataProvider from "../../utils/dataProvider";
 import { useAuth } from "../../utils/AuthContext";
 
+// Компонент форми реєстрації з підтримкою соціальних мереж
 const RegistrationForm = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const RegistrationForm = () => {
   const [serverError, setServerError] = useState(null);
   const [serverMessage, setServerMessage] = useState(null);
 
-  // Обробка Google OAuth callback
+  // Обробка callback від Google OAuth
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
@@ -32,7 +33,7 @@ const RegistrationForm = () => {
       login(token);
       setServerMessage("Авторизація через Google успішна! Перенаправлення...");
 
-      // Очищаем URL от параметров
+      // Очищуємо URL від параметрів
       const newUrl =
         window.location.protocol +
         "//" +
@@ -46,7 +47,7 @@ const RegistrationForm = () => {
     } else if (error) {
       setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
 
-      // Очищаем URL от параметров ошибки
+      // Очищуємо URL від параметрів помилки
       const newUrl =
         window.location.protocol +
         "//" +
@@ -56,6 +57,7 @@ const RegistrationForm = () => {
     }
   }, [login, navigate]);
 
+  // Зміна методу реєстрації (телефон/email)
   const handleMethodChange = (e) => {
     setMethod(e.target.value);
     setErrors({});
@@ -63,6 +65,7 @@ const RegistrationForm = () => {
     setServerMessage(null);
   };
 
+  // Обробка змін у полях форми
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -70,12 +73,13 @@ const RegistrationForm = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Очищаем ошибки при изменении полей
+    // Очищуємо помилки при зміні полів
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
+  // Валідація форми реєстрації
   const validateForm = () => {
     const newErrors = {};
 
@@ -113,6 +117,7 @@ const RegistrationForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Відправка форми реєстрації
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -128,12 +133,9 @@ const RegistrationForm = () => {
         password: formData.password,
       };
 
-      console.log("Attempting registration with params:", requestData);
       const response = await dataProvider.create("users", {
         data: requestData,
       });
-
-      console.log("Registration successful:", response);
 
       const token =
         response.data?.access_token ||
@@ -147,7 +149,7 @@ const RegistrationForm = () => {
           "Реєстрація успішна! Перенаправлення на головну сторінку..."
         );
 
-        // Очищаем форму
+        // Очищуємо форму
         setFormData({
           phone: "",
           email: "",
@@ -168,8 +170,6 @@ const RegistrationForm = () => {
         setTimeout(() => {
           navigate("/home");
         }, 1500);
-
-        console.warn("Токен не знайдено в відповіді сервера:", response);
       }
     } catch (error) {
       console.error("Помилка при реєстрації:", error);
@@ -181,7 +181,7 @@ const RegistrationForm = () => {
     }
   };
 
-  // Функція для авторизації через Google
+  // Авторизація через Google
   const handleGoogleAuth = () => {
     setServerError(null);
     setServerMessage(null);
@@ -190,12 +190,12 @@ const RegistrationForm = () => {
     window.location.href = `${apiUrl}/auth/google`;
   };
 
-  // Функція для авторизації через Facebook (заглушка)
+  // Авторизація через Facebook (заглушка)
   const handleFacebookAuth = () => {
     setServerError("Авторизація через Facebook поки не реалізована");
   };
 
-  // Функція для переходу на головну сторінку без реєстрації
+  // Перехід на головну сторінку без реєстрації
   const handleSkipRegistration = () => {
     navigate("/home");
   };
@@ -206,7 +206,7 @@ const RegistrationForm = () => {
       <h2 className={styles.title}>Реєстрація</h2>
       <p className={styles.subtitle}>Оберіть спосіб реєстрації</p>
 
-      {/* Социальные кнопки */}
+      {/* Соціальні мережі */}
       <div className={styles.socialAuth}>
         <button
           type="button"
@@ -229,7 +229,7 @@ const RegistrationForm = () => {
         </button>
       </div>
 
-      {/* Разделитель */}
+      {/* Розділювач */}
       <div className={styles.divider}>
         <span className={styles.dividerText}>
           За допомогою електронної пошти
@@ -237,7 +237,7 @@ const RegistrationForm = () => {
         <div className={styles.dividerLine}></div>
       </div>
 
-      {/* Переключатель метода регистрации */}
+      {/* Вибір методу реєстрації */}
       <div className={styles.methodOptions}>
         <label className={styles.methodLabel}>
           <input
@@ -266,7 +266,7 @@ const RegistrationForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Поле телефона или email */}
+        {/* Поле телефону або email */}
         {method === "phone" ? (
           <div className={styles.inputGroup}>
             <label htmlFor="phone">Телефон</label>
@@ -324,7 +324,7 @@ const RegistrationForm = () => {
           )}
         </div>
 
-        {/* Поле подтверждения пароля */}
+        {/* Поле підтвердження пароля */}
         <div className={styles.inputGroup}>
           <label htmlFor="confirmPassword">Підтвердити пароль</label>
           <div className={styles.passwordWrapper}>
@@ -347,7 +347,7 @@ const RegistrationForm = () => {
           )}
         </div>
 
-        {/* Чекбокс подписки */}
+        {/* Чекбокс підписки */}
         <div className={styles.checkboxGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -362,7 +362,7 @@ const RegistrationForm = () => {
           </label>
         </div>
 
-        {/* Чекбокс согласия */}
+        {/* Чекбокс згоди */}
         <div className={styles.checkboxGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -383,14 +383,14 @@ const RegistrationForm = () => {
           {errors.agree && <span className={styles.error}>{errors.agree}</span>}
         </div>
 
-        {/* Сообщения об ошибках и успехе */}
+        {/* Повідомлення про помилки та успіх */}
         {serverError && <div className={styles.serverError}>{serverError}</div>}
 
         {serverMessage && (
           <div className={styles.serverMessage}>{serverMessage}</div>
         )}
 
-        {/* Кнопки действий */}
+        {/* Кнопки дій */}
         <div className={styles.actionButtons}>
           <div className={styles.submitButton}>
             <ButtonGeneral
@@ -418,7 +418,7 @@ const RegistrationForm = () => {
         </div>
       </form>
 
-      {/* Дополнительные ссылки */}
+      {/* Додаткові посилання */}
       <div className={styles.additionalLinks}>
         <a href="/authorization">Вже маю акаунт</a>
       </div>
