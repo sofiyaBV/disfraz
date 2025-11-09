@@ -107,7 +107,6 @@ export class AuthService {
   }): Promise<User> {
     const { email, googleId } = data;
 
-    // Шукаємо користувача по email
     let user = await this.usersService.findByEmail(email);
 
     if (!user) {
