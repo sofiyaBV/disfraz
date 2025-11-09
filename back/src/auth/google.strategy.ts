@@ -18,15 +18,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
       scope: ['email', 'profile'],
     });
-
-    // Логируем конфигурацию
-    this.logger.log('Google Strategy инициализирован');
-    this.logger.log(
-      `Client ID: ${configService.get<string>('GOOGLE_CLIENT_ID')?.substring(0, 20)}...`,
-    );
-    this.logger.log(
-      `Callback URL: ${configService.get<string>('GOOGLE_CALLBACK_URL')}`,
-    );
   }
 
   async validate(
@@ -36,18 +27,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ): Promise<any> {
     try {
-      this.logger.log('Google OAuth validate вызван');
-      this.logger.log(`Profile: ${JSON.stringify(profile, null, 2)}`);
-
       const { name, emails, id } = profile;
       const email = emails[0]?.value;
 
       if (!email) {
-        this.logger.error('Email не найден в профиле Google');
+        this.logger.error('Email not found in Google profile');
         return done(new Error('Email not found in Google profile'), null);
       }
 
-      // Находим или создаем пользователя
       const user = await this.authService.findOrCreateGoogleUser({
         email,
         googleId: id,
@@ -55,9 +42,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         lastName: name?.familyName,
       });
 
-      this.logger.log(`Пользователь найден/создан: ${user.id}`);
+      this.logger.debug(`Google OAuth success for user ID: ${user.id}`);
 
-      // Создаем JWT токен
       const payload = {
         sub: user.id,
         email: user.email,
@@ -65,11 +51,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       };
 
       const jwtToken = await this.authService.generateJwtToken(payload);
-      this.logger.log('JWT токен создан');
 
       return done(null, { ...user, access_token: jwtToken });
     } catch (error) {
-      this.logger.error('Ошибка в Google OAuth validate:', error);
+      this.logger.error(
+        'Google OAuth validation error',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
       return done(error, null);
     }
   }

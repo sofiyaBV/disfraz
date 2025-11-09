@@ -2,43 +2,41 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Logger } from '@nestjs/common';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  private logger = new Logger('JwtAuthGuard');
+  private readonly logger = new Logger(JwtAuthGuard.name);
+
+  constructor(private reflector: Reflector) {
+    super();
+  }
 
   canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers.authorization;
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-    this.logger.log(`Заголовок авторизації: ${authHeader || 'Відсутній'}`);
-
-    if (!authHeader) {
-      this.logger.error('Заголовок авторизації не знайдений');
-      throw new UnauthorizedException('Токен не знайдений');
+    if (isPublic) {
+      this.logger.debug('Public route - bypassing JWT check');
+      return true;
     }
 
     return super.canActivate(context);
   }
 
-  handleRequest(err, user, info, context) {
-    const request = context.switchToHttp().getRequest();
-
+  handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
-      this.logger.warn(
-        `Помилка автентифікації JWT: ${info?.message || 'Невідома помилка'}`,
-      );
-      throw new UnauthorizedException('Недійсний або прострочений токен');
+      this.logger.warn(`JWT auth failed: ${info?.message || 'Unknown error'}`);
+      throw err || new UnauthorizedException('Invalid or expired token');
     }
 
-    request.user = user;
-    this.logger.log(
-      `Автентифікований користувач JWT: ${user.username} з ролями: ${user.roles}`,
-    );
-
+    this.logger.debug(`User authenticated: ${user.id}`);
     return user;
   }
 }

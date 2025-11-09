@@ -3,21 +3,25 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtStrategy } from './jwt.strategy';
-import { ConfigModule } from '@nestjs/config';
 import { GoogleStrategy } from './google.strategy';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '36000s' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '1d',
+        },
+      }),
     }),
   ],
   providers: [
@@ -26,7 +30,7 @@ import { GoogleStrategy } from './google.strategy';
     GoogleStrategy,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: JwtAuthGuard,
     },
   ],
   controllers: [AuthController],
