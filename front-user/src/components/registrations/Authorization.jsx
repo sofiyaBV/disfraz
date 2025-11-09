@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import facebook from "../../img/icon/facebook_color.png";
-import google from "../../img/icon/google_color.png";
 import add from "../../assets/add.png";
 import add_hover from "../../assets/add_hover.png";
+import facebook from "../../img/icon/facebook_color.png";
+import google from "../../img/icon/google_color.png";
 import styles from "../../style/authorization.module.css";
-import dataProvider from "../../utils/dataProvider";
+import { useAuth } from "../../utils/context/AuthContext";
+import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import { useAuth } from "../../utils/AuthContext";
 
 // Компонент авторизації користувачів з підтримкою різних методів входу
 const Authorization = ({ onClose }) => {

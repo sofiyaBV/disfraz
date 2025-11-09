@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../style/profile/profile.module.css";
-import ButtonGeneral from "../buttons/ButtonGeneral";
-import dataProvider from "../../utils/dataProvider";
-import { useAuth } from "../../utils/AuthContext";
-import Header from "../header/Header";
+import { useAuth } from "../../utils/context/AuthContext";
+import dataProvider from "../../utils/services/dataProvider";
 
 const ProfilePage = () => {
   const { token, logout, isLoading: authLoading, isAuthenticated } = useAuth();

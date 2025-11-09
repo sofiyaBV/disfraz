@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "../../style/footer.module.css";
 import payPalImage from "../../assets/footer/PayPal.png";
 import FooterSection from "./FooterSection";
-import { footerSections } from "../../utils/FooterData";
+import { footerSections } from "../../utils/constants/FooterData";
 
 const Footer = () => {
   const textSections = footerSections.filter(

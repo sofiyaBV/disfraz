@@ -1,8 +1,3 @@
-import offer1 from "../img/offers/offer1.png";
-import offer4 from "../img/offers/offer2.png";
-import offer3 from "../img/offers/offer3.png";
-import offer2 from "../img/offers/offer4.png";
-
 const offersData = [
   {
     title: "готуєшся до найстрашнішої ночі року?",
@@ -12,7 +7,7 @@ const offersData = [
     buttonLink: "/shop",
     textColor: "#fff",
     backgroundColor: "#B95A06",
-    img: offer1,
+    img: require("../../img/offers/offer1.png"),
   },
   {
     title: "розбуди в собі дух середньовічного героя!",
@@ -21,7 +16,7 @@ const offersData = [
     buttonLink: "/shop",
     textColor: "#fff",
     backgroundColor: "#3F3C38",
-    img: offer2,
+    img: require("../../img/offers/offer4.png"),
   },
   {
     title: "поринь у світ розкоші та таємниць",
@@ -31,7 +26,7 @@ const offersData = [
     buttonLink: "/shop",
     textColor: "#fff",
     backgroundColor: "#342843",
-    img: offer3,
+    img: require("../../img/offers/offer3.png"),
   },
   {
     title: "стань героєм власної історії",
@@ -41,7 +36,7 @@ const offersData = [
     buttonLink: "/shop",
     textColor: "#fff",
     backgroundColor: "#265A7F",
-    img: offer4,
+    img: require("../../img/offers/offer2.png"),
   },
 ];
 

@@ -1,7 +1,6 @@
-import React from "react";
 import style from "../../style/products/thematicProducts.module.css";
+import TematicsData from "../../utils/constants/TematicsData";
 import ProductCart from "../cart/ProductCart";
-import TematicsData from "../../utils/TematicsData";
 
 const ThematicProducts = ({
   theme,

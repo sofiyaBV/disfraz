@@ -1,24 +1,23 @@
 import "./App.css";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Registration from "./pages/Registration";
 import Authorization from "./components/registrations/Authorization";
 import Footer from "./components/footer/Footer";
 import Header from "./components/header/Header";
-// import Navigation from "./components/Navigation";
-import general from "./style/general_style.css";
+import "./style/general_style.css";
 import Breadcrumbs from "./components/Breadcrumbs";
 import ErrorPage from "./pages/ErrorPage";
 import ProfilePage from "./components/profile/profilePage";
 import Tests from "./pages/Tests";
-import { AuthProvider } from "./utils/AuthContext";
+import { AuthProvider } from "./utils/context/AuthContext";
 import AllSectionPage from "./pages/AllSectionPage";
 import ProductPage from "./pages/ProductPage";
 
 function App() {
   return (
     <AuthProvider>
-      <div className={general}>
+      <div>
         <Header />
         <Breadcrumbs />
         <Routes>
