@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import dataProvider from "../utils/dataProvider";
-import styles from "../../src/style/pagesStyle/productPage.module.css";
-import ButtonGeneral from "../components/buttons/ButtonGeneral";
-import { useAuth } from "../utils/AuthContext";
-import sizesImg from "../img/sizes.png";
 import { ReactSVG } from "react-svg";
+import styles from "../../src/style/pagesStyle/productPage.module.css";
 import heart from "../assets/svg/heartborder.svg";
-import icon_novaPay from "../img/icon/NovaPay.png";
-import icon_monobank from "../img/icon/monobank.png";
-import icon_PrivatBank from "../img/icon/privat.png";
-import vector from "../img/Vector.png";
+import ButtonGeneral from "../components/buttons/ButtonGeneral";
 import CommentSection from "../components/CommentSection";
+import icon_monobank from "../img/icon/monobank.png";
+import icon_novaPay from "../img/icon/NovaPay.png";
+import icon_PrivatBank from "../img/icon/privat.png";
+import sizesImg from "../img/sizes.png";
+import vector from "../img/Vector.png";
+import { useAuth } from "../utils/context/AuthContext";
+import dataProvider from "../utils/services/dataProvider";
 
 const ProductPage = () => {
   const { theme, productName } = useParams();

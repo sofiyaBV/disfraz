@@ -1,6 +1,3 @@
-import GooglePay from "../assets/footer/app_download_11.png";
-import AppStore from "../assets/footer/app_download_04.png";
-
 export const footerSections = [
   {
     title: "Інформація про компанію",
@@ -46,8 +43,16 @@ export const footerSections = [
   {
     title: "Завантажуйте наші застосунки",
     apps: [
-      { name: "Google Play", url: "/google-play", image: GooglePay },
-      { name: "App Store", url: "/app-store", image: AppStore },
+      {
+        name: "Google Play",
+        url: "/google-play",
+        image: require("../../assets/footer/app_download_11.png"),
+      },
+      {
+        name: "App Store",
+        url: "/app-store",
+        image: require("../../assets/footer/app_download_04.png"),
+      },
     ],
     socialTitle: "Ми в соціальних мережах",
     socialLinks: {

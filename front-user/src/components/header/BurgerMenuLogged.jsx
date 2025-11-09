@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "../../style/burgerMenu.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import Authorization from "../registrations/Authorization";
-import { useAuth } from "../../utils/AuthContext";
+import { useAuth } from "../../utils/context/AuthContext";
 import CatalogMenu from "./CatalogMenu";
 import {
   FaHome,

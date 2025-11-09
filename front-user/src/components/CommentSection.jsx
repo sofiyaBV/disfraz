@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import dataProvider from "../utils/dataProvider";
+import { useEffect, useState } from "react";
 import styles from "../../src/style/pagesStyle/productPage.module.css";
+import dataProvider from "../utils/services/dataProvider";
 
 const CommentSection = ({
   productAttributeId,
