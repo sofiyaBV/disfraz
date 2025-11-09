@@ -26,3 +26,4 @@ data
 
 .env
 docker.env
+.idea/.idea/
