@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   Logger,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
@@ -10,7 +11,7 @@ import { Role } from '../enums/role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  private logger = new Logger('RolesGuard');
+  private readonly logger = new Logger(RolesGuard.name);
 
   constructor(private reflector: Reflector) {}
 
@@ -20,27 +21,28 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (!requiredRoles) {
-      return true; // Якщо у метода немає обмежень за ролями, доступ відкритий
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
     }
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || !user.roles) {
-      //  Перевіряємо, чи є взагалі ролі
-      this.logger.warn('Запит без користувача або ролей - відхилено');
-      return false;
+    if (!user) {
+      this.logger.warn('Access denied: user not authenticated');
+      throw new ForbiddenException('Access denied');
     }
-
-    this.logger.log(`Користувач ${user.username} з ролями: ${user.roles}`);
 
     const hasRole = requiredRoles.some((role) => user.roles?.includes(role));
 
     if (!hasRole) {
-      this.logger.warn(`Доступ заборонений. Потрібні ролі: ${requiredRoles}`);
+      this.logger.warn(
+        `Access denied for user ID ${user.id}: required roles [${requiredRoles.join(', ')}]`,
+      );
+      throw new ForbiddenException('Insufficient permissions');
     }
 
-    return hasRole;
+    this.logger.debug(`Access granted for user ID: ${user.id}`);
+    return true;
   }
 }

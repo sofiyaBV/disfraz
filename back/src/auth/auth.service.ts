@@ -5,13 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 import { User } from '../user/entities/user.entity';
-
-interface UpdateProfileDto {
-  email?: string;
-  phone?: string;
-  password?: string;
-}
-
+import { UpdateProfileDto } from './dto/update-profile.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -111,23 +105,20 @@ export class AuthService {
     firstName?: string;
     lastName?: string;
   }): Promise<User> {
-    const { email, googleId, firstName, lastName } = data;
+    const { email, googleId } = data;
 
-    // Сначала ищем пользователя по email
+    // Шукаємо користувача по email
     let user = await this.usersService.findByEmail(email);
 
     if (!user) {
-      // Если пользователя нет, создаем нового
       const createUserDto: CreateUserDto = {
         email,
-        password: '', // Пароль не нужен для Google OAuth
+        password: '',
         phone: null,
         roles: [Role.User],
       };
 
       user = await this.usersService.createUser(createUserDto);
-
-      await this.usersService.updateUser(user.id, user);
     }
 
     return user;
