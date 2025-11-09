@@ -1,19 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
+
 export class SignInDto {
-  @ApiProperty({ example: 'admin', description: 'Имя пользователя' })
-  email: string;
+  @ApiProperty({
+    example: 'user@example.com',
+    description: 'Email користувача',
+    required: false,
+  })
+  @IsOptional()
+  @IsEmail({}, { message: 'Некоректний формат email' })
+  email?: string;
 
   @ApiProperty({
-    example: 'admin',
+    example: 'password123',
     description: 'Пароль користувача',
     minLength: 6,
   })
+  @IsString()
+  @MinLength(6, { message: 'Пароль має бути не менше 6 символів' })
   password: string;
 
   @ApiProperty({
     example: '+380123456789',
-    description: 'Номер телефона пользователя',
+    description: 'Номер телефону користувача',
     required: false,
   })
   @IsOptional()
