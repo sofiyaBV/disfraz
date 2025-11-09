@@ -16,6 +16,7 @@ import {
   ApiTags,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -46,6 +47,7 @@ export class CommentsController {
     return this.commentsService.create(createCommentDto, user.id);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Отримати всі коментарі' })
   @ApiResponse({
     status: 200,
@@ -57,6 +59,7 @@ export class CommentsController {
     return this.commentsService.findAllPag(query);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Отримати коментар за ID' })
   @ApiResponse({
     status: 200,
@@ -70,7 +73,7 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-  @Get(':id') // ИСПРАВЛЕНО: было @Get(''), теперь @Get(':id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(+id);
   }
@@ -90,9 +93,9 @@ export class CommentsController {
     example: 1,
   })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Patch(':id') // ИСПРАВЛЕНО: было @Patch(''), теперь @Patch(':id')
+  @UseGuards(RolesGuard)
   @Roles(Role.Admin)
+  @Patch(':id')
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
   }
@@ -106,10 +109,10 @@ export class CommentsController {
     description: 'ID коментаря',
     example: 1,
   })
-  @Delete(':id') // ИСПРАВЛЕНО: было @Delete(''), теперь @Delete(':id')
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(Role.Admin)
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.commentsService.remove(+id);
   }
