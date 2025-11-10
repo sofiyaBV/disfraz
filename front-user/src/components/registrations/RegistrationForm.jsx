@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../style/pagesStyle/registration.module.css";
+import { useAuth } from "../../utils/context/AuthContext";
+import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import dataProvider from "../../utils/dataProvider";
-import { useAuth } from "../../utils/AuthContext";
 
 // Компонент форми реєстрації з підтримкою соціальних мереж
 const RegistrationForm = () => {
