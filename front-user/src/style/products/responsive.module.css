@@ -1,0 +1,72 @@
+/* Responsive design */
+@media (max-width: 768px) {
+  .productPage {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 2rem;
+  }
+  
+  .imageSection {
+    flex-direction: column;
+  }
+  
+  .thumbnailColumn {
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .thumbnail {
+    flex-shrink: 0;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .newPrice,
+  .price {
+    font-size: 1.5rem;
+  }
+  
+  .optionsSection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .similarProductsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .comment_section {
+    flex-direction: column;
+  }
+  
+  .messageContainer {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .productPage {
+    padding: 0.5rem;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+  }
+  
+  .favoriteButton {
+    align-self: flex-start;
+  }
+}
