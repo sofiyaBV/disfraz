@@ -1,16 +1,8 @@
-import React, { useEffect, useState } from "react";
-import dataProvider from "../utils/dataProvider";
-import styles from "../../src/style/pagesStyle/productPage.module.css";
+import { useEffect, useState } from "react";
+import styles from "../../src/style/products/productPage.module.css";
+import dataProvider from "../utils/services/dataProvider";
 
-const CommentSection = ({
-  productAttributeId,
-  refresh,
-  setShowReviewModal,
-  showReviewModal,
-  reviewContent,
-  setReviewContent,
-  handleSubmitComment,
-}) => {
+const CommentSection = ({ productAttributeId, refresh }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

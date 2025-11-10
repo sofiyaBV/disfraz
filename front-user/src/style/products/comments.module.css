@@ -1,0 +1,35 @@
+/* Comments section */
+.section_2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem auto 2rem;
+  max-width: 1200px;
+  padding: 0 2rem;
+}
+
+.section_2 h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-right: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.img_vector {
+  flex: 1;
+  height: 2px;
+  max-width: 400px;
+}
+
+.comment_section {
+  max-width: 1200px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
+  display: flex;
+  gap: 2rem;
+}
+
+.comment_section2 {
+  flex: 1;
+}

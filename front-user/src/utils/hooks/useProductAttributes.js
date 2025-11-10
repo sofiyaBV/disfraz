@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import dataProvider from "./dataProvider";
+import dataProvider from "../services/dataProvider";
 
 const useProductAttributes = ({ productId } = {}) => {
   const [productAttributes, setProductAttributes] = useState([]);
