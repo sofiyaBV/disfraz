@@ -154,7 +154,7 @@ export class Migration1743868231694 implements MigrationInterface {
       INSERT INTO "user" ("email", "password", "roles", "createdAt", "updatedAt")
       VALUES ($1, $2, $3, NOW(), NOW())
     `,
-      ['admin', hashedPassword, ['admin']],
+      ['admin@disfraz.com', hashedPassword, ['admin12345']],
     );
 
     // Створення індексів для таблиці product_attribute
