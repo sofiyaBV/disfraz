@@ -146,7 +146,7 @@ export class Migration1743868231694 implements MigrationInterface {
 
     // Генерація хешованого пароля для адміністратора
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash('admin', salt);
+    const hashedPassword = await bcrypt.hash('admin12345', salt);
 
     // Додавання запису адміністратора до таблиці user
     await queryRunner.query(
@@ -154,7 +154,7 @@ export class Migration1743868231694 implements MigrationInterface {
       INSERT INTO "user" ("email", "password", "roles", "createdAt", "updatedAt")
       VALUES ($1, $2, $3, NOW(), NOW())
     `,
-      ['admin@disfraz.com', hashedPassword, ['admin12345']],
+      ['admin@disfraz.com', hashedPassword, ['admin']],
     );
 
     // Створення індексів для таблиці product_attribute
