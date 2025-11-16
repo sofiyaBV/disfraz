@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../style/burgerMenu.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
@@ -24,17 +24,15 @@ import {
   FaApple,
   FaGooglePlay,
 } from "react-icons/fa";
-
-// Оставляем только необходимые импорты изображений
 import LOGO from "../../assets/LOGO.png";
 import vector from "../../img/Vector.png";
 
 const BurgerMenuLogged = ({ onClose }) => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [isClosing, setIsClosing] = useState(false);
+  const [isClosing] = useState(false);
 
   const openAuthModal = () => {
     setIsAuthModalOpen(true);
@@ -54,11 +52,6 @@ const BurgerMenuLogged = ({ onClose }) => {
     if (e.target.className.includes(styles.modalOverlay)) {
       closeCatalogMenu();
     }
-  };
-
-  const resetAuthState = () => {
-    localStorage.removeItem("authToken");
-    logout();
   };
 
   const openCatalogMenu = () => {

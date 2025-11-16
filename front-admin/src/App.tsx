@@ -14,7 +14,7 @@ import { ProductAttributeList, ProductAttributeEdit, ProductAttributeShow, Produ
 
 
 export const App = () => (
-  <Admin layout={Layout} dataProvider={dataProvider} authProvider={authProvider}>
+  <Admin layout={Layout} dataProvider={dataProvider as any} authProvider={authProvider}>
         <Resource name="user" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} options={{label:"Користувачі"}}/>
         <Resource name="products" list={ProductList} edit={ProductEdit} show={ProductShow} create={ProductCreate}  options={{label:"Продукти"}}/>
         <Resource name="attributes" list={AttributeList} edit={AttributeEdit} show={AttributeShow} create={AttributeCreate} options={{label:"Атрибути"}} />

@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "../../style/footer.module.css";
 import {
   FaFacebook,

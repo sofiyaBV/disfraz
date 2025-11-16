@@ -186,9 +186,23 @@ export const dataProvider = {
     }).then(({ json }) => ({ data: json }));
   },
 
-  // Видалення запису
-  delete: (resource: string, params: any) =>
-    httpClient(`${apiUrl}/${resource}/${params.id}`, {
+  delete: (resource: string, params: any) => {
+    return httpClient(`${apiUrl}/${resource}/${params.id}`, {
       method: "DELETE",
-    }).then(({ json }) => ({ data: json })),
+    }).then(() => ({
+      data: { id: params.id },
+    }));
+  },
+
+  deleteMany: (resource: string, params: any) => {
+    const deletePromises = params.ids.map((id: any) =>
+      httpClient(`${apiUrl}/${resource}/${id}`, {
+        method: "DELETE",
+      }),
+    );
+
+    return Promise.all(deletePromises).then(() => ({
+      data: params.ids,
+    }));
+  },
 };
