@@ -181,20 +181,6 @@ const RegistrationForm = () => {
     }
   };
 
-  // Авторизація через Google
-  const handleGoogleAuth = () => {
-    setServerError(null);
-    setServerMessage(null);
-
-    const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
-    window.location.href = `${apiUrl}/auth/google`;
-  };
-
-  // Авторизація через Facebook (заглушка)
-  const handleFacebookAuth = () => {
-    setServerError("Авторизація через Facebook поки не реалізована");
-  };
-
   // Перехід на головну сторінку без реєстрації
   const handleSkipRegistration = () => {
     navigate("/home");
@@ -204,30 +190,6 @@ const RegistrationForm = () => {
     <div className={styles.container}>
       {/* Заголовок */}
       <h2 className={styles.title}>Реєстрація</h2>
-      <p className={styles.subtitle}>Оберіть спосіб реєстрації</p>
-
-      {/* Соціальні мережі */}
-      <div className={styles.socialAuth}>
-        <button
-          type="button"
-          className={`${styles.socialButton} ${styles.googleButton}`}
-          onClick={handleGoogleAuth}
-          disabled={isSubmitting}
-        >
-          <span className={styles.googleIcon}>G</span>
-          GOOGLE
-        </button>
-
-        <button
-          type="button"
-          className={`${styles.socialButton} ${styles.facebookButton}`}
-          onClick={handleFacebookAuth}
-          disabled={isSubmitting}
-        >
-          <span className={styles.facebookIcon}>f</span>
-          FACEBOOK
-        </button>
-      </div>
 
       {/* Розділювач */}
       <div className={styles.divider}>
