@@ -8,20 +8,20 @@ RUN npm install -g typescript
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json first
+# Copy package.json and yarn.lock files to the working directory
 COPY package.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of the application code to the working directory
 COPY . .
 
-# Build the application
+# Build
 RUN npm run build
 
 # Expose the port the app runs on
-EXPOSE 4173
+EXPOSE 3001
 
 # Start the application
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "4173"]
+CMD ["npm", "run", "serve"]
