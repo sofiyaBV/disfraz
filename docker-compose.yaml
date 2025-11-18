@@ -1,18 +1,23 @@
 services:
-
   cosplay.db:
     image: postgres:17.3
+    container_name: cosplay.db
     env_file:
       - docker.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=disfraz
     ports:
       - "5432:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d disfraz"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   cosplay.admin:
     container_name: cosplay.admin
@@ -22,6 +27,8 @@ services:
       context: ./front-admin
     ports:
       - "4173:4173"
+    depends_on:
+      - cosplay.api
 
   cosplay.api:
     container_name: cosplay.api
@@ -34,5 +41,3 @@ services:
       context: ./back
     ports:
       - "3000:3000"
-
-

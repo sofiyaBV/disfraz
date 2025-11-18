@@ -1,29 +1,30 @@
 # Use the official Node.js image as the base image
 FROM node:22-alpine
-RUN apk add --no-cache git libc6-compat
 
-RUN npm install -g npm@latest
-RUN npm install -g typescript
+# Install dependencies for building
+RUN apk add --no-cache git libc6-compat bash
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and yarn.lock files to the working directory
-COPY package.json ./
+# Copy package.json first (для кеширования слоев)
+COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci || npm install
 
-# Copy the rest of the application code to the working directory
+# Copy the rest of the application code
 COPY . .
 
 # Build the NestJS application
 RUN npm run build
 
-RUN npm run migration:run
+# Copy entrypoint script
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
-# Expose the port the app runs on
+# Expose the port
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start:prod"]
+# Start the application with migrations
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

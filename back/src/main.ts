@@ -12,10 +12,10 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:4114',
       'http://localhost:4173',
-    ], // Дозволяємо запити з Swagger та фронтенду
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Дозволені методи
-    allowedHeaders: ['Content-Type', 'Authorization'], // Дозволені заголовки
-    credentials: true, // Дозволяємо передачу cookies
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
   dotenv.config();
@@ -47,6 +47,9 @@ async function bootstrap() {
 
   SwaggerModule.setup('doc', app, document, swaggerCustomOptions);
 
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
+
+  console.log('🚀 Application is running on: http://localhost:3000');
+  console.log('📚 Swagger docs available at: http://localhost:3000/doc');
 }
 bootstrap();
