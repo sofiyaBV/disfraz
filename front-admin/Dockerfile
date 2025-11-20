@@ -17,11 +17,15 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# Build
+
+ARG VITE_JSON_SERVER_URL=http://localhost:3000
+ENV VITE_JSON_SERVER_URL=$VITE_JSON_SERVER_URL
+
+# Build with environment variable
 RUN npm run build
 
 # Expose the port the app runs on
-EXPOSE 3001
+EXPOSE 4173
 
 # Start the application
 CMD ["npm", "run", "serve"]
