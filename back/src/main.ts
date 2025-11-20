@@ -5,20 +5,25 @@ import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
 async function bootstrap() {
+  dotenv.config();
+
   const app = await NestFactory.create(AppModule);
 
+  // CORS для всех localhost портов
   app.enableCors({
     origin: [
       'http://localhost:3000',
-      'http://localhost:4114',
       'http://localhost:4173',
+      'http://localhost:4114',
+      'http://localhost:5173',
+      /^http:\/\/localhost:\d+$/,
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
 
-  dotenv.config();
+  app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
     .setTitle('User API')
@@ -42,8 +47,6 @@ async function bootstrap() {
     customCss: '.topbar { background-color: #4CAF50 }',
     customSiteTitle: 'User API Docs',
   };
-
-  app.useGlobalPipes(new ValidationPipe());
 
   SwaggerModule.setup('doc', app, document, swaggerCustomOptions);
 
