@@ -28,7 +28,7 @@ import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productAttributePaginateConfig } from '../config/pagination.config';
 import { ProductAttributeDto } from './dto/product-attribute.dto';
-
+import { Public } from '../auth/decorators/public.decorator';
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
 export class ProductAttributeController {
@@ -57,6 +57,7 @@ export class ProductAttributeController {
     description: 'Список всіх product-attribute',
   })
   @PaginatedSwaggerDocs(ProductAttributeDto, productAttributePaginateConfig)
+  @Public()
   @Get()
   async findAll(
     @Paginate() query: PaginateQuery,

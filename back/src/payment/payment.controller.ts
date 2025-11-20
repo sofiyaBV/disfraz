@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { HandleCallbackDto } from './dto/HandleCallback.Dto';
+import { HandleCallbackDto } from './dto/handlecallback.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
