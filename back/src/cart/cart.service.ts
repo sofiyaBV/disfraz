@@ -53,6 +53,17 @@ export class CartService {
     return paginate<Cart>(query, this.cartRepository, cartPaginateConfig);
   }
 
+  async findByUserId(userId: number): Promise<Cart[]> {
+    return this.cartRepository.find({
+      where: { user: { id: userId } },
+      relations: [
+        'productAttribute',
+        'productAttribute.product',
+        'productAttribute.attribute',
+      ],
+    });
+  }
+
   async findAll(): Promise<Cart[]> {
     return this.cartRepository.find({
       relations: [

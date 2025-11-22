@@ -119,12 +119,12 @@ const Header = () => {
           <Link to="/profile" className={styles.icon_link}>
             <img src={FaUser} alt="Profile" />
           </Link>
-          <Link to="" className={styles.icon_link}>
+          {/* <Link to="" className={styles.icon_link}>
             <img src={FaHeart} alt="Favorites" />
-          </Link>
-          <div className={styles.icon_link}>
+          </Link> */}
+          <Link to="/cart" className={styles.icon_link}>
             <img src={FaShoppingCart} alt="Cart" />
-          </div>
+          </Link>
         </div>
       </header>
       {isMenuOpen && <BurgerMenuLogged onClose={toggleMenu} />}

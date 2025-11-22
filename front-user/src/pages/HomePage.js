@@ -24,7 +24,6 @@ import img1woman from "../img/newsS/women1.png";
 import img2woman from "../img/newsS/women2.png";
 
 const HomePage = () => {
-  // Рефи для скролу
   const offersScrollRef = useRef(null);
   const tematicsScrollRef1 = useRef(null);
   const tematicsScrollRef2 = useRef(null);

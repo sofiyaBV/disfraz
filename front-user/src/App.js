@@ -13,7 +13,7 @@ import Tests from "./pages/Tests";
 import { AuthProvider } from "./utils/context/AuthContext";
 import AllSectionPage from "./pages/AllSectionPage";
 import ProductPage from "./pages/ProductPage";
-
+import CartPage from "./pages/CartPage";
 function App() {
   return (
     <AuthProvider>
@@ -31,6 +31,7 @@ function App() {
           <Route path="/tematics" element={<AllSectionPage />} />
           <Route path="/test" element={<Tests />} />
           <Route path="*" element={<ErrorPage />} />
+          <Route path="/cart" element={<CartPage />} />
         </Routes>
         <Footer />
       </div>

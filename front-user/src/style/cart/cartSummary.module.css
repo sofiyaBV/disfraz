@@ -1,0 +1,114 @@
+.summary {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  position: sticky;
+  top: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.totalLabel {
+  color: #e53935;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.totalItems {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.closeBtn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.closeBtn:hover {
+  color: #333;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.label {
+  color: #e53935;
+  font-size: 14px;
+}
+
+.value {
+  font-size: 16px;
+  color: #333;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.totalRow .totalLabel {
+  font-size: 16px;
+}
+
+.totalValue {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.continueBtn {
+  width: 100%;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.continueBtn:hover {
+  background: #f5f5f5;
+}
+
+.checkoutBtn {
+  width: 100%;
+  padding: 15px;
+  background: #333;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkoutBtn:hover {
+  background: #555;
+}
+
+@media (max-width: 1024px) {
+  .summary {
+    position: static;
+  }
+}

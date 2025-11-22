@@ -49,6 +49,14 @@ export class CartController {
     return this.cartService.create(createCartDto, user.id);
   }
 
+  @Get('my')
+  @Roles(Role.User, Role.Admin)
+  @ApiOperation({ summary: 'Отримати кошик поточного користувача' })
+  @ApiResponse({ status: 200, description: 'Кошик користувача', type: [Cart] })
+  async getMyCart(@User() user: any): Promise<Cart[]> {
+    return this.cartService.findByUserId(user.id);
+  }
+
   @Get()
   @Roles(Role.Admin)
   @ApiOperation({ summary: 'Отримати всі кошики' })
