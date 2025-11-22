@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import CategoriesScrole from "../components/CategoriesScrole";
 import NewsOnTheSite from "../components/homePage/NewsOnTheSite";
 import Offers from "../components/homePage/Offers";
@@ -7,11 +7,16 @@ import TematicsScrole from "../components/homePage/TematicsScrole";
 import ProductScroll from "../components/Products/ProductScroll";
 import ThematicProducts from "../components/Products/ThematicProducts";
 import style from "../style/pagesStyle/homePage.module.css";
+
 import categoriesData from "../utils/constants/CategoriesData";
 import newsData from "../utils/constants/NewsData";
 import offersData from "../utils/constants/OffersData";
 import TematicsData from "../utils/constants/TematicsData";
-import dataProvider from "../utils/services/dataProvider";
+
+import useAutoScroll from "../utils/hooks/useAutoScroll";
+import useCarousel from "../utils/hooks/useCarousel";
+import usePagination from "../utils/hooks/usePagination";
+import useHomePageData from "../utils/hooks/useHomePageData";
 
 import img1man from "../img/newsS/man1.png";
 import img2man from "../img/newsS/man2.png";
@@ -19,340 +24,75 @@ import img1woman from "../img/newsS/women1.png";
 import img2woman from "../img/newsS/women2.png";
 
 const HomePage = () => {
-  const scrollRef = useRef(null);
+  // Рефи для скролу
+  const offersScrollRef = useRef(null);
   const tematicsScrollRef1 = useRef(null);
   const tematicsScrollRef2 = useRef(null);
   const categoriesScrollRef = useRef(null);
-  const topSalesScrollRef = useRef(null);
-  const discountScrollRef = useRef(null);
 
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const currentTematicsIndexRef = useRef(0);
+  // Завантаження даних
+  const { thematicProductAttributes, allProducts, loading, error } =
+    useHomePageData();
 
-  const [thematicProductAttributes, setThematicProductAttributes] = useState(
-    {}
-  );
-  const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
-  const [topSalesIndex, setTopSalesIndex] = useState(0);
-  const [discountIndex, setDiscountIndex] = useState(0);
-
-  const themesToLoad = TematicsData.map((item) => item.theme);
-  const itemsPerPage = 4;
-
-  const fetchProductAttributesByTheme = async (theme) => {
-    try {
-      const productAttributesResponse = await dataProvider.getList(
-        "product-attributes",
-        {
-          filter: { "attribute.theme": theme },
-        }
-      );
-      return productAttributesResponse.data || [];
-    } catch (err) {
-      console.error(
-        `Error fetching product-attributes for theme ${theme}:`,
-        err
-      );
-      throw err;
-    }
-  };
-
-  const fetchAllProducts = async () => {
-    try {
-      const response = await dataProvider.getList("product-attributes", {
-        filter: {},
-      });
-      return response.data || [];
-    } catch (err) {
-      console.error("Error fetching all products:", err);
-      throw err;
-    }
-  };
-
-  useEffect(() => {
-    const loadAllData = async () => {
-      setLoading(true);
-      try {
-        const productAttributesByTheme = {};
-        for (const theme of themesToLoad) {
-          if (!thematicProductAttributes[theme]) {
-            const productAttributes = await fetchProductAttributesByTheme(
-              theme
-            );
-            productAttributesByTheme[theme] = productAttributes;
-          }
-        }
-        setThematicProductAttributes((prev) => ({
-          ...prev,
-          ...productAttributesByTheme,
-        }));
-
-        const products = await fetchAllProducts();
-        setAllProducts(products);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message || "Ошибка при загрузке данных");
-        setLoading(false);
-      }
-    };
-
-    loadAllData();
-  }, []);
-
-  const handlePrevTheme = () => {
-    setCurrentThemeIndex((prevIndex) =>
-      prevIndex === 0 ? TematicsData.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleNextTheme = () => {
-    setCurrentThemeIndex((prevIndex) =>
-      prevIndex === TematicsData.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const handlePrevTopSales = () => {
-    setTopSalesIndex((prevIndex) =>
-      prevIndex === 0
-        ? Math.floor(topSalesProducts.length / itemsPerPage) - 1
-        : prevIndex - 1
-    );
-  };
-
-  const handleNextTopSales = () => {
-    setTopSalesIndex((prevIndex) =>
-      prevIndex === Math.floor(topSalesProducts.length / itemsPerPage) - 1
-        ? 0
-        : prevIndex + 1
-    );
-  };
-
-  const handlePrevDiscount = () => {
-    setDiscountIndex((prevIndex) =>
-      prevIndex === 0
-        ? Math.floor(discountProducts.length / itemsPerPage) - 1
-        : prevIndex - 1
-    );
-  };
-
-  const handleNextDiscount = () => {
-    setDiscountIndex((prevIndex) =>
-      prevIndex === Math.floor(discountProducts.length / itemsPerPage) - 1
-        ? 0
-        : prevIndex + 1
-    );
-  };
-
-  useEffect(() => {
-    let mounted = true;
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-
-    const scrollWidth = scrollContainer.scrollWidth;
-    const clientWidth = window.innerWidth;
-    let scrollPosition = 0;
-    let lastTime = 0;
-
-    const scroll = (currentTime) => {
-      if (!mounted) return;
-
-      if (!lastTime) lastTime = currentTime;
-      const deltaTime = currentTime - lastTime;
-
-      if (deltaTime >= 5500) {
-        scrollPosition += clientWidth;
-        if (scrollPosition >= scrollWidth) {
-          scrollPosition = 0;
-        }
-        scrollContainer.scrollTo({
-          left: scrollPosition,
-          behavior: "smooth",
-        });
-        lastTime = currentTime;
-      }
-
-      requestAnimationFrame(scroll);
-    };
-
-    requestAnimationFrame(scroll);
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const updateNews = (currentTime) => {
-      if (!mounted) return;
-
-      if (!lastNewsTime) lastNewsTime = currentTime;
-      const deltaTime = currentTime - lastNewsTime;
-
-      if (deltaTime >= 6000) {
-        setCurrentNewsIndex((prevIndex) =>
-          prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
-        );
-        lastNewsTime = currentTime;
-      }
-
-      requestAnimationFrame(updateNews);
-    };
-
-    let lastNewsTime = 0;
-    requestAnimationFrame(updateNews);
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    const tematicsContainer = tematicsScrollRef1.current;
-    if (!tematicsContainer) return;
-
-    const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2);
-    let scrollPosition = 0;
-    let lastTime = 0;
-
-    const scrollTematics = (currentTime) => {
-      if (!mounted) return;
-
-      if (!lastTime) lastTime = currentTime;
-      const deltaTime = currentTime - lastTime;
-
-      if (deltaTime >= 5000) {
-        scrollPosition += cardWidth;
-        if (scrollPosition >= tematicsContainer.scrollWidth) {
-          scrollPosition = 0;
-          currentTematicsIndexRef.current = 0;
-        } else {
-          currentTematicsIndexRef.current += 2;
-        }
-        tematicsContainer.scrollTo({
-          left: scrollPosition,
-          behavior: "smooth",
-        });
-        lastTime = currentTime;
-      }
-
-      requestAnimationFrame(scrollTematics);
-    };
-
-    requestAnimationFrame(scrollTematics);
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    const tematicsContainer = tematicsScrollRef2.current;
-    if (!tematicsContainer) return;
-
-    const cardWidth = tematicsContainer.scrollWidth / (TematicsData.length / 2);
-    let scrollPosition = 0;
-    let lastTime = 0;
-
-    const scrollTematics = (currentTime) => {
-      if (!mounted) return;
-
-      if (!lastTime) lastTime = currentTime;
-      const deltaTime = currentTime - lastTime;
-
-      if (deltaTime >= 5000) {
-        scrollPosition += cardWidth;
-        if (scrollPosition >= tematicsContainer.scrollWidth) {
-          scrollPosition = 0;
-          currentTematicsIndexRef.current = 0;
-        } else {
-          currentTematicsIndexRef.current += 2;
-        }
-        tematicsContainer.scrollTo({
-          left: scrollPosition,
-          behavior: "smooth",
-        });
-        lastTime = currentTime;
-      }
-
-      requestAnimationFrame(scrollTematics);
-    };
-
-    requestAnimationFrame(scrollTematics);
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    const categoriesContainer = categoriesScrollRef.current;
-    if (!categoriesContainer) return;
-
-    const cardWidth =
-      categoriesContainer.scrollWidth / (categoriesData.length / 5);
-    let scrollPosition = 0;
-    let lastTime = 0;
-
-    const scrollCategories = (currentTime) => {
-      if (!mounted) return;
-
-      if (!lastTime) lastTime = currentTime;
-      const deltaTime = currentTime - lastTime;
-
-      if (deltaTime >= 6000) {
-        scrollPosition += cardWidth;
-        if (scrollPosition >= categoriesContainer.scrollWidth) {
-          scrollPosition = 0;
-        }
-        categoriesContainer.scrollTo({
-          left: scrollPosition,
-          behavior: "smooth",
-        });
-        lastTime = currentTime;
-      }
-
-      requestAnimationFrame(scrollCategories);
-    };
-
-    requestAnimationFrame(scrollCategories);
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
+  // Фільтруємо товари
   const topSalesProducts = allProducts.filter(
-    (product) => product.product?.topSale === true
+    (p) => p.product?.topSale === true
   );
-
   const discountProducts = allProducts.filter(
-    (product) => product.product?.newPrice != null
+    (p) => p.product?.newPrice != null
   );
 
-  const displayedTopSales = topSalesProducts.slice(
-    topSalesIndex * itemsPerPage,
-    (topSalesIndex + 1) * itemsPerPage
-  );
-  const displayedDiscount = discountProducts.slice(
-    discountIndex * itemsPerPage,
-    (discountIndex + 1) * itemsPerPage
-  );
+  // Автоскрол секцій
+  useAutoScroll(offersScrollRef, {
+    interval: 5500,
+    itemsPerScroll: 1,
+    totalItems: offersData.length,
+  });
 
+  useAutoScroll(tematicsScrollRef1, {
+    interval: 5000,
+    itemsPerScroll: 2,
+    totalItems: TematicsData.length,
+  });
+
+  useAutoScroll(tematicsScrollRef2, {
+    interval: 5000,
+    itemsPerScroll: 2,
+    totalItems: TematicsData.length,
+  });
+
+  useAutoScroll(categoriesScrollRef, {
+    interval: 6000,
+    itemsPerScroll: 5,
+    totalItems: categoriesData.length,
+  });
+
+  // Карусель новин
+  const currentNewsIndex = useCarousel(newsData.length, 6000);
   const currentNews = newsData[currentNewsIndex];
-  const currentTheme = TematicsData[currentThemeIndex].theme;
+
+  // Пагінація тематик
+  const themePagination = usePagination(TematicsData.length, 1);
+  const currentTheme = TematicsData[themePagination.currentIndex]?.theme;
+
+  // Пагінація топ продажів
+  const topSalesPagination = usePagination(topSalesProducts.length, 4);
+  const displayedTopSales = topSalesProducts.slice(
+    topSalesPagination.startIndex,
+    topSalesPagination.endIndex
+  );
+
+  // Пагінація акційних товарів
+  const discountPagination = usePagination(discountProducts.length, 4);
+  const displayedDiscount = discountProducts.slice(
+    discountPagination.startIndex,
+    discountPagination.endIndex
+  );
 
   return (
     <div className={style.general}>
-      <div className={style.offers_scroll} ref={scrollRef}>
+      {/* Офери */}
+      <div className={style.offers_scroll} ref={offersScrollRef}>
         {offersData.map((offer, index) => (
           <Offers
             key={index}
@@ -366,6 +106,8 @@ const HomePage = () => {
           />
         ))}
       </div>
+
+      {/* Новини */}
       <div className={style.section_news}>
         <div className={style.news_general}>
           <NewsOnTheSite
@@ -383,6 +125,8 @@ const HomePage = () => {
           <SuitWM title="Жіночі костюми" img1={img1woman} img2={img2woman} />
         </div>
       </div>
+
+      {/* Тематики 1 */}
       <div className={style.scrol_tematic} ref={tematicsScrollRef1}>
         {TematicsData.map((item, index) => (
           <TematicsScrole
@@ -393,6 +137,8 @@ const HomePage = () => {
           />
         ))}
       </div>
+
+      {/* Категорії */}
       <div className={style.categories_section}>
         <h3>ПОПУЛЯРНІ КАТЕГОРІЇ</h3>
         <div className={style.scrol_categories} ref={categoriesScrollRef}>
@@ -405,16 +151,20 @@ const HomePage = () => {
           ))}
         </div>
       </div>
+
+      {/* Тематичні товари */}
       <div className={style.themeNavigation}>
         <ThematicProducts
           theme={currentTheme}
           productAttributes={thematicProductAttributes[currentTheme] || []}
           loading={loading}
           error={error}
-          handlePrevTheme={handlePrevTheme}
-          handleNextTheme={handleNextTheme}
+          handlePrevTheme={themePagination.goPrev}
+          handleNextTheme={themePagination.goNext}
         />
       </div>
+
+      {/* Тематики 2 */}
       <div className={style.scrol_tematic} ref={tematicsScrollRef2}>
         {TematicsData.map((item, index) => (
           <TematicsScrole
@@ -425,22 +175,26 @@ const HomePage = () => {
           />
         ))}
       </div>
+
+      {/* Акційні товари */}
       <div className={style.topSales_discountSection}>
         <ProductScroll
           title="АКЦІЙНІ ТОВАРИ"
           products={displayedDiscount}
-          handlePrev={handlePrevDiscount}
-          handleNext={handleNextDiscount}
-          disabled={discountProducts.length <= itemsPerPage}
+          handlePrev={discountPagination.goPrev}
+          handleNext={discountPagination.goNext}
+          disabled={discountPagination.isDisabled}
         />
       </div>
+
+      {/* Топ продаж */}
       <div className={style.topSales_discountSection}>
         <ProductScroll
           title="ТОП ПРОДАЖ"
           products={displayedTopSales}
-          handlePrev={handlePrevTopSales}
-          handleNext={handleNextTopSales}
-          disabled={topSalesProducts.length <= itemsPerPage}
+          handlePrev={topSalesPagination.goPrev}
+          handleNext={topSalesPagination.goNext}
+          disabled={topSalesPagination.isDisabled}
         />
       </div>
     </div>
