@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,6 +11,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
+import { PaymentStatus } from './enums/payment-status.enum';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -54,12 +56,15 @@ export class PaymentService {
       paymentMethod =
         await this.stripe.paymentMethods.retrieve(paymentMethodId);
       if (paymentMethod.type !== 'card') {
-        throw new Error('Метод оплати має бути карткою');
+        throw new BadRequestException('Метод оплати має бути карткою');
       }
     } catch (error: any) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new Error(`Помилка при отриманні методу оплати: ${errorMessage}`);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Невірний метод оплати: ${error.message || 'Невідома помилка'}`,
+      );
     }
 
     const payment = this.paymentRepository.create({
@@ -67,7 +72,7 @@ export class PaymentService {
       amount: order.price,
       currency: currency || 'UAH',
       description: description || `Оплата замовлення #${order.id}`,
-      status: 'pending',
+      status: PaymentStatus.PENDING,
       stripePaymentIntentId: null,
       last4: paymentMethod.card?.last4,
       cardType: paymentMethod.card?.brand,
@@ -77,18 +82,21 @@ export class PaymentService {
     try {
       savedPayment = await this.paymentRepository.save(payment);
     } catch (error: any) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new Error(`Помилка при збереженні платежу: ${errorMessage}`);
+      throw new InternalServerErrorException(
+        `Помилка при збереженні платежу: ${error.message || 'Невідома помилка'}`,
+      );
     }
 
     let paymentIntent: Stripe.PaymentIntent;
     try {
       paymentIntent = await this.stripe.paymentIntents.create({
-        amount: Math.round(order.price * 100), // Використовуємо order.price
+        amount: Math.round(order.price * 100),
         currency: currency || 'UAH',
         description: description || `Оплата замовлення #${order.id}`,
-        metadata: { orderId: order.id.toString(), paymentId: savedPayment.id },
+        metadata: {
+          orderId: order.id.toString(),
+          paymentId: savedPayment.id.toString(),
+        },
         payment_method: paymentMethodId,
         confirm: true,
         automatic_payment_methods: {
@@ -98,13 +106,26 @@ export class PaymentService {
       });
 
       savedPayment.stripePaymentIntentId = paymentIntent.id;
-      savedPayment.status = paymentIntent.status;
+      savedPayment.status = paymentIntent.status as PaymentStatus;
       await this.paymentRepository.save(savedPayment);
     } catch (error: any) {
       await this.paymentRepository.delete(savedPayment.id);
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new Error(`Помилка при створенні PaymentIntent: ${errorMessage}`);
+
+      const stripeError = error as Stripe.errors.StripeError;
+
+      if (stripeError.type === 'StripeCardError') {
+        throw new BadRequestException(
+          `Картку відхилено: ${stripeError.message}`,
+        );
+      }
+
+      if (stripeError.type === 'StripeInvalidRequestError') {
+        throw new BadRequestException(`Невірний запит: ${stripeError.message}`);
+      }
+
+      throw new InternalServerErrorException(
+        `Помилка при створенні платежу: ${error.message || 'Невідома помилка'}`,
+      );
     }
 
     return {
@@ -112,6 +133,8 @@ export class PaymentService {
       paymentId: savedPayment.id,
       stripePaymentIntentId: paymentIntent.id,
       status: paymentIntent.status,
+      requiresAction: paymentIntent.status === 'requires_action',
+      nextAction: paymentIntent.next_action,
     };
   }
 
@@ -131,7 +154,9 @@ export class PaymentService {
     const payment = await this.findOne(id);
 
     if (updatePaymentDto.amount && updatePaymentDto.amount !== payment.amount) {
-      throw new Error('Оновлення суми платежу не допускається після створення');
+      throw new BadRequestException(
+        'Оновлення суми платежу не допускається після створення',
+      );
     }
 
     await this.paymentRepository.update(id, updatePaymentDto);
@@ -139,39 +164,75 @@ export class PaymentService {
   }
 
   async remove(id: number) {
-    const payment = await this.findOne(id);
+    await this.findOne(id);
     await this.paymentRepository.delete(id);
     return { message: `Платіж #${id} видалено` };
   }
 
-  async handleCallback(data: { paymentIntentId: string }) {
-    const { paymentIntentId } = data;
+  async handleWebhook(rawBody: Buffer, signature: string) {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    if (!paymentIntentId) {
-      throw new BadRequestException('paymentIntentId є обов’язковим');
+    if (!webhookSecret) {
+      throw new InternalServerErrorException('WEBHOOKне налаштовано');
     }
 
+    let event: Stripe.Event;
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        webhookSecret,
+      );
+    } catch (error: any) {
+      throw new BadRequestException(`Webhook помилка: ${error.message}`);
+    }
+
+    switch (event.type) {
+      case 'payment_intent.succeeded': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await this.updatePaymentStatus(
+          paymentIntent.id,
+          PaymentStatus.SUCCEEDED,
+        );
+        break;
+      }
+      case 'payment_intent.payment_failed': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await this.updatePaymentStatus(paymentIntent.id, PaymentStatus.FAILED);
+        break;
+      }
+      case 'payment_intent.canceled': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await this.updatePaymentStatus(
+          paymentIntent.id,
+          PaymentStatus.CANCELED,
+        );
+        break;
+      }
+      case 'payment_intent.processing': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        await this.updatePaymentStatus(
+          paymentIntent.id,
+          PaymentStatus.PROCESSING,
+        );
+        break;
+      }
+    }
+
+    return { received: true };
+  }
+
+  private async updatePaymentStatus(
+    stripePaymentIntentId: string,
+    status: PaymentStatus,
+  ) {
     const payment = await this.paymentRepository.findOne({
-      where: { stripePaymentIntentId: paymentIntentId },
+      where: { stripePaymentIntentId },
     });
 
-    if (!payment) {
-      throw new NotFoundException('Платіж не знайдено');
+    if (payment) {
+      payment.status = status;
+      await this.paymentRepository.save(payment);
     }
-
-    let paymentIntent: Stripe.PaymentIntent;
-    try {
-      paymentIntent =
-        await this.stripe.paymentIntents.retrieve(paymentIntentId);
-    } catch (error: any) {
-      throw new BadRequestException(
-        `Помилка при отриманні PaymentIntent: ${error.message}`,
-      );
-    }
-
-    payment.status = paymentIntent.status;
-    await this.paymentRepository.save(payment);
-
-    return payment;
   }
 }

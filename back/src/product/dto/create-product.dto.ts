@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsNumber,
@@ -5,48 +6,58 @@ import {
   IsArray,
   IsBoolean,
 } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
-  @IsString()
   @ApiProperty({
+    type: 'string',
     example: 'Костюм супергероя',
     description: 'Назва товару',
   })
+  @IsString()
   name: string;
 
-  @IsNumber()
   @ApiProperty({
+    type: 'number',
     example: 199.99,
     description: 'Ціна товару',
   })
+  @IsNumber()
   price: number;
 
-  @IsNumber()
-  @IsOptional()
   @ApiPropertyOptional({
+    type: 'number',
     example: 25,
     description: 'Знижка на товар у відсотках (0-100)',
   })
+  @IsNumber()
+  @IsOptional()
   discount?: number;
 
-  @IsBoolean()
-  @IsOptional()
   @ApiPropertyOptional({
+    type: 'boolean',
     example: true,
     description: 'Чи є товар топовим у продажу',
   })
+  @IsBoolean()
+  @IsOptional()
   topSale?: boolean;
 
-  @IsString()
-  @IsOptional()
   @ApiPropertyOptional({
+    type: 'string',
     example: 'Костюм для косплею',
     description: 'Опис товару',
   })
+  @IsString()
+  @IsOptional()
   description?: string;
 
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'integer' },
+    example: [5, 7],
+    description: 'Список ID схожих товарів',
+  })
   @IsArray()
   @IsNumber({}, { each: true })
   @IsOptional()
@@ -64,9 +75,12 @@ export class CreateProductDto {
     }
     return value;
   })
-  @ApiPropertyOptional({
-    example: [5, 7],
-    description: 'Список ID схожих товарів',
-  })
   similarProductIds?: number[];
+
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    description: 'Файли зображень (до 10 файлів)',
+  })
+  images?: any[];
 }

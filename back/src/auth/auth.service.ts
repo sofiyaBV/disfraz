@@ -68,7 +68,6 @@ export class AuthService {
       throw new UnauthorizedException('Користувач не знайдений');
     }
 
-    // Проверяем уникальность email, если он изменяется
     if (updateData.email && updateData.email !== user.email) {
       const existingUser = await this.usersService.findByEmail(
         updateData.email,
@@ -78,7 +77,6 @@ export class AuthService {
       }
     }
 
-    // Проверяем уникальность телефона, если он изменяется
     if (updateData.phone && updateData.phone !== user.phone) {
       const existingUser = await this.usersService.findByPhone(
         updateData.phone,
@@ -90,7 +88,6 @@ export class AuthService {
       }
     }
 
-    // Хешируем новый пароль, если он предоставлен
     if (updateData.password) {
       const saltRounds = 10;
       updateData.password = await bcrypt.hash(updateData.password, saltRounds);

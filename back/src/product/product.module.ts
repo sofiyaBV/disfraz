@@ -4,6 +4,7 @@ import { Product } from './entities/product.entity';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 import { Attribute } from '../attribute/entities/attribute.entity';
+import { ImageService } from './image.service';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { extname } from 'path';
@@ -12,7 +13,7 @@ import { extname } from 'path';
   imports: [
     TypeOrmModule.forFeature([Product, Attribute]),
     MulterModule.register({
-      storage: multer.memoryStorage(), // Зберігаємо файли в пам'яті перед відправленням в ImgBB
+      storage: multer.memoryStorage(),
       fileFilter: (req, file, callback) => {
         const allowedTypes = /jpeg|jpg|png|gif/;
         const ext = extname(file.originalname).toLowerCase();
@@ -28,12 +29,12 @@ import { extname } from 'path';
         }
       },
       limits: {
-        fileSize: 32 * 1024 * 1024, // Ограничение размера файла (32 МБ, как у ImgBB)
+        fileSize: 32 * 1024 * 1024,
       },
     }),
   ],
   controllers: [ProductController],
-  providers: [ProductService],
+  providers: [ProductService, ImageService],
   exports: [ProductService],
 })
 export class ProductModule {}

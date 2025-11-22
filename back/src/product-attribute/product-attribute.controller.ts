@@ -22,13 +22,13 @@ import {
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { AuthGuard } from '@nestjs/passport';
 import { ProductAttribute } from './entities/product-attribute.entity';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productAttributePaginateConfig } from '../config/pagination.config';
 import { ProductAttributeDto } from './dto/product-attribute.dto';
 import { Public } from '../auth/decorators/public.decorator';
+
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
 export class ProductAttributeController {
@@ -36,6 +36,10 @@ export class ProductAttributeController {
     private readonly productAttributeService: ProductAttributeService,
   ) {}
 
+  @Post()
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
   @ApiOperation({ summary: 'Створіть новий product-attribute' })
   @ApiResponse({
     status: 201,
@@ -43,28 +47,26 @@ export class ProductAttributeController {
     type: ProductAttribute,
   })
   @ApiBody({ type: CreateProductAttributeDto })
-  @Post()
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin, Role.User)
   create(@Body() createProductAttributeDto: CreateProductAttributeDto) {
     return this.productAttributeService.create(createProductAttributeDto);
   }
 
+  @Public()
+  @Get()
   @ApiOperation({ summary: 'Отримати всi product-attribute ' })
   @ApiResponse({
     status: 200,
     description: 'Список всіх product-attribute',
   })
   @PaginatedSwaggerDocs(ProductAttributeDto, productAttributePaginateConfig)
-  @Public()
-  @Get()
   async findAll(
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<ProductAttribute>> {
     return this.productAttributeService.findAllPag(query);
   }
 
+  @Public()
+  @Get(':id')
   @ApiOperation({ summary: 'Отримати product-attribute за ID' })
   @ApiResponse({
     status: 200,
@@ -81,14 +83,15 @@ export class ProductAttributeController {
     description: 'Product-attribute ID',
     example: 1,
   })
-  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productAttributeService.findOne(+id);
   }
 
-  @ApiOperation({
-    summary: 'Оновлення product-attribute за ID',
-  })
+  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
+  @ApiOperation({ summary: 'Оновлення product-attribute за ID' })
   @ApiResponse({
     status: 200,
     description: 'Product-attribute успішно оновлено',
@@ -105,10 +108,6 @@ export class ProductAttributeController {
     description: 'Product-attribute ID',
     example: 1,
   })
-  @Patch(':id')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.Admin)
   update(
     @Param('id') id: string,
     @Body() updateProductAttributeDto: UpdateProductAttributeDto,
@@ -116,6 +115,10 @@ export class ProductAttributeController {
     return this.productAttributeService.update(+id, updateProductAttributeDto);
   }
 
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @ApiOperation({ summary: 'Видалення  product-attribute за ID' })
   @ApiResponse({
     status: 200,
@@ -131,10 +134,6 @@ export class ProductAttributeController {
     description: 'Product-attribute link ID',
     example: 1,
   })
-  @Delete(':id')
-  @Roles(Role.Admin)
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   remove(@Param('id') id: string) {
     return this.productAttributeService.remove(+id);
   }

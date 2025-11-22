@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
@@ -11,6 +11,7 @@ import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
   @ApiPropertyOptional({
+    type: 'string',
     example: 'Костюм супергероя',
     description: 'Назва товару (опціонально)',
   })
@@ -19,6 +20,7 @@ export class UpdateProductDto {
   name?: string;
 
   @ApiPropertyOptional({
+    type: 'number',
     example: 199.99,
     description: 'Ціна товару (опціонально)',
   })
@@ -27,6 +29,7 @@ export class UpdateProductDto {
   price?: number;
 
   @ApiPropertyOptional({
+    type: 'number',
     example: 25,
     description: 'Знижка на товар у відсотках (0-100, опціонально)',
   })
@@ -35,6 +38,7 @@ export class UpdateProductDto {
   discount?: number;
 
   @ApiPropertyOptional({
+    type: 'boolean',
     example: true,
     description: 'Чи є товар топовим у продажу (опціонально)',
   })
@@ -43,6 +47,7 @@ export class UpdateProductDto {
   topSale?: boolean;
 
   @ApiPropertyOptional({
+    type: 'string',
     example: 'Костюм для косплею',
     description: 'Опис товару (опціонально)',
   })
@@ -51,6 +56,8 @@ export class UpdateProductDto {
   description?: string;
 
   @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'integer' },
     example: [5, 7],
     description: 'Список ID схожих товарів (опціонально)',
   })
@@ -75,4 +82,11 @@ export class UpdateProductDto {
     return value;
   })
   similarProductIds?: number[];
+
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    description: 'Файли зображень (до 10 файлів, опціонально)',
+  })
+  images?: any[];
 }

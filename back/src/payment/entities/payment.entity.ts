@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Order } from '../../order/entities/order.entity';
+import { PaymentStatus } from '../enums/payment-status.enum';
 
 @Entity()
 export class Payment {
@@ -26,9 +27,13 @@ export class Payment {
   @Column()
   currency: string;
 
-  @ApiProperty({ description: 'Статус платежу', example: 'success' })
-  @Column()
-  status: string;
+  @ApiProperty({
+    description: 'Статус платежу',
+    enum: PaymentStatus,
+    example: PaymentStatus.SUCCEEDED,
+  })
+  @Column({ type: 'varchar', default: PaymentStatus.PENDING })
+  status: PaymentStatus;
 
   @ApiProperty({
     description: 'ID платежу від Stripe',

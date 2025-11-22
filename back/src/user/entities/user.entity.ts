@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'; // Імпорт для Swagger
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Role } from '../../auth/enums/role.enum';
 import { Cart } from '../../cart/entities/cart.entity';
 import { Comment } from '../../comments/entities/comment.entity';
@@ -22,7 +22,7 @@ export class User {
   })
   id: number;
 
-  @Column({ type: 'varchar', length: 255, unique: true})
+  @Column({ type: 'varchar', length: 255, unique: true })
   @ApiProperty({
     example: 'user@example.com',
     description: 'Електронна пошта користувача',

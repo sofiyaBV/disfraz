@@ -65,7 +65,7 @@ export class UserService {
     const user = this.userRepository.create({
       email: email || null,
       phone: phone || null,
-      password: hashedPassword || '', // Порожній пароль для Google
+      password: hashedPassword || '',
       roles: [Role.User],
     });
 
@@ -147,7 +147,6 @@ export class UserService {
     }
     return this.userRepository.findOneBy({ phone });
   }
-  // Добавьте эти методы в ваш UserService
 
   async findById(id: number): Promise<User | null> {
     return this.userRepository.findOne({ where: { id } });

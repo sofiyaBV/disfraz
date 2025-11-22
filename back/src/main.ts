@@ -7,9 +7,10 @@ import * as dotenv from 'dotenv';
 async function bootstrap() {
   dotenv.config();
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
-  // CORS для всех localhost портов
   app.enableCors({
     origin: [
       'http://localhost:3000',
@@ -23,7 +24,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle('User API')
@@ -52,7 +53,6 @@ async function bootstrap() {
 
   await app.listen(3000, '0.0.0.0');
 
-  console.log('🚀 Application is running on: http://localhost:3000');
-  console.log('📚 Swagger docs available at: http://localhost:3000/doc');
+  console.log(' Swagger docs available at: http://localhost:3000/doc');
 }
 bootstrap();
