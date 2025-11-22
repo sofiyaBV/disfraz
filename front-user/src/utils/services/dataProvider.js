@@ -4,7 +4,6 @@ import attributeService from "./attributeService";
 import commentService from "./commentService";
 import cartService from "./cartService";
 
-// Головний провайдер даних для роботи з API
 const dataProvider = {
   // Отримання списків даних
   getList: async (resource, params) => {

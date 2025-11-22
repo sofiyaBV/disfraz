@@ -10,8 +10,6 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { Public } from './decorators/public.decorator';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -19,14 +17,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { Public } from './decorators/public.decorator';
 import { SignInDto, SignInResponseDto } from './dto/sign-in.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RolesGuard } from './guards/roles.guard';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { Roles } from './decorators/roles.decorator';
 import { Role } from './enums/role.enum';
-import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -35,9 +36,10 @@ export class AuthController {
   private getFrontendUrl(): string {
     return process.env.FRONTEND_URL || 'http://localhost:4114';
   }
+
+  @Post('signin')
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Post('signin')
   @ApiOperation({ summary: 'Авторизація користувача' })
   @ApiBody({ type: SignInDto })
   @ApiResponse({
@@ -54,9 +56,9 @@ export class AuthController {
     );
   }
 
+  @Post('register')
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  @Post('register')
   @ApiOperation({ summary: 'Реєстрація нового користувача' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
@@ -93,7 +95,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Отримання профілю користувача' })
   @ApiResponse({ status: 200, description: 'Інформація про користувача' })
   @ApiResponse({ status: 401, description: 'Неавторизований запит' })
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: any }) {
     return req.user;
   }
 
@@ -106,23 +108,23 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Профіль успішно оновлено' })
   @ApiResponse({ status: 401, description: 'Неавторизований запит' })
   async updateProfile(
-    @Request() req,
+    @Request() req: { user: any },
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     const userId = req.user.id;
     return this.authService.updateProfile(userId, updateProfileDto);
   }
 
-  @Public()
   @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @Public()
+  @UseGuards(GoogleOAuthGuard)
   @ApiOperation({ summary: 'Авторизація через Google' })
   @ApiResponse({ status: 302, description: 'Перенаправлення на Google' })
-  async googleAuth(@Request() req) {}
+  async googleAuth() {}
 
-  @Public()
   @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
+  @Public()
+  @UseGuards(GoogleOAuthGuard)
   @ApiOperation({ summary: 'Callback для Google авторизації' })
   @ApiResponse({
     status: 200,

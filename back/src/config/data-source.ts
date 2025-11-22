@@ -6,8 +6,8 @@ import { Cart } from '../cart/entities/cart.entity';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import { Comment } from '../comments/entities/comment.entity';
-import * as dotenv from 'dotenv';
 import { Payment } from '../payment/entities/payment.entity';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -27,10 +27,9 @@ export const AppDataSource = new DataSource({
     User,
     Comment,
     Payment,
-    __dirname + '/**/*.entity{.ts,.js}',
   ],
   synchronize: false,
-  migrations: ['src/migrations/*.ts'],
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
   migrationsRun: false,
   logging: true,
 });

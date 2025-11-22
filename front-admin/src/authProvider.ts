@@ -1,41 +1,40 @@
 const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
 
-// Провайдер авторизації для React Admin
+interface LoginParams {
+  username?: string;
+  phone?: string;
+  password: string;
+}
+
+interface Identity {
+  id: number;
+  fullName: string;
+}
+
 export const authProvider = {
-  async login({
-    username,
-    phone,
-    password,
-  }: {
-    username?: string;
-    phone?: string;
-    password: string;
-  }) {
+  async login({ username, phone, password }: LoginParams) {
     if (!username && !phone) {
       throw new Error("Потрібно вказати email або телефон");
     }
 
-    const email = username;
-
-    const request = new Request(`${apiUrl}/auth/signin`, {
+    const response = await fetch(`${apiUrl}/auth/signin`, {
       method: "POST",
-      body: JSON.stringify({ email, phone, password }),
-      headers: new Headers({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ email: username, phone, password }),
+      headers: { "Content-Type": "application/json" },
     });
 
-    const response = await fetch(request);
-    if (response.status < 200 || response.status >= 300) {
-      throw new Error("Помилка авторизації");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || "Помилка авторизації");
     }
 
     const { access_token } = await response.json();
     localStorage.setItem("token", access_token);
-    if (email) localStorage.setItem("email", email);
+    if (username) localStorage.setItem("email", username);
     if (phone) localStorage.setItem("phone", phone);
   },
 
-  async checkError(error: { status: any }) {
-    const status = error.status;
+  async checkError({ status }: { status: number }) {
     if (status === 401 || status === 403) {
       localStorage.removeItem("token");
       localStorage.removeItem("email");
@@ -56,21 +55,32 @@ export const authProvider = {
     localStorage.removeItem("phone");
   },
 
-  async getIdentity() {
+  async getIdentity(): Promise<Identity> {
     const token = localStorage.getItem("token");
     if (!token) throw new Error("Токен не знайдено");
 
-    const request = new Request(`${apiUrl}/auth/profile`, {
+    const response = await fetch(`${apiUrl}/auth/profile`, {
       method: "GET",
-      headers: new Headers({ Authorization: `Bearer ${token}` }),
+      headers: { Authorization: `Bearer ${token}` },
     });
 
-    const response = await fetch(request);
-    if (response.status < 200 || response.status >= 300) {
+    if (!response.ok) {
       throw new Error("Не вдалося отримати дані користувача");
     }
 
     const { id, fullName } = await response.json();
     return { id, fullName };
+  },
+
+  async getPermissions() {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.roles;
+    } catch {
+      return null;
+    }
   },
 };

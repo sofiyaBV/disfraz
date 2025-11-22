@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,7 +17,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -32,74 +32,88 @@ import { UserDto } from './dto/user.dto';
 @ApiTags('User')
 @Controller('user')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: 'Додати нового користувача' })
-  @ApiResponse({
-    status: 201,
-    description: 'користувача',
-    type: User,
-  })
-  @ApiBody({ type: CreateAdminDto })
   @Post()
   @Roles(Role.Admin)
+  @ApiOperation({ summary: 'Додати нового користувача' })
+  @ApiBody({ type: CreateAdminDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Користувача успішно створено',
+    type: User,
+  })
   create(@Body() createAdminDto: CreateAdminDto): Promise<User> {
     return this.userService.createAdmin(createAdminDto);
   }
 
-  @ApiOperation({ summary: 'Оновити користувача за ID' })
+  @Get()
+  @Roles(Role.Admin)
+  @ApiOperation({ summary: 'Отримати всіх користувачів' })
   @ApiResponse({
     status: 200,
-    description: 'Користувача успiшно оновлено',
-    type: User,
+    description: 'Список всіх користувачів',
   })
-  @ApiResponse({ status: 404, description: 'Користувач не знайдений' })
-  @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
-  @ApiBody({ type: UpdateUserDto })
+  @PaginatedSwaggerDocs(UserDto, userPaginateConfig)
+  async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<User>> {
+    return this.userService.findAllPag(query);
+  }
+
+  @Get(':id')
+  @Roles(Role.Admin, Role.User)
+  @ApiOperation({ summary: 'Отримати користувача за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID користувача',
+    example: 1,
+  })
+  @ApiResponse({ status: 200, description: 'Користувача знайдено', type: User })
+  @ApiResponse({ status: 404, description: 'Користувача не знайдено' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<User | null> {
+    return this.userService.findOne(id);
+  }
+
   @Patch(':id')
   @Roles(Role.Admin)
+  @ApiOperation({ summary: 'Оновити користувача за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID користувача',
+    example: 1,
+  })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Користувача успішно оновлено',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'Користувача не знайдено' })
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.userService.updateUser(id, updateUserDto);
   }
 
-  @ApiOperation({ summary: 'Видалити користувача за ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully deleted',
-  })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
   @Delete(':id')
   @Roles(Role.Admin)
-  async delete(@Param('id') id: number): Promise<{ message: string }> {
+  @ApiOperation({ summary: 'Видалити користувача за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID користувача',
+    example: 1,
+  })
+  @ApiResponse({ status: 200, description: 'Користувача успішно видалено' })
+  @ApiResponse({ status: 404, description: 'Користувача не знайдено' })
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ message: string }> {
     await this.userService.deleteUser(id);
     return { message: 'Користувача успішно видалено' };
-  }
-
-  @ApiOperation({ summary: 'Отримати всіх користувачів' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all users',
-  })
-  @PaginatedSwaggerDocs(UserDto, userPaginateConfig)
-  @Get()
-  @Roles(Role.Admin)
-  async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<User>> {
-    return this.userService.findAllPag(query);
-  }
-
-  @ApiOperation({ summary: 'Отримати користувача за ID' })
-  @ApiResponse({ status: 200, description: 'User found', type: User })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiParam({ name: 'id', required: true, description: 'User ID', example: 1 })
-  @Get(':id')
-  @Roles(Role.Admin, Role.User)
-  findOne(@Param('id') id: number): Promise<User | null> {
-    return this.userService.findOne(id);
   }
 }

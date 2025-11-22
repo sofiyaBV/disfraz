@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, Not, IsNull } from 'typeorm';
 import { Attribute } from './entities/attribute.entity';
@@ -10,6 +15,8 @@ import { attributePaginateConfig } from '../config/pagination.config';
 
 @Injectable()
 export class AttributesService {
+  private readonly logger = new Logger(AttributesService.name);
+
   constructor(
     @InjectRepository(Attribute)
     private attributeRepository: Repository<Attribute>,
@@ -20,7 +27,11 @@ export class AttributesService {
 
   async create(createAttributeDto: CreateAttributeDto): Promise<Attribute> {
     const attribute = this.attributeRepository.create(createAttributeDto);
-    return this.attributeRepository.save(attribute);
+    const savedAttribute = await this.attributeRepository.save(attribute);
+
+    this.logger.log(`Attribute created: ${savedAttribute.id}`);
+
+    return savedAttribute;
   }
 
   async findAllPag(query: PaginateQuery): Promise<Paginated<Attribute>> {
@@ -40,9 +51,11 @@ export class AttributesService {
       where: { id },
       relations: ['products'],
     });
+
     if (!attribute) {
-      throw new NotFoundException(`Атрибут з ID ${id} не знайдений`);
+      throw new NotFoundException(`Атрибут з ID ${id} не знайдено`);
     }
+
     return attribute;
   }
 
@@ -57,45 +70,48 @@ export class AttributesService {
       });
 
       if (!attribute) {
-        throw new NotFoundException(`Атрибут з ID ${id} не знайдений`);
+        throw new NotFoundException(`Атрибут з ID ${id} не знайдено`);
       }
 
-      // Оновлюємо основні поля атрибуту
       manager.merge(Attribute, attribute, updateAttributeDto);
-
-      // Зберігаємо оновлений атрибут
       await manager.save(attribute);
+
+      this.logger.log(`Attribute updated: ${id}`);
+
       return attribute;
     });
   }
 
   async remove(id: number): Promise<void> {
     const result = await this.attributeRepository.delete(id);
+
     if (result.affected === 0) {
-      throw new NotFoundException(`Атрибут з ID ${id} не знайдений`);
+      throw new NotFoundException(`Атрибут з ID ${id} не знайдено`);
     }
+
+    this.logger.log(`Attribute deleted: ${id}`);
   }
 
   async findByType(
     type: 'material' | 'size' | 'theme' | 'bodyPart' | 'isSet' | 'description',
   ): Promise<Attribute[]> {
-    if (
-      ![
-        'material',
-        'size',
-        'theme',
-        'bodyPart',
-        'isSet',
-        'description',
-      ].includes(type)
-    ) {
-      throw new Error('Недопустимий тип атрибуту');
+    const validTypes = [
+      'material',
+      'size',
+      'theme',
+      'bodyPart',
+      'isSet',
+      'description',
+    ];
+
+    if (!validTypes.includes(type)) {
+      throw new BadRequestException('Недопустимий тип атрибуту');
     }
 
-    const field = type === 'isSet' ? 'isSet' : type;
     if (type === 'isSet') {
-      return this.attributeRepository.find({ where: { [field]: true } });
+      return this.attributeRepository.find({ where: { isSet: true } });
     }
-    return this.attributeRepository.find({ where: { [field]: Not(IsNull()) } });
+
+    return this.attributeRepository.find({ where: { [type]: Not(IsNull()) } });
   }
 }

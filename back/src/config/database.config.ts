@@ -1,16 +1,7 @@
 import * as Joi from 'joi';
 import { registerAs } from '@nestjs/config';
-import { Product } from '../product/entities/product.entity';
-import { Attribute } from '../attribute/entities/attribute.entity';
-import { ProductAttribute } from '../product-attribute/entities/product-attribute.entity';
-import { Cart } from '../cart/entities/cart.entity';
-import { Order } from '../order/entities/order.entity';
-import { User } from '../user/entities/user.entity';
-import { Comment } from '../comments/entities/comment.entity';
-import { Payment } from 'src/payment/entities/payment.entity';
 
 export default registerAs('database', () => {
-  // Валідація змінних оточення з дозволом невідомих ключів
   const envVarsSchema = Joi.object({
     POSTGRES_HOST: Joi.string().required(),
     POSTGRES_PORT: Joi.number().port().required(),
@@ -35,17 +26,6 @@ export default registerAs('database', () => {
     username: value.POSTGRES_USER,
     password: value.POSTGRES_PASSWORD,
     database: value.POSTGRES_DB,
-    entities: [
-      Product,
-      Attribute,
-      ProductAttribute,
-      Cart,
-      Order,
-      User,
-      Comment,
-      Payment,
-      __dirname + '/**/*.entity{.ts,.js}',
-    ],
     autoLoadEntities: true,
     synchronize: false,
   };

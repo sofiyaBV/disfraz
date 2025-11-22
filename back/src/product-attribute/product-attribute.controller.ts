@@ -7,10 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { ProductAttributeService } from './product-attribute.service';
-import { CreateProductAttributeDto } from './dto/create-product-attribute.dto';
-import { UpdateProductAttributeDto } from './dto/update-product-attribute.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -19,6 +17,9 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { ProductAttributeService } from './product-attribute.service';
+import { CreateProductAttributeDto } from './dto/create-product-attribute.dto';
+import { UpdateProductAttributeDto } from './dto/update-product-attribute.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -40,20 +41,20 @@ export class ProductAttributeController {
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin, Role.User)
-  @ApiOperation({ summary: 'Створіть новий product-attribute' })
+  @ApiOperation({ summary: 'Створити новий product-attribute' })
+  @ApiBody({ type: CreateProductAttributeDto })
   @ApiResponse({
     status: 201,
     description: 'Product-attribute успішно створено',
     type: ProductAttribute,
   })
-  @ApiBody({ type: CreateProductAttributeDto })
   create(@Body() createProductAttributeDto: CreateProductAttributeDto) {
     return this.productAttributeService.create(createProductAttributeDto);
   }
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Отримати всi product-attribute ' })
+  @ApiOperation({ summary: 'Отримати всі product-attribute' })
   @ApiResponse({
     status: 200,
     description: 'Список всіх product-attribute',
@@ -68,30 +69,37 @@ export class ProductAttributeController {
   @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Отримати product-attribute за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID product-attribute',
+    example: 1,
+  })
   @ApiResponse({
     status: 200,
-    description: 'Product-attribute  знайдено',
+    description: 'Product-attribute знайдено',
     type: ProductAttribute,
   })
   @ApiResponse({
     status: 404,
-    description: 'Product-attribute  не знайдено',
+    description: 'Product-attribute не знайдено',
   })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Product-attribute ID',
-    example: 1,
-  })
-  findOne(@Param('id') id: string) {
-    return this.productAttributeService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.productAttributeService.findOne(id);
   }
 
   @Patch(':id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
-  @ApiOperation({ summary: 'Оновлення product-attribute за ID' })
+  @ApiOperation({ summary: 'Оновити product-attribute за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID product-attribute',
+    example: 1,
+  })
+  @ApiBody({ type: UpdateProductAttributeDto })
   @ApiResponse({
     status: 200,
     description: 'Product-attribute успішно оновлено',
@@ -99,42 +107,35 @@ export class ProductAttributeController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Product-attribute  не знайдено',
-  })
-  @ApiBody({ type: UpdateProductAttributeDto })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Product-attribute ID',
-    example: 1,
+    description: 'Product-attribute не знайдено',
   })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateProductAttributeDto: UpdateProductAttributeDto,
   ) {
-    return this.productAttributeService.update(+id, updateProductAttributeDto);
+    return this.productAttributeService.update(id, updateProductAttributeDto);
   }
 
   @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
-  @ApiOperation({ summary: 'Видалення  product-attribute за ID' })
+  @ApiOperation({ summary: 'Видалити product-attribute за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID product-attribute',
+    example: 1,
+  })
   @ApiResponse({
     status: 200,
     description: 'Product-attribute успішно видалено',
   })
   @ApiResponse({
     status: 404,
-    description: 'Product-attribute  не знайдено',
+    description: 'Product-attribute не знайдено',
   })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Product-attribute link ID',
-    example: 1,
-  })
-  remove(@Param('id') id: string) {
-    return this.productAttributeService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.productAttributeService.remove(id);
   }
 }

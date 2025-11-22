@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -38,14 +39,11 @@ export class OrderController {
   @Post()
   @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Створити нове замовлення' })
+  @ApiBody({ type: CreateOrderDto })
   @ApiResponse({
     status: 201,
     description: 'Замовлення успішно створено',
     type: Order,
-  })
-  @ApiBody({
-    type: CreateOrderDto,
-    description: 'Включає дані для створення замовлення',
   })
   async create(@Body() createOrderDto: CreateOrderDto, @User() user: any) {
     return this.orderService.create(createOrderDto, user.id);
@@ -56,7 +54,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Отримати всі замовлення' })
   @ApiResponse({
     status: 200,
-    description: 'Список усіх замовлень із користувачами',
+    description: 'Список усіх замовлень',
   })
   @PaginatedSwaggerDocs(CreateOrderDto, orderPaginateConfig)
   async findAll(@Paginate() query: PaginateQuery): Promise<Paginated<Order>> {
@@ -66,57 +64,57 @@ export class OrderController {
   @Get(':id')
   @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Отримати замовлення за ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Замовлення знайдено з користувачем',
-    type: Order,
-  })
-  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
   @ApiParam({
     name: 'id',
     required: true,
     description: 'ID замовлення',
     example: 1,
   })
-  findOne(@Param('id') id: number) {
+  @ApiResponse({
+    status: 200,
+    description: 'Замовлення знайдено',
+    type: Order,
+  })
+  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.findOne(id);
   }
 
   @Patch(':id')
   @Roles(Role.Admin)
   @ApiOperation({ summary: 'Оновити замовлення за ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'ID замовлення',
+    example: 1,
+  })
+  @ApiBody({ type: UpdateOrderDto })
   @ApiResponse({
     status: 200,
     description: 'Замовлення успішно оновлено',
     type: Order,
   })
   @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
-  @ApiBody({
-    type: UpdateOrderDto,
-    description: 'Дані для оновлення замовлення',
-  })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'ID замовлення',
-    example: 1,
-  })
-  update(@Param('id') id: number, @Body() updateOrderDto: UpdateOrderDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
     return this.orderService.update(id, updateOrderDto);
   }
 
   @Delete(':id')
   @Roles(Role.Admin)
   @ApiOperation({ summary: 'Видалити замовлення за ID' })
-  @ApiResponse({ status: 200, description: 'Замовлення успішно видалено' })
-  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
   @ApiParam({
     name: 'id',
     required: true,
     description: 'ID замовлення',
     example: 1,
   })
-  remove(@Param('id') id: number) {
+  @ApiResponse({ status: 200, description: 'Замовлення успішно видалено' })
+  @ApiResponse({ status: 404, description: 'Замовлення не знайдено' })
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
   }
 }
