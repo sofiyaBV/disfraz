@@ -10,7 +10,6 @@ const NewsOnTheSite = ({
   newsKey,
 }) => {
   return (
-    // Новинки на сайті
     <div className={style.general}>
       <div>
         <h3 className={style.h3_news}>{title}</h3>

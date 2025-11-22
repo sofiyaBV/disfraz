@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-// Контекст для управління авторизацією користувачів
 const AuthContext = createContext();
 
 // Провайдер авторизації для всього додатку

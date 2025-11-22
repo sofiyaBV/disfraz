@@ -3,9 +3,7 @@ import { useParams } from "react-router-dom";
 import { ReactSVG } from "react-svg";
 
 import layoutStyles from "../style/products/productPage.module.css";
-import imageStyles from "../style/products/imageGallery.module.css";
 import detailsStyles from "../style/products/productDetails.module.css";
-import similarStyles from "../style/products/similarProducts.module.css";
 import commentsStyles from "../style/products/comments.module.css";
 import modalStyles from "../style/products/modals.module.css";
 import "../style/products/responsive.module.css";
@@ -13,42 +11,49 @@ import "../style/products/responsive.module.css";
 import heart from "../assets/svg/heartborder.svg";
 import ButtonGeneral from "../components/buttons/ButtonGeneral";
 import CommentSection from "../components/CommentSection";
+import ImageGallery from "../components/Products/ImageGallery";
+import SimilarProducts from "../components/Products/SimilarProducts";
+import Notifications from "../components/Products/Notifications";
 import icon_monobank from "../img/icon/monobank.png";
 import icon_novaPay from "../img/icon/NovaPay.png";
 import icon_PrivatBank from "../img/icon/privat.png";
 import sizesImg from "../img/sizes.png";
 import vector from "../img/Vector.png";
-import { useAuth } from "../utils/context/AuthContext";
-import dataProvider from "../utils/services/dataProvider";
+
+import useProductDetails from "../utils/hooks/useProductDetails";
+import useCart from "../utils/hooks/useCart";
+import useComments from "../utils/hooks/useComments";
+import useNotifications from "../utils/hooks/useNotifications";
 
 const styles = {
   ...layoutStyles,
-  ...imageStyles,
   ...detailsStyles,
-  ...similarStyles,
   ...commentsStyles,
   ...modalStyles,
 };
 
 const ProductPage = () => {
   const { theme, productName } = useParams();
-  const { isAuthenticated } = useAuth();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // Хуки
+  const { product, similarProducts, loading, error } = useProductDetails(
+    theme,
+    productName
+  );
+  const { addToCart } = useCart();
+  const { submitComment } = useComments(product?.id);
+  const notifications = useNotifications(3000);
+
+  // Локальний стейт
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showSizeTableModal, setShowSizeTableModal] = useState(false);
   const [reviewContent, setReviewContent] = useState("");
-  const [cartMessage, setCartMessage] = useState(null);
-  const [cartError, setCartError] = useState(null);
-  const [showMessage, setShowMessage] = useState(false);
+  const [showFavoriteMessage, setShowFavoriteMessage] = useState(false);
   const [activeInfo, setActiveInfo] = useState(null);
   const [refreshComments, setRefreshComments] = useState(0);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [similarProducts, setSimilarProducts] = useState([]);
 
   const infoRefs = {
     description: useRef(null),
@@ -56,137 +61,36 @@ const ProductPage = () => {
     payment: useRef(null),
   };
 
+  // Розмір за замовчуванням
   useEffect(() => {
-    if (showMessage) {
-      const timer = setTimeout(() => setShowMessage(false), 2000);
+    if (product?.attribute?.size) {
+      setSelectedSize(product.attribute.size.split(" ")[0]);
+    }
+  }, [product]);
+
+  // Автоховання повідомлення обраного
+  useEffect(() => {
+    if (showFavoriteMessage) {
+      const timer = setTimeout(() => setShowFavoriteMessage(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [showMessage]);
-
-  useEffect(() => {
-    if (cartMessage || cartError) {
-      const timer = setTimeout(() => {
-        setCartMessage(null);
-        setCartError(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [cartMessage, cartError]);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      setLoading(true);
-      try {
-        const response = await dataProvider.getList("product-attributes", {
-          filter: {},
-        });
-        const products = response.data || [];
-
-        const targetProduct = products.find((item) => {
-          const transliteratedName = item.product.name
-            .toLowerCase()
-            .replace(
-              /[а-яіїє]/g,
-              (match) =>
-                ({
-                  а: "a",
-                  б: "b",
-                  в: "v",
-                  г: "h",
-                  ґ: "g",
-                  д: "d",
-                  е: "e",
-                  є: "ye",
-                  ж: "zh",
-                  з: "z",
-                  и: "y",
-                  і: "i",
-                  ї: "yi",
-                  й: "y",
-                  к: "k",
-                  л: "l",
-                  м: "m",
-                  н: "n",
-                  о: "o",
-                  п: "p",
-                  р: "r",
-                  с: "s",
-                  т: "t",
-                  у: "u",
-                  ф: "f",
-                  х: "kh",
-                  ц: "ts",
-                  ч: "ch",
-                  ш: "sh",
-                  щ: "shch",
-                  ь: "",
-                  ю: "yu",
-                  я: "ya",
-                }[match] || match)
-            )
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "");
-          return (
-            transliteratedName === productName &&
-            item.attribute.theme.toLowerCase().replace(/\s+/g, "-") === theme
-          );
-        });
-
-        if (!targetProduct) {
-          throw new Error("Товар не знайдено");
-        }
-
-        setProduct(targetProduct);
-        setSelectedSize(targetProduct.attribute.size.split(" ")[0] || "");
-
-        // Получаем похожие товары
-        const similar = products
-          .filter(
-            (item) =>
-              item.attribute.theme === targetProduct.attribute.theme &&
-              item.id !== targetProduct.id
-          )
-          .slice(0, 4);
-        setSimilarProducts(similar);
-
-        setLoading(false);
-      } catch (err) {
-        setError(err.message || "Помилка при завантаженні товару");
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [theme, productName]);
+  }, [showFavoriteMessage]);
 
   const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      setCartError("Будь ласка, увійдіть в акаунт для додавання в кошик!");
-      return;
-    }
-    try {
-      const payload = {
-        productAttributeId: product.id,
-        quantity: quantity,
-      };
-      const response = await dataProvider.create("cart", { data: payload });
-      console.log("Успішно додано до кошика:", response);
-      setCartMessage("Товар додано до кошика!");
-      setCartError(null);
-    } catch (err) {
-      console.error("Помилка при додаванні до кошика:", err);
-      setCartError(
-        "Помилка при додаванні до кошика: " +
-          (err.message || "Невідома помилка")
+    const success = await addToCart(product.id, quantity);
+    if (success) {
+      notifications.showSuccess("Товар додано до кошика!");
+    } else {
+      notifications.showError(
+        "Будь ласка, увійдіть в акаунт для додавання в кошик!"
       );
-      setCartMessage(null);
     }
   };
 
   const handleFavoriteClick = (e) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
-    setShowMessage(true);
+    setShowFavoriteMessage(true);
   };
 
   const handleQuantityChange = (delta) => {
@@ -194,37 +98,19 @@ const ProductPage = () => {
   };
 
   const handleSubmitComment = async () => {
-    if (!isAuthenticated) {
-      setCartError("Будь ласка, увійдіть в акаунт для надсилання коментаря!");
-      return;
-    }
-    try {
-      const payload = {
-        productAttributeId: product.id,
-        content: reviewContent,
-      };
-      await dataProvider.create("comments", { data: payload });
-      setCartMessage("Коментар надіслано!");
-      setCartError(null);
-      setShowReviewModal(false);
-      setReviewContent("");
-      setRefreshComments((prev) => prev + 1);
-    } catch (err) {
-      console.error("Помилка при надсиланні коментаря:", err);
-      setCartError(
-        "Помилка при надсиланні коментаря: " +
-          (err.message || "Невідома помилка")
-      );
-      setCartMessage(null);
-    }
+    const success = await submitComment(reviewContent, {
+      onSuccess: (msg) => {
+        notifications.showSuccess(msg);
+        setShowReviewModal(false);
+        setReviewContent("");
+        setRefreshComments((prev) => prev + 1);
+      },
+      onError: (msg) => notifications.showError(msg),
+    });
   };
 
   const toggleInfo = (infoType) => {
-    if (activeInfo === infoType) {
-      setActiveInfo(null);
-    } else {
-      setActiveInfo(infoType);
-    }
+    setActiveInfo(activeInfo === infoType ? null : infoType);
   };
 
   const renderStars = (rating = 4) => {
@@ -240,13 +126,12 @@ const ProductPage = () => {
     ));
   };
 
+  // Стани завантаження
   if (loading) return <div className={styles.loading}>Завантаження...</div>;
   if (error) return <div className={styles.error}>Помилка: {error}</div>;
   if (!product) return <div className={styles.error}>Товар не знайдено</div>;
 
   const images = product.product.images || [];
-  const currentImage =
-    images[selectedImageIndex] || (images.length > 0 ? images[0] : null);
   const hasDiscount = product.product.discount > 0 && product.product.newPrice;
   const sizes = product.attribute.size ? product.attribute.size.split(" ") : [];
   const favoriteMessage = isFavorite
@@ -256,32 +141,7 @@ const ProductPage = () => {
   return (
     <div>
       <div className={styles.productPage}>
-        <div className={styles.imageSection}>
-          <div className={styles.thumbnailColumn}>
-            {images.map((img, index) => (
-              <img
-                key={index}
-                src={img.url}
-                alt={`${product.product.name} ${index + 1}`}
-                className={`${styles.thumbnail} ${
-                  selectedImageIndex === index ? styles.thumbnailActive : ""
-                }`}
-                onClick={() => setSelectedImageIndex(index)}
-              />
-            ))}
-          </div>
-          <div className={styles.mainImageContainer}>
-            {currentImage ? (
-              <img
-                src={currentImage.url}
-                alt={product.product.name}
-                className={styles.mainImage}
-              />
-            ) : (
-              <div className={styles.imagePlaceholder}>Немає зображення</div>
-            )}
-          </div>
-        </div>
+        <ImageGallery images={images} productName={product.product.name} />
 
         <div className={styles.detailsSection}>
           <div className={styles.productHeader}>
@@ -334,7 +194,6 @@ const ProductPage = () => {
                 ))}
               </select>
             </div>
-
             <button
               className={styles.sizeTableButton}
               onClick={() => setShowSizeTableModal(true)}
@@ -481,56 +340,7 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* Похожие товары */}
-      {similarProducts.length > 0 && (
-        <div className={styles.similarProductsSection}>
-          <h2 className={styles.similarProductsTitle}>Схожі товари</h2>
-          <div className={styles.similarProductsGrid}>
-            {similarProducts.map((similarProduct) => (
-              <div
-                key={similarProduct.id}
-                className={styles.similarProductCard}
-              >
-                <div className={styles.similarProductImage}>
-                  {similarProduct.product.images &&
-                  similarProduct.product.images.length > 0 ? (
-                    <img
-                      src={similarProduct.product.images[0].url}
-                      alt={similarProduct.product.name}
-                    />
-                  ) : (
-                    <div className={styles.noImagePlaceholder}>Немає фото</div>
-                  )}
-                  <button className={styles.similarProductFavorite}>
-                    <ReactSVG src={heart} />
-                  </button>
-                </div>
-                <div className={styles.similarProductInfo}>
-                  <h3 className={styles.similarProductName}>
-                    {similarProduct.product.name}
-                  </h3>
-                  <div className={styles.similarProductPrice}>
-                    {similarProduct.product.newPrice ? (
-                      <>
-                        <span className={styles.similarNewPrice}>
-                          {similarProduct.product.newPrice} грн
-                        </span>
-                        <span className={styles.similarOldPrice}>
-                          {similarProduct.product.price} грн
-                        </span>
-                      </>
-                    ) : (
-                      <span className={styles.similarPrice}>
-                        {similarProduct.product.price} грн
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <SimilarProducts products={similarProducts} />
 
       <div className={styles.section_2}>
         <h2>ВІДГУКИ</h2>
@@ -557,7 +367,7 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* Модальные окна */}
+      {/* Модалка відгуку */}
       {showReviewModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
@@ -586,6 +396,7 @@ const ProductPage = () => {
         </div>
       )}
 
+      {/* Модалка розмірів */}
       {showSizeTableModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.sizeTableModal}>
@@ -604,13 +415,11 @@ const ProductPage = () => {
         </div>
       )}
 
-      <div className={styles.messageContainer}>
-        {cartMessage && <div className={styles.cartMessage}>{cartMessage}</div>}
-        {cartError && <div className={styles.cartError}>{cartError}</div>}
-        {showMessage && (
-          <div className={styles.favoriteMessage}>{favoriteMessage}</div>
-        )}
-      </div>
+      <Notifications
+        success={notifications.success}
+        error={notifications.error}
+        favoriteMessage={showFavoriteMessage ? favoriteMessage : null}
+      />
     </div>
   );
 };

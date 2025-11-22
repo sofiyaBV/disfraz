@@ -1,4 +1,3 @@
-// components/homePage/CategoriesScrole.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import style from "../style/categoriesScrole.module.css";

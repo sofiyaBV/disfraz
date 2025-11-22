@@ -62,12 +62,12 @@ const BurgerMenuLogged = ({ onClose }) => {
     setIsCatalogMenuOpen(false);
   };
 
-  // Функция для плавного закрытия меню
+ 
   const handleClose = () => {
     onClose();
   };
 
-  // Данные для социальных сетей
+  
   const socialNetworks = [
     { Icon: FaYoutube, name: "YouTube", link: "#" },
     { Icon: FaFacebook, name: "Facebook", link: "#" },
