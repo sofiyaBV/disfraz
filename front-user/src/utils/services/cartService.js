@@ -66,7 +66,8 @@ export const clearCart = async (cartItems) => {
   }
 
   // Видаляємо всі items по черзі
-  await Promise.all(cartItems.map((item) => removeFromCart(item.id)));
+  const promises = cartItems.map((item) => removeFromCart(item.id));
+  await Promise.all(promises);
 };
 
 const cartService = {

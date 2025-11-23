@@ -49,15 +49,15 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   height: 100%;
-  scrollbar-width: none; /* Для Firefox */
+  scrollbar-width: none; 
 
   }
   
   .productsScroll::-webkit-scrollbar {
-    display: none; /* Для Chrome, Safari */
+    display: none; 
   }
   
-  /* Стили для карточек товаров */
+  
   .productsScroll > div {
     flex: 0 0 clamp(12rem, 22.5rem, 25vw);
     aspect-ratio: 4 / 5;

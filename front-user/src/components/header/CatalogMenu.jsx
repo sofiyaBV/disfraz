@@ -38,7 +38,7 @@ const CatalogMenu = ({ onClose }) => {
   ];
 
   const contentInfo = [
-    // Косплейні костюми (3 lists)
+    // Косплейні костюми
     {
       lists: [
         {

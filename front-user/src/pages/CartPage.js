@@ -27,18 +27,22 @@ const CartPage = () => {
     return <div className={styles.loading}>Завантаження...</div>;
   }
 
-  if (error) {
-    return <div className={styles.error}>Помилка: {error}</div>;
-  }
-
   if (cartItems.length === 0) {
     return <EmptyCart />;
+  }
+
+  // Помилку показуємо тільки якщо є товари
+  if (error) {
+    return <div className={styles.error}>Помилка: {error}</div>;
   }
 
   return (
     <div className={styles.cartPage}>
       <div className={styles.breadcrumb}>
-        <span className={styles.breadcrumbLink} onClick={() => navigate("/")}>
+        <span
+          className={styles.breadcrumbLink}
+          onClick={() => navigate("/home")}
+        >
           КОШИК
         </span>
       </div>

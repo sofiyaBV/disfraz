@@ -24,7 +24,12 @@ const useCartData = () => {
       setCartItems(data || []);
     } catch (err) {
       console.error("Помилка завантаження кошика:", err);
-      setError(err.message || "Не вдалося завантажити кошик");
+
+      if (err.message === "Необхідна авторизація") {
+        setError(err.message);
+      } else {
+        setCartItems([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -35,12 +40,19 @@ const useCartData = () => {
     if (newQuantity < 1) return;
 
     try {
-      await cartService.updateCartItem(cartItemId, newQuantity);
+      const updatedItem = await cartService.updateCartItem(
+        cartItemId,
+        newQuantity
+      );
+
       setCartItems((prev) =>
         prev.map((item) =>
-          item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+          item.id === cartItemId
+            ? { ...item, quantity: newQuantity, price: updatedItem.price }
+            : item
         )
       );
+      setError(null);
     } catch (err) {
       console.error("Помилка оновлення кількості:", err);
       setError("Не вдалося оновити кількість");
@@ -52,6 +64,7 @@ const useCartData = () => {
     try {
       await cartService.removeFromCart(cartItemId);
       setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
+      setError(null);
     } catch (err) {
       console.error("Помилка видалення товару:", err);
       setError("Не вдалося видалити товар");
@@ -63,6 +76,7 @@ const useCartData = () => {
     try {
       await cartService.clearCart(cartItems);
       setCartItems([]);
+      setError(null);
     } catch (err) {
       console.error("Помилка очищення кошика:", err);
       setError("Не вдалося очистити кошик");

@@ -1,4 +1,3 @@
-// HTTP клієнт для роботи з API
 const httpClient = async (url, options = {}) => {
   // Встановлюємо базові заголовки
   if (!options.headers) {
@@ -32,7 +31,19 @@ const httpClient = async (url, options = {}) => {
       throw new Error(errorMessage);
     }
 
-    return await response.json();
+    const contentType = response.headers.get("content-type");
+    const contentLength = response.headers.get("content-length");
+
+    if (
+      contentLength === "0" ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return null;
+    }
+
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
     console.error("Fetch error:", error);
     throw error;

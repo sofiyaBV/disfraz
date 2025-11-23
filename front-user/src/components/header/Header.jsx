@@ -4,9 +4,8 @@ import styles from "../../style/header.module.css";
 import logoImage from "../../assets/LOGO.png";
 import menuImage from "../../assets/menu.png";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import BurgerMenuLogged from "./BurgerMenuLogged"; // Импортируем компонент меню
+import BurgerMenuLogged from "./BurgerMenuLogged"; 
 
-// Импорт SVG-иконок
 import FaSearch from "../../assets/svg/search-normal.svg";
 import FaHeart from "../../assets/svg/heart.svg";
 import FaShoppingCart from "../../assets/svg/shopping-bag.svg";
