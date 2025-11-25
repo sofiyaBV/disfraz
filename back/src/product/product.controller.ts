@@ -21,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiConsumes,
 } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -36,6 +37,8 @@ import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { productPaginateConfig } from '../config/pagination.config';
 import { Public } from '../auth/decorators/public.decorator';
 
+// ВАЖЛИВО: Вимкнути rate limiting для адмін-панелі
+@SkipThrottle()
 @ApiTags('Products')
 @Controller('products')
 export class ProductController {

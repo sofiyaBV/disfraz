@@ -17,6 +17,7 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { AttributesService } from './attribute.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
@@ -29,6 +30,7 @@ import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { attributePaginateConfig } from '../config/pagination.config';
 
+@SkipThrottle()
 @ApiTags('Attributes')
 @Controller('attributes')
 export class AttributesController {

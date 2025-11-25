@@ -17,6 +17,7 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ProductAttributeService } from './product-attribute.service';
 import { CreateProductAttributeDto } from './dto/create-product-attribute.dto';
 import { UpdateProductAttributeDto } from './dto/update-product-attribute.dto';
@@ -30,6 +31,7 @@ import { productAttributePaginateConfig } from '../config/pagination.config';
 import { ProductAttributeDto } from './dto/product-attribute.dto';
 import { Public } from '../auth/decorators/public.decorator';
 
+@SkipThrottle()
 @ApiTags('Product Attributes')
 @Controller('product-attribute')
 export class ProductAttributeController {
