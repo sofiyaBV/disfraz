@@ -28,6 +28,7 @@ import { cartPaginateConfig } from '../config/pagination.config';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { RequestUser } from '../common/interfaces/request.interface';
 
 @ApiTags('Cart')
 @Controller('cart')
@@ -45,7 +46,10 @@ export class CartController {
     description: 'Кошик успішно створений',
     type: Cart,
   })
-  async create(@Body() createCartDto: CreateCartDto, @User() user: any) {
+  async create(
+    @Body() createCartDto: CreateCartDto,
+    @User() user: RequestUser,
+  ) {
     return this.cartService.create(createCartDto, user.id);
   }
 
@@ -53,7 +57,7 @@ export class CartController {
   @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Отримати кошик поточного користувача' })
   @ApiResponse({ status: 200, description: 'Кошик користувача', type: [Cart] })
-  async getMyCart(@User() user: any): Promise<Cart[]> {
+  async getMyCart(@User() user: RequestUser): Promise<Cart[]> {
     return this.cartService.findByUserId(user.id);
   }
 

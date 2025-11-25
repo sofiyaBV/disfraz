@@ -10,6 +10,7 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
+import { RequestWithUser } from '../common/interfaces/request.interface';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -37,6 +38,15 @@ export class AuthController {
     return process.env.FRONTEND_URL || 'http://localhost:4114';
   }
 
+  private setAuthCookie(res: Response, token: string): void {
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+  }
+
   @Post('signin')
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -48,12 +58,19 @@ export class AuthController {
     description: 'Успішний вхід',
   })
   @ApiResponse({ status: 401, description: 'Помилка авторизації' })
-  async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
-    return this.authService.signIn(
+  async signIn(
+    @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SignInResponseDto> {
+    const result = await this.authService.signIn(
       signInDto.email,
       signInDto.phone,
       signInDto.password,
     );
+
+    this.setAuthCookie(res, result.access_token);
+
+    return result;
   }
 
   @Post('register')
@@ -68,6 +85,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Некоректні дані' })
   async register(
     @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string; access_token?: string }> {
     const user = await this.authService.register(createUserDto);
 
@@ -78,6 +96,8 @@ export class AuthController {
         roles: user.roles,
       };
       const access_token = await this.authService.generateJwtToken(payload);
+
+      this.setAuthCookie(res, access_token);
 
       return {
         message: 'Користувач успішно зареєстрований',
@@ -95,7 +115,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Отримання профілю користувача' })
   @ApiResponse({ status: 200, description: 'Інформація про користувача' })
   @ApiResponse({ status: 401, description: 'Неавторизований запит' })
-  getProfile(@Request() req: { user: any }) {
+  getProfile(@Request() req: RequestWithUser) {
     return req.user;
   }
 
@@ -108,11 +128,29 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Профіль успішно оновлено' })
   @ApiResponse({ status: 401, description: 'Неавторизований запит' })
   async updateProfile(
-    @Request() req: { user: any },
+    @Request() req: RequestWithUser,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     const userId = req.user.id;
     return this.authService.updateProfile(userId, updateProfileDto);
+  }
+
+  @Post('logout')
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin, Role.User)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Вихід з системи' })
+  @ApiResponse({ status: 200, description: 'Успішний вихід з системи' })
+  @ApiResponse({ status: 401, description: 'Неавторизований запит' })
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    return { message: 'Успішний вихід з системи' };
   }
 
   @Get('google')
@@ -138,6 +176,8 @@ export class AuthController {
       return res.redirect(`${frontendUrl}/?error=google_auth_failed`);
     }
 
-    return res.redirect(`${frontendUrl}/?token=${user.access_token}`);
+    this.setAuthCookie(res, user.access_token);
+
+    return res.redirect(`${frontendUrl}/?oauth=success`);
   }
 }

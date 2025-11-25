@@ -5,7 +5,7 @@ import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 
 const ProfilePage = () => {
-  const { token, logout, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user, logout, isLoading: authLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -44,25 +44,25 @@ const ProfilePage = () => {
     console.log(
       "ProfilePage useEffect - authLoading:",
       authLoading,
-      "token:",
-      token,
       "isAuthenticated:",
-      isAuthenticated
+      isAuthenticated,
+      "user:",
+      user
     );
 
     if (authLoading) {
       return;
     }
 
-    if (!token) {
-      console.log("No token found, redirecting to registration");
+    if (!isAuthenticated) {
+      console.log("User not authenticated, redirecting to registration");
       navigate("/");
       return;
     }
 
-    console.log("Token found, fetching profile");
+    console.log("User authenticated, fetching profile");
     fetchUserProfile();
-  }, [token, authLoading, isAuthenticated, navigate]);
+  }, [isAuthenticated, authLoading, user, navigate]);
 
   const fetchUserProfile = async () => {
     try {

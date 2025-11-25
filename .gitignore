@@ -42,7 +42,7 @@ docker.env
 *.swp
 *.swo
 *.iml
-
+.claude
 # OS
 Thumbs.db
 

@@ -28,6 +28,7 @@ import { Role } from '../auth/enums/role.enum';
 import { Payment } from './entities/payment.entity';
 import { User } from '../auth/decorators/user.decorator';
 import { Public } from '../auth/decorators/public.decorator';
+import { RequestUser } from '../common/interfaces/request.interface';
 
 @ApiTags('Payment')
 @Controller('payment')
@@ -45,7 +46,10 @@ export class PaymentController {
     description: 'Платіж успішно створено',
     type: Payment,
   })
-  create(@Body() createPaymentDto: CreatePaymentDto, @User() user: any) {
+  create(
+    @Body() createPaymentDto: CreatePaymentDto,
+    @User() user: RequestUser,
+  ) {
     return this.paymentService.create(createPaymentDto, user.id);
   }
 

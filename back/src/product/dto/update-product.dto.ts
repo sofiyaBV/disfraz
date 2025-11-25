@@ -88,5 +88,5 @@ export class UpdateProductDto {
     items: { type: 'string', format: 'binary' },
     description: 'Файли зображень (до 10 файлів, опціонально)',
   })
-  images?: any[];
+  images?: Express.Multer.File[];
 }

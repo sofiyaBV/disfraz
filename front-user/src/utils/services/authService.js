@@ -35,11 +35,6 @@ export const register = async ({ email, phone, password }) => {
     body: JSON.stringify({ email, phone, password }),
   });
 
-  // Зберігаємо токен після успішної реєстрації
-  if (response.access_token) {
-    localStorage.setItem("token", response.access_token);
-  }
-
   return { data: response };
 };
 
@@ -50,17 +45,16 @@ export const signin = async ({ email, phone, password }) => {
     body: JSON.stringify({ email, phone, password }),
   });
 
-  // Зберігаємо токен після успішного входу
-  if (response.access_token) {
-    localStorage.setItem("token", response.access_token);
-  }
 
   return { data: response };
 };
 
-// Вихід з системи
-export const logout = () => {
-  localStorage.removeItem("token");
+
+export const logout = async () => {
+
+  await httpClient(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+  });
 };
 
 const authService = {

@@ -1,66 +1,84 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { API_BASE_URL } from "../services/api";
 
 const AuthContext = createContext();
 
-// Провайдер авторизації для всього додатку
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
-  // Ініціалізація - перевіряємо наявність токена при завантаженні
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-      setIsAuthenticated(true);
-      console.log("Token found in localStorage:", storedToken);
-    } else {
-      console.log("No token found in localStorage");
-    }
-    setIsLoading(false);
+    checkAuth();
   }, []);
 
-  // Синхронізація з localStorage при зміні в інших вкладках
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
+  // Перевірка аутентифікації через API
+  const checkAuth = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
         setIsAuthenticated(true);
+        console.log("User authenticated:", userData);
       } else {
-        setToken(null);
+        setUser(null);
         setIsAuthenticated(false);
+        console.log("User not authenticated");
       }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Функція входу користувача в систему
-  const login = (newToken) => {
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
+  const login = () => {
     setIsAuthenticated(true);
-    console.log("User logged in with token:", newToken);
+    console.log("User logged in");
+
+    checkAuth();
   };
 
   // Функція виходу користувача з системи
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-    setIsAuthenticated(false);
-    console.log("User logged out");
+  const logout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
+      console.log("User logged out");
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        token,
+        user,
         isLoading,
         login,
         logout,
+        checkAuth,
       }}
     >
       {children}

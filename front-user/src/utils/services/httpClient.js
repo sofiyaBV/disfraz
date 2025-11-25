@@ -7,13 +7,7 @@ const httpClient = async (url, options = {}) => {
     });
   }
 
-  // Додаємо токен авторизації з localStorage
-  const token = localStorage.getItem("token");
-  const skipAuth = options.skipAuth || false;
-
-  if (token && !skipAuth) {
-    options.headers.set("Authorization", `Bearer ${token}`);
-  }
+  options.credentials = "include";
 
   try {
     const response = await fetch(url, options);

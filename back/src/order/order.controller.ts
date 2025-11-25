@@ -28,6 +28,7 @@ import { User } from '../auth/decorators/user.decorator';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { orderPaginateConfig } from '../config/pagination.config';
+import { RequestUser } from '../common/interfaces/request.interface';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -45,7 +46,10 @@ export class OrderController {
     description: 'Замовлення успішно створено',
     type: Order,
   })
-  async create(@Body() createOrderDto: CreateOrderDto, @User() user: any) {
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @User() user: RequestUser,
+  ) {
     return this.orderService.create(createOrderDto, user.id);
   }
 

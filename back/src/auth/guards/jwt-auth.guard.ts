@@ -7,6 +7,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import {
+  RequestUser,
+  AuthInfo,
+} from '../../common/interfaces/request.interface';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -30,13 +34,20 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, user: any, info: any) {
+  handleRequest<TUser = RequestUser>(
+    err: Error | null,
+    user: TUser | false,
+    info: AuthInfo | undefined,
+    context: ExecutionContext,
+    status?: any,
+  ): TUser {
     if (err || !user) {
       this.logger.warn(`JWT auth failed: ${info?.message || 'Unknown error'}`);
       throw err || new UnauthorizedException('Invalid or expired token');
     }
 
-    this.logger.debug(`User authenticated: ${user.id}`);
+    const requestUser = user as RequestUser;
+    this.logger.debug(`User authenticated: ${requestUser.id}`);
     return user;
   }
 }

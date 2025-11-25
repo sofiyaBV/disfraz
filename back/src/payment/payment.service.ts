@@ -58,13 +58,13 @@ export class PaymentService {
       if (paymentMethod.type !== 'card') {
         throw new BadRequestException('Метод оплати має бути карткою');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new BadRequestException(
-        `Невірний метод оплати: ${error.message || 'Невідома помилка'}`,
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : 'Невідома помилка';
+      throw new BadRequestException(`Невірний метод оплати: ${errorMessage}`);
     }
 
     const payment = this.paymentRepository.create({
@@ -81,9 +81,11 @@ export class PaymentService {
     let savedPayment: Payment;
     try {
       savedPayment = await this.paymentRepository.save(payment);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Невідома помилка';
       throw new InternalServerErrorException(
-        `Помилка при збереженні платежу: ${error.message || 'Невідома помилка'}`,
+        `Помилка при збереженні платежу: ${errorMessage}`,
       );
     }
 
@@ -108,23 +110,29 @@ export class PaymentService {
       savedPayment.stripePaymentIntentId = paymentIntent.id;
       savedPayment.status = paymentIntent.status as PaymentStatus;
       await this.paymentRepository.save(savedPayment);
-    } catch (error: any) {
+    } catch (error: unknown) {
       await this.paymentRepository.delete(savedPayment.id);
 
-      const stripeError = error as Stripe.errors.StripeError;
+      if (error instanceof Error && 'type' in error) {
+        const stripeError = error as Stripe.errors.StripeError;
 
-      if (stripeError.type === 'StripeCardError') {
-        throw new BadRequestException(
-          `Картку відхилено: ${stripeError.message}`,
-        );
+        if (stripeError.type === 'StripeCardError') {
+          throw new BadRequestException(
+            `Картку відхилено: ${stripeError.message}`,
+          );
+        }
+
+        if (stripeError.type === 'StripeInvalidRequestError') {
+          throw new BadRequestException(
+            `Невірний запит: ${stripeError.message}`,
+          );
+        }
       }
 
-      if (stripeError.type === 'StripeInvalidRequestError') {
-        throw new BadRequestException(`Невірний запит: ${stripeError.message}`);
-      }
-
+      const errorMessage =
+        error instanceof Error ? error.message : 'Невідома помилка';
       throw new InternalServerErrorException(
-        `Помилка при створенні платежу: ${error.message || 'Невідома помилка'}`,
+        `Помилка при створенні платежу: ${errorMessage}`,
       );
     }
 
@@ -183,8 +191,10 @@ export class PaymentService {
         signature,
         webhookSecret,
       );
-    } catch (error: any) {
-      throw new BadRequestException(`Webhook помилка: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Невідома помилка';
+      throw new BadRequestException(`Webhook помилка: ${errorMessage}`);
     }
 
     switch (event.type) {

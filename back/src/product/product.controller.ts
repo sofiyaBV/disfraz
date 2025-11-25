@@ -55,7 +55,7 @@ export class ProductController {
     type: Product,
   })
   async create(
-    @Body() body: any,
+    @Body() body: Record<string, any>,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
     const createProductDto = plainToClass(CreateProductDto, {
@@ -127,7 +127,7 @@ export class ProductController {
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: any,
+    @Body() body: Record<string, any>,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<Product> {
     const updateProductDto = plainToClass(UpdateProductDto, {

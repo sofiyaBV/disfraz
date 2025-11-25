@@ -33,14 +33,22 @@ const Authorization = ({ onClose }) => {
     }
   };
 
-  // Обробка callback від Google OAuth
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
+    const oauth = urlParams.get("oauth");
     const error = urlParams.get("error");
 
-    if (token) {
-      login(token);
+    if (error) {
+      setError("Помилка авторизації через Google. Спробуйте ще раз.");
+
+      const newUrl =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    } else if (oauth === "success") {
+      login();
       setSuccessMessage("Авторизація через Google успішна!");
 
       // Очищуємо URL від параметрів
@@ -54,15 +62,6 @@ const Authorization = ({ onClose }) => {
       setTimeout(() => {
         navigate("/home");
       }, 1500);
-    } else if (error) {
-      setError("Помилка авторизації через Google. Спробуйте ще раз.");
-
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
     }
   }, [login, navigate]);
 
@@ -142,25 +141,19 @@ const Authorization = ({ onClose }) => {
 
       const response = await dataProvider.signin(params);
 
-      // Отримуємо токен з відповіді
-      const token = response.data?.access_token || response.access_token;
-      if (token) {
-        login(token);
+      if (response) {
+        login();
         setSuccessMessage("Авторизація пройшла успішно!");
 
-        // Очищуємо форму
         setFormData({
           email: "",
           phone: "",
           password: "",
         });
 
-        // Перенаправляємо через 1.5 секунди
         setTimeout(() => {
           navigate("/home");
         }, 1500);
-      } else {
-        setError("Токен не отриманий від сервера");
       }
     } catch (err) {
       console.error("Signin error:", err);
@@ -199,7 +192,6 @@ const Authorization = ({ onClose }) => {
     window.location.href = `${apiUrl}/auth/google`;
   };
 
-  // Авторизація через Facebook (заглушка)
   const handleFacebookAuth = () => {
     setError("Авторизація через Facebook поки не реалізована");
   };

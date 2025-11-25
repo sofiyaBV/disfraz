@@ -1,5 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Role } from '../../auth/enums/role.enum';
+import { Cart } from '../../cart/entities/cart.entity';
+import { Comment } from '../../comments/entities/comment.entity';
+import { Order } from '../../order/entities/order.entity';
 
 export class UserDto {
   @ApiProperty({
@@ -37,16 +40,19 @@ export class UserDto {
 
   @ApiProperty({
     description: 'Список кошиків користувача',
+    type: () => [Cart],
   })
-  carts?: any[];
+  carts?: Cart[];
 
   @ApiProperty({
     description: 'Список коментарів користувача',
+    type: () => [Comment],
   })
-  comments?: any[];
+  comments?: Comment[];
 
   @ApiProperty({
     description: 'Список замовлень користувача',
+    type: () => [Order],
   })
-  orders?: any[];
+  orders?: Order[];
 }

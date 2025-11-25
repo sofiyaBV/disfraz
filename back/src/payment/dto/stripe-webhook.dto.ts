@@ -9,6 +9,6 @@ export class StripeWebhookEventDto {
 
   @ApiProperty({ description: 'Дані події' })
   data: {
-    object: any;
+    object: unknown;
   };
 }

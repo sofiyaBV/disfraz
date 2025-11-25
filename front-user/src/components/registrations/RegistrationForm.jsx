@@ -23,14 +23,22 @@ const RegistrationForm = () => {
   const [serverError, setServerError] = useState(null);
   const [serverMessage, setServerMessage] = useState(null);
 
-  // Обробка callback від Google OAuth
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
+    const oauth = urlParams.get("oauth");
     const error = urlParams.get("error");
 
-    if (token) {
-      login(token);
+    if (error) {
+      setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
+
+      const newUrl =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    } else if (oauth === "success") {
+      login();
       setServerMessage("Авторизація через Google успішна! Перенаправлення...");
 
       // Очищуємо URL від параметрів
@@ -44,16 +52,6 @@ const RegistrationForm = () => {
       setTimeout(() => {
         navigate("/home");
       }, 1500);
-    } else if (error) {
-      setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
-
-      // Очищуємо URL від параметрів помилки
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
     }
   }, [login, navigate]);
 
@@ -137,19 +135,12 @@ const RegistrationForm = () => {
         data: requestData,
       });
 
-      const token =
-        response.data?.access_token ||
-        response.data?.token ||
-        response.access_token ||
-        response.token;
-
-      if (token) {
-        login(token);
+      if (response) {
+        login();
         setServerMessage(
           "Реєстрація успішна! Перенаправлення на головну сторінку..."
         );
 
-        // Очищуємо форму
         setFormData({
           phone: "",
           email: "",
@@ -158,14 +149,6 @@ const RegistrationForm = () => {
           agree: false,
           loginLater: false,
         });
-
-        setTimeout(() => {
-          navigate("/home");
-        }, 1500);
-      } else {
-        setServerMessage(
-          "Реєстрація успішна! Перенаправлення на головну сторінку..."
-        );
 
         setTimeout(() => {
           navigate("/home");

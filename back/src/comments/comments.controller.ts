@@ -28,6 +28,7 @@ import { User } from '../auth/decorators/user.decorator';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { PaginatedSwaggerDocs } from 'nestjs-paginate';
 import { commentPaginateConfig } from '../config/pagination.config';
+import { RequestUser } from '../common/interfaces/request.interface';
 
 @ApiTags('Comment')
 @Controller('comments')
@@ -45,7 +46,10 @@ export class CommentsController {
     type: Comment,
   })
   @ApiBody({ type: CreateCommentDto })
-  async create(@Body() createCommentDto: CreateCommentDto, @User() user: any) {
+  async create(
+    @Body() createCommentDto: CreateCommentDto,
+    @User() user: RequestUser,
+  ) {
     return this.commentsService.create(createCommentDto, user.id);
   }
 
