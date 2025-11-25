@@ -1,5 +1,8 @@
+import { useState } from "react";
 import styles from "../../style/pages/cart/cartSummary.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
+import dataProvider from "../../utils/services/dataProvider";
+import { useAuth } from "../../utils/context/AuthContext";
 
 const CartSummary = ({
   totalItems,
@@ -7,6 +10,55 @@ const CartSummary = ({
   totalPrice,
   onClearCart,
 }) => {
+  const { isAuthenticated } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleCheckout = async () => {
+    if (!isAuthenticated) {
+      alert("Будь ласка, увійдіть в акаунт для оформлення замовлення!");
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      const orderResponse = await dataProvider.create("orders", {
+        data: {
+          customerName: "Користувач",
+          customerEmail: "user@example.com",
+          customerPhone: "+380971234567",
+          deliveryAddress: "Київ, Україна",
+          deliveryMethod: "Нова Пошта - відділення",
+        },
+      });
+
+      const orderId = orderResponse.data.id;
+
+      const checkoutResponse = await dataProvider.create(
+        "payment/create-checkout-session",
+        {
+          data: {
+            orderId,
+            successUrl: `${window.location.origin}/payment/success`,
+            cancelUrl: `${window.location.origin}/payment/cancel`,
+          },
+        }
+      );
+
+      if (checkoutResponse.data.url) {
+        window.location.href = checkoutResponse.data.url;
+      }
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Checkout error:", err);
+      }
+      setError(err.message || "Помилка при оформленні замовлення");
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className={styles.summary}>
       <div className={styles.header}>
@@ -25,14 +77,18 @@ const CartSummary = ({
         <span className={styles.totalValue}>{totalPrice.toFixed(0)} ₴</span>
       </div>
 
+      {error && <div className={styles.error}>{error}</div>}
+
       <div className={styles.actions}>
         <button className={styles.continueBtn} onClick={onClearCart}>
           ПРОДОВЖИТИ ПОКУПКИ
         </button>
         <ButtonGeneral
-          text="ОФОРМИТИ ЗАМОВЛЕННЯ"
+          text={isProcessing ? "ОБРОБКА..." : "ОФОРМИТИ ЗАМОВЛЕННЯ"}
           textColor="white"
           className={styles.checkoutBtn}
+          onClick={handleCheckout}
+          disabled={isProcessing}
         />
       </div>
     </div>

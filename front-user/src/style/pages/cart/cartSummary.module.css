@@ -107,6 +107,16 @@
   background: #555;
 }
 
+.error {
+  color: #dc3545;
+  font-size: 14px;
+  margin: 15px 0;
+  padding: 10px;
+  background: #ffe6e6;
+  border-radius: 4px;
+  text-align: center;
+}
+
 @media (max-width: 1024px) {
   .summary {
     position: static;

@@ -3,6 +3,8 @@ import productService from "./productService";
 import attributeService from "./attributeService";
 import commentService from "./commentService";
 import cartService from "./cartService";
+import orderService from "./orderService";
+import paymentService from "./paymentService";
 
 const dataProvider = {
   // Отримання списків даних
@@ -42,6 +44,10 @@ const dataProvider = {
         return cartService.addToCart(params.data);
       case "comments":
         return commentService.createComment(params.data);
+      case "orders":
+        return orderService.createOrder(params.data);
+      case "payment/create-checkout-session":
+        return paymentService.createCheckoutSession(params.data);
       default:
         throw new Error(`Unsupported resource: ${resource}`);
     }

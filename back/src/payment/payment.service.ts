@@ -10,9 +10,11 @@ import { Repository } from 'typeorm';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from './entities/payment.entity';
 import { PaymentStatus } from './enums/payment-status.enum';
+import { OrderStatus } from '../order/enums/order-status.enum';
 
 @Injectable()
 export class PaymentService {
@@ -146,6 +148,71 @@ export class PaymentService {
     };
   }
 
+  async createCheckoutSession(
+    createCheckoutSessionDto: CreateCheckoutSessionDto,
+    userId: number,
+  ) {
+    const { orderId, successUrl, cancelUrl } = createCheckoutSessionDto;
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`Користувача з ID ${userId} не знайдено`);
+    }
+
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, user: { id: userId } },
+      relations: ['user'],
+    });
+
+    if (!order) {
+      throw new NotFoundException(
+        `Замовлення з ID ${orderId} не знайдено або не належить користувачу`,
+      );
+    }
+
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'uah',
+            product_data: {
+              name: `Замовлення #${order.id}`,
+              description: `${order.quantity} товарів`,
+            },
+            unit_amount: Math.round(order.price * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: successUrl || `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${baseUrl}/payment/cancel`,
+      metadata: {
+        orderId: order.id.toString(),
+        userId: userId.toString(),
+      },
+    });
+
+    const payment = this.paymentRepository.create({
+      orderId: order.id,
+      amount: order.price,
+      currency: 'UAH',
+      description: `Оплата замовлення #${order.id}`,
+      status: PaymentStatus.PENDING,
+      stripePaymentIntentId: session.id,
+    });
+
+    await this.paymentRepository.save(payment);
+
+    return {
+      sessionId: session.id,
+      url: session.url,
+      paymentId: payment.id,
+    };
+  }
+
   async findAll() {
     return this.paymentRepository.find();
   }
@@ -198,6 +265,11 @@ export class PaymentService {
     }
 
     switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await this.handleCheckoutSessionCompleted(session);
+        break;
+      }
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         await this.updatePaymentStatus(
@@ -243,6 +315,42 @@ export class PaymentService {
     if (payment) {
       payment.status = status;
       await this.paymentRepository.save(payment);
+    }
+  }
+
+  private async handleCheckoutSessionCompleted(
+    session: Stripe.Checkout.Session,
+  ) {
+    const payment = await this.paymentRepository.findOne({
+      where: { stripePaymentIntentId: session.id },
+      relations: ['order'],
+    });
+
+    if (!payment) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`Payment not found for session ${session.id}`);
+      }
+      return;
+    }
+
+    payment.status = PaymentStatus.SUCCEEDED;
+    await this.paymentRepository.save(payment);
+
+    if (payment.order) {
+      const order = await this.orderRepository.findOne({
+        where: { id: payment.orderId },
+      });
+
+      if (order) {
+        order.status = OrderStatus.PAID;
+        await this.orderRepository.save(order);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log(
+            `Order #${order.id} marked as PAID after successful payment`,
+          );
+        }
+      }
     }
   }
 }

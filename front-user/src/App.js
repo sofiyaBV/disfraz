@@ -14,6 +14,8 @@ import { AuthProvider } from "./utils/context/AuthContext";
 import AllSectionPage from "./pages/AllSectionPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
@@ -33,8 +35,10 @@ function App() {
             <Route path="/:theme/" element={<Tests />} />
             <Route path="/tematics" element={<AllSectionPage />} />
             <Route path="/test" element={<Tests />} />
-            <Route path="*" element={<ErrorPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
+            <Route path="*" element={<ErrorPage />} />
           </Routes>
           <Footer />
         </div>

@@ -22,6 +22,7 @@ import {
 import { Request } from 'express';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -51,6 +52,26 @@ export class PaymentController {
     @User() user: RequestUser,
   ) {
     return this.paymentService.create(createPaymentDto, user.id);
+  }
+
+  @Post('create-checkout-session')
+  @ApiBearerAuth()
+  @UseGuards(RolesGuard)
+  @Roles(Role.User, Role.Admin)
+  @ApiOperation({ summary: 'Створити Stripe Checkout Session' })
+  @ApiBody({ type: CreateCheckoutSessionDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Checkout session успішно створено',
+  })
+  createCheckoutSession(
+    @Body() createCheckoutSessionDto: CreateCheckoutSessionDto,
+    @User() user: RequestUser,
+  ) {
+    return this.paymentService.createCheckoutSession(
+      createCheckoutSessionDto,
+      user.id,
+    );
   }
 
   @Public()
