@@ -99,8 +99,7 @@ const ProductPage = () => {
 
   const handleSubmitComment = async () => {
     const success = await submitComment(reviewContent, {
-      onSuccess: (msg) => {
-        notifications.showSuccess(msg);
+      onSuccess: () => {
         setShowReviewModal(false);
         setReviewContent("");
         setRefreshComments((prev) => prev + 1);
