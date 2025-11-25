@@ -27,7 +27,9 @@ const useCart = () => {
       setMessage("Товар додано до кошика!");
       return true;
     } catch (err) {
-      console.error("Помилка при додаванні до кошика:", err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Помилка при додаванні до кошика:", err);
+      }
       setError(
         "Помилка при додаванні до кошика: " +
           (err.message || "Невідома помилка")

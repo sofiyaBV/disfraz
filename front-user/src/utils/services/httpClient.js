@@ -39,7 +39,9 @@ const httpClient = async (url, options = {}) => {
     const text = await response.text();
     return text ? JSON.parse(text) : null;
   } catch (error) {
-    console.error("Fetch error:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Fetch error:", error);
+    }
     throw error;
   }
 };

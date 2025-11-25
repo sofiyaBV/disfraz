@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../style/pagesStyle/registration.module.css";
 import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
+import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/validation";
 
 // Компонент форми реєстрації з підтримкою соціальних мереж
 const RegistrationForm = () => {
@@ -23,6 +24,18 @@ const RegistrationForm = () => {
   const [serverError, setServerError] = useState(null);
   const [serverMessage, setServerMessage] = useState(null);
 
+  // Ref для збереження timeout ID для cleanup
+  const timeoutRef = useRef(null);
+
+  // Cleanup при unmount компонента
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const oauth = urlParams.get("oauth");
@@ -41,7 +54,7 @@ const RegistrationForm = () => {
       login();
       setServerMessage("Авторизація через Google успішна! Перенаправлення...");
 
-      // Очищуємо URL від параметрів
+      
       const newUrl =
         window.location.protocol +
         "//" +
@@ -49,13 +62,13 @@ const RegistrationForm = () => {
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
 
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         navigate("/home");
       }, 1500);
     }
   }, [login, navigate]);
 
-  // Зміна методу реєстрації (телефон/email)
+  // Зміна методу реєстрації 
   const handleMethodChange = (e) => {
     setMethod(e.target.value);
     setErrors({});
@@ -71,7 +84,7 @@ const RegistrationForm = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Очищуємо помилки при зміні полів
+    
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -84,13 +97,13 @@ const RegistrationForm = () => {
     if (method === "phone") {
       if (!formData.phone) {
         newErrors.phone = "Номер телефону обов'язковий";
-      } else if (!/^\+?3?8?(0\d{9})$/.test(formData.phone)) {
-        newErrors.phone = "Некоректний формат номера телефону";
+      } else if (!validateUkrainianPhone(formData.phone)) {
+        newErrors.phone = "Некоректний формат номера телефону. Використовуйте формат: +380XXXXXXXXX або 0XXXXXXXXX";
       }
     } else {
       if (!formData.email) {
         newErrors.email = "E-mail обов'язковий";
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      } else if (!validateEmail(formData.email)) {
         newErrors.email = "Некоректний формат e-mail";
       }
     }
@@ -150,12 +163,14 @@ const RegistrationForm = () => {
           loginLater: false,
         });
 
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
           navigate("/home");
         }, 1500);
       }
     } catch (error) {
-      console.error("Помилка при реєстрації:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Помилка при реєстрації:", error);
+      }
       setServerError(
         error.message || "Помилка при реєстрації. Спробуйте ще раз."
       );

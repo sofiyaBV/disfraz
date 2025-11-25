@@ -28,14 +28,15 @@ export const AuthProvider = ({ children }) => {
         const userData = await response.json();
         setUser(userData);
         setIsAuthenticated(true);
-        console.log("User authenticated:", userData);
       } else {
         setUser(null);
         setIsAuthenticated(false);
-        console.log("User not authenticated");
       }
     } catch (error) {
-      console.error("Auth check failed:", error);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Auth check failed:", error);
+      }
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -45,8 +46,6 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     setIsAuthenticated(true);
-    console.log("User logged in");
-
     checkAuth();
   };
 
@@ -62,11 +61,12 @@ export const AuthProvider = ({ children }) => {
         },
       });
     } catch (error) {
-      console.error("Logout error:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Logout error:", error);
+      }
     } finally {
       setUser(null);
       setIsAuthenticated(false);
-      console.log("User logged out");
     }
   };
 

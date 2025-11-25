@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,10 +13,12 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Order } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
 import { PaymentStatus } from './enums/payment-status.enum';
+import { OrderStatus } from '../order/enums/order-status.enum';
 import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
   private stripe: Stripe;
 
   constructor(
@@ -32,22 +35,66 @@ export class PaymentService {
   }
 
   async create(createPaymentDto: CreatePaymentDto, userId: number) {
-    const { currency, description, paymentMethodId } = createPaymentDto;
+    const { orderId, currency, description, paymentMethodId } = createPaymentDto;
 
+    // ВАЖЛИВО: Перевіряємо користувача
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(`Користувача з ID ${userId} не знайдено`);
     }
 
-    const order = await this.orderRepository.findOne({
-      where: { user: { id: userId } },
-      order: { createdAt: 'DESC' },
-      relations: ['user'],
+    let order: Order;
+
+    // ВАЖЛИВО: Якщо orderId вказано - використовуємо його (явно)
+    if (orderId) {
+      order = await this.orderRepository.findOne({
+        where: { id: orderId, user: { id: userId } },
+        relations: ['user'],
+      });
+
+      if (!order) {
+        throw new NotFoundException(
+          `Замовлення з ID ${orderId} не знайдено або не належить користувачу`,
+        );
+      }
+    } else {
+      // ВАЖЛИВО: Якщо orderId НЕ вказано - беремо останнє неоплачене замовлення
+      const unpaidOrders = await this.orderRepository.find({
+        where: { user: { id: userId }, status: 'Pending' },
+        order: { createdAt: 'DESC' },
+        relations: ['user'],
+      });
+
+      if (unpaidOrders.length === 0) {
+        throw new NotFoundException(
+          `У користувача немає неоплачених замовлень. Створіть замовлення перед оплатою.`,
+        );
+      }
+
+      if (unpaidOrders.length > 1) {
+        const orderIds = unpaidOrders.map((o) => o.id).join(', ');
+        throw new BadRequestException(
+          `У вас кілька неоплачених замовлень (${orderIds}). Будь ласка, вкажіть orderId для оплати конкретного замовлення.`,
+        );
+      }
+
+      order = unpaidOrders[0];
+      this.logger.log(
+        `Auto-selected order ${order.id} for user ${userId} payment`,
+      );
+    }
+
+    // ВАЖЛИВО: Перевіряємо, чи не було вже успішної оплати для цього замовлення
+    const existingPayment = await this.paymentRepository.findOne({
+      where: {
+        orderId: order.id,
+        status: PaymentStatus.SUCCEEDED,
+      },
     });
 
-    if (!order) {
-      throw new NotFoundException(
-        `Замовлення для користувача з ID ${userId} не знайдено`,
+    if (existingPayment) {
+      throw new BadRequestException(
+        `Замовлення #${orderId} вже оплачено. ID платежу: ${existingPayment.id}`,
       );
     }
 
@@ -91,25 +138,42 @@ export class PaymentService {
 
     let paymentIntent: Stripe.PaymentIntent;
     try {
-      paymentIntent = await this.stripe.paymentIntents.create({
-        amount: Math.round(order.price * 100),
-        currency: currency || 'UAH',
-        description: description || `Оплата замовлення #${order.id}`,
-        metadata: {
-          orderId: order.id.toString(),
-          paymentId: savedPayment.id.toString(),
+      // ВАЖЛИВО: Додано idempotency_key для запобігання дублікатів
+      const idempotencyKey = `order_${order.id}_payment_${savedPayment.id}_${Date.now()}`;
+
+      paymentIntent = await this.stripe.paymentIntents.create(
+        {
+          amount: Math.round(order.price * 100),
+          currency: currency || 'UAH',
+          description: description || `Оплата замовлення #${order.id}`,
+          metadata: {
+            orderId: order.id.toString(),
+            paymentId: savedPayment.id.toString(),
+            userId: userId.toString(),
+          },
+          payment_method: paymentMethodId,
+          confirm: true,
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: 'never',
+          },
         },
-        payment_method: paymentMethodId,
-        confirm: true,
-        automatic_payment_methods: {
-          enabled: true,
-          allow_redirects: 'never',
+        {
+          idempotencyKey: idempotencyKey,
         },
-      });
+      );
 
       savedPayment.stripePaymentIntentId = paymentIntent.id;
       savedPayment.status = paymentIntent.status as PaymentStatus;
       await this.paymentRepository.save(savedPayment);
+
+      // ВАЖЛИВО: Якщо оплата успішна - змінюємо статус замовлення
+      if (paymentIntent.status === 'succeeded') {
+        await this.updateOrderStatus(order.id, OrderStatus.PAID);
+        this.logger.log(
+          `Order ${order.id} status changed to PAID after successful payment`,
+        );
+      }
     } catch (error: unknown) {
       await this.paymentRepository.delete(savedPayment.id);
 
@@ -181,7 +245,7 @@ export class PaymentService {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-      throw new InternalServerErrorException('WEBHOOKне налаштовано');
+      throw new InternalServerErrorException('WEBHOOK не налаштовано');
     }
 
     let event: Stripe.Event;
@@ -204,6 +268,15 @@ export class PaymentService {
           paymentIntent.id,
           PaymentStatus.SUCCEEDED,
         );
+
+        // ВАЖЛИВО: Змінюємо статус замовлення при успішній оплаті через webhook
+        const orderId = paymentIntent.metadata?.orderId;
+        if (orderId) {
+          await this.updateOrderStatus(parseInt(orderId), OrderStatus.PAID);
+          this.logger.log(
+            `Order ${orderId} status changed to PAID via webhook`,
+          );
+        }
         break;
       }
       case 'payment_intent.payment_failed': {
@@ -243,6 +316,26 @@ export class PaymentService {
     if (payment) {
       payment.status = status;
       await this.paymentRepository.save(payment);
+    }
+  }
+
+  // ВАЖЛИВО: Допоміжний метод для зміни статусу замовлення
+  private async updateOrderStatus(orderId: number, status: OrderStatus) {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+    });
+
+    if (order) {
+      const oldStatus = order.status;
+      order.status = status;
+      await this.orderRepository.save(order);
+      this.logger.log(
+        `Order ${orderId} status updated: ${oldStatus} -> ${status}`,
+      );
+    } else {
+      this.logger.warn(
+        `Cannot update order ${orderId} status - order not found`,
+      );
     }
   }
 }

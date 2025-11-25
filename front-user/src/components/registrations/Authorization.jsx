@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import add from "../../assets/add.png";
 import add_hover from "../../assets/add_hover.png";
@@ -8,6 +8,7 @@ import styles from "../../style/authorization.module.css";
 import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
+import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/validation";
 
 // Компонент авторизації користувачів з підтримкою різних методів входу
 const Authorization = ({ onClose }) => {
@@ -23,12 +24,23 @@ const Authorization = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
+  
+  const timeoutRef = useRef(null);
+
+  // Cleanup при unmount компонента
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   // Безпечне закриття модального вікна з перенаправленням
   const safeClose = (message = null) => {
     if (typeof onClose === "function") {
       onClose(message);
     } else {
-      console.warn("onClose is not a function, redirecting to home");
       navigate("/home");
     }
   };
@@ -39,7 +51,7 @@ const Authorization = ({ onClose }) => {
     const error = urlParams.get("error");
 
     if (error) {
-      setError("Помилка авторизації через Google. Спробуйте ще раз.");
+      setError("Помилка авторізації через Google. Спробуйте ще раз.");
 
       const newUrl =
         window.location.protocol +
@@ -49,7 +61,7 @@ const Authorization = ({ onClose }) => {
       window.history.replaceState({}, document.title, newUrl);
     } else if (oauth === "success") {
       login();
-      setSuccessMessage("Авторизація через Google успішна!");
+      setSuccessMessage("Авторізація через Google успішна!");
 
       // Очищуємо URL від параметрів
       const newUrl =
@@ -59,13 +71,16 @@ const Authorization = ({ onClose }) => {
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
 
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         navigate("/home");
       }, 1500);
+
+     
+      return () => clearTimeout(timeoutId);
     }
   }, [login, navigate]);
 
-  // Перемикання між методами входу (телефон/email)
+  // Перемикання між методами входу 
   const toggleLoginMethod = () => {
     setIsPhoneLogin(!isPhoneLogin);
     setFormData({ ...formData, email: "", phone: "" });
@@ -102,8 +117,8 @@ const Authorization = ({ onClose }) => {
         setError("Введіть номер телефону");
         return false;
       }
-      if (!/^\+?3?8?(0\d{9})$/.test(phone)) {
-        setError("Некоректний формат номера телефону");
+      if (!validateUkrainianPhone(phone)) {
+        setError("Некоректний формат номера телефону. Використовуйте формат: +380XXXXXXXXX або 0XXXXXXXXX");
         return false;
       }
     } else {
@@ -111,7 +126,7 @@ const Authorization = ({ onClose }) => {
         setError("Введіть email");
         return false;
       }
-      if (!/\S+@\S+\.\S+/.test(email)) {
+      if (!validateEmail(email)) {
         setError("Некоректний формат email");
         return false;
       }
@@ -151,12 +166,14 @@ const Authorization = ({ onClose }) => {
           password: "",
         });
 
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
           navigate("/home");
         }, 1500);
       }
     } catch (err) {
-      console.error("Signin error:", err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Signin error:", err);
+      }
 
       // Обробка різних типів помилок
       let errorMessage = "Не вдалося авторизуватися. Спробуйте ще раз.";
@@ -187,8 +204,13 @@ const Authorization = ({ onClose }) => {
     setError(null);
     setSuccessMessage(null);
 
-    const apiUrl =
-      process.env.REACT_APP_JSON_SERVER_URL || "http://localhost:3000";
+    const apiUrl = process.env.REACT_APP_JSON_SERVER_URL;
+
+    if (!apiUrl) {
+      setError("Конфігурація API не налаштована. Зверніться до адміністратора.");
+      return;
+    }
+
     window.location.href = `${apiUrl}/auth/google`;
   };
 

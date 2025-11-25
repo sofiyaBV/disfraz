@@ -1,7 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsPositive,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class CreatePaymentDto {
+  @ApiProperty({
+    description:
+      'ID замовлення для оплати (optional - якщо не вказано, використовується останнє неоплачене замовлення користувача)',
+    example: 1,
+    required: false,
+  })
+  @IsNumber()
+  @IsPositive()
+  @IsOptional()
+  orderId?: number;
+
   @ApiProperty({
     description: 'Валюта платежу',
     example: 'UAH',
