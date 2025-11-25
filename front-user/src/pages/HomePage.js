@@ -6,7 +6,7 @@ import SuitWM from "../components/homePage/SuitWM";
 import TematicsScrole from "../components/homePage/TematicsScrole";
 import ProductScroll from "../components/Products/ProductScroll";
 import ThematicProducts from "../components/Products/ThematicProducts";
-import style from "../style/pagesStyle/homePage.module.css";
+import style from "../style/pages/home/homePage.module.css";
 
 import categoriesData from "../utils/constants/CategoriesData";
 import newsData from "../utils/constants/NewsData";

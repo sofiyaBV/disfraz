@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ReactSVG } from "react-svg";
 import heart from "../../assets/svg/heartborder.svg";
-import styles from "../../style/cart/cartItem.module.css";
+import styles from "../../style/pages/cart/cartItem.module.css";
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const [isFavorite, setIsFavorite] = useState(false);

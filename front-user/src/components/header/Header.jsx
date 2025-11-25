@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import styles from "../../style/header.module.css";
+import styles from "../../style/layout/header.module.css";
 import logoImage from "../../assets/LOGO.png";
 import menuImage from "../../assets/menu.png";
 import ButtonGeneral from "../buttons/ButtonGeneral";

@@ -1,4 +1,4 @@
-import styles from "../../style/products/modals.module.css";
+import styles from "../../style/pages/products/modals.module.css";
 
 const Notifications = ({ success, error, favoriteMessage }) => {
   if (!success && !error && !favoriteMessage) return null;

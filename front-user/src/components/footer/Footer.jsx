@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import styles from "../../style/footer.module.css";
+import styles from "../../style/layout/footer.module.css";
 import payPalImage from "../../assets/footer/PayPal.png";
 import FooterSection from "./FooterSection";
 import { footerSections } from "../../utils/constants/FooterData";

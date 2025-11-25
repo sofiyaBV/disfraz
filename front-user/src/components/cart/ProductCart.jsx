@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import style from "../../style/cart/productCart.module.css";
+import style from "../../style/pages/cart/productCart.module.css";
 import { ReactSVG } from "react-svg";
 import heart from "../../assets/svg/heartborder.svg";
 import discount_icon from "../../assets/svg/discount.svg";

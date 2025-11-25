@@ -4,7 +4,7 @@ import add from "../../assets/add.png";
 import add_hover from "../../assets/add_hover.png";
 import facebook from "../../img/icon/facebook_color.png";
 import google from "../../img/icon/google_color.png";
-import styles from "../../style/authorization.module.css";
+import styles from "../../style/pages/auth/authorization.module.css";
 import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";

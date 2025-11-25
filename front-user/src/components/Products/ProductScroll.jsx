@@ -1,5 +1,5 @@
 import React from "react";
-import style from "../../style/products/productScroll.module.css";
+import style from "../../style/pages/products/productScroll.module.css";
 import ProductCart from "../cart/ProductCart";
 
 const ProductScroll = ({

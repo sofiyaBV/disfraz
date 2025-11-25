@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import styles from "../../style/cart/emptyCart.module.css";
+import styles from "../../style/pages/cart/emptyCart.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 
 const EmptyCart = () => {

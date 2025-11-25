@@ -1,4 +1,4 @@
-import styles from "../../style/footer.module.css";
+import styles from "../../style/layout/footer.module.css";
 import {
   FaFacebook,
   FaInstagram,

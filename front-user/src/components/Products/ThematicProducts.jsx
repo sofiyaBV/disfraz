@@ -1,4 +1,4 @@
-import style from "../../style/products/thematicProducts.module.css";
+import style from "../../style/pages/products/thematicProducts.module.css";
 import TematicsData from "../../utils/constants/TematicsData";
 import ProductCart from "../cart/ProductCart";
 

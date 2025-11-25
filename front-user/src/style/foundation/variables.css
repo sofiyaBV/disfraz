@@ -1,0 +1,98 @@
+:root {
+  --color-primary: #151515;
+  --color-primary-hover: #333;
+
+  --color-bg-primary: #fff;
+  --color-bg-secondary: #F2F2F2;
+  --color-bg-tertiary: #f5f5f5;
+  --color-bg-gray: #f8f9fa;
+  --color-bg-dark: #151515;
+
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-text-tertiary: #999;
+  --color-text-light: #F2F2F2;
+
+  --color-border-light: #e0e0e0;
+  --color-border-medium: #ddd;
+  --color-border-dark: #EEEEEE;
+  --color-border-gray: #e9ecef;
+  --color-border-focus: #151515;
+
+  --color-success: #28a745;
+  --color-success-bg: #e6ffe6;
+  --color-success-light: #d4edda;
+  --color-success-border: #c3e6cb;
+  --color-success-text: #155724;
+
+  --color-error: #dc3545;
+  --color-error-bg: #ffe6e6;
+  --color-error-light: #f8d7da;
+  --color-error-border: #f5c6cb;
+  --color-error-text: #721c24;
+
+  --color-warning: #ffc107;
+  --color-warning-bg: #fff3cd;
+
+  --color-info: #007bff;
+  --color-info-hover: #0056b3;
+
+  --color-link: #007bff;
+  --color-link-hover: #0056b3;
+
+  --color-facebook: #1877f2;
+  --color-facebook-hover: #166fe5;
+  --color-google: #4285f4;
+  --color-google-bg: #f8f9ff;
+
+  --color-star: #ffc107;
+  --color-discount: #e74c3c;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 1.9rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 50%;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 6px 16px rgba(0, 0, 0, 0.2);
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.4s ease;
+
+  --font-size-xs: 0.8rem;
+  --font-size-sm: 0.9rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.2rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: bold;
+
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-header: 20;
+  --z-overlay: 30;
+  --z-modal: 1000;
+
+  --opacity-disabled: 0.6;
+  --opacity-hover: 0.8;
+
+  --header-height: 6.25rem;
+  --sidebar-width: 280px;
+  --container-max-width: 1200px;
+}

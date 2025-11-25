@@ -1,7 +1,7 @@
 // components/buttons/ButtonGeneral.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../../style/buttons/buttonGeneral.module.css";
+import styles from "../../style/components/buttons/buttonGeneral.module.css";
 
 const ButtonGeneral = ({
   initialColor = "black",
@@ -12,10 +12,10 @@ const ButtonGeneral = ({
   height,
   transitionDuration = "0.3s",
   link = "#",
-  type = "button", // Добавляем type по умолчанию
-  disabled = false, // Добавляем disabled
-  colorHover, // Добавляем colorHover
-  onClick, // Добавляем onClick в props
+  type = "button",
+  disabled = false,
+  colorHover,
+  onClick,
 }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -26,7 +26,7 @@ const ButtonGeneral = ({
 
   const finalTextColor = isHovered
     ? colorHover
-      ? textColor // Если colorHover задан, текст остается прежнего цвета
+      ? textColor
       : initialColor === "white"
       ? "#fff"
       : "#000"
@@ -42,11 +42,10 @@ const ButtonGeneral = ({
   };
 
   const handleClick = (e) => {
-    // Вызываем переданный onClick, если он есть
     if (onClick) {
       onClick(e);
     }
-    // Обрабатываем навигацию, если задан link
+
     if (link) {
       navigate(link);
     }
@@ -54,8 +53,8 @@ const ButtonGeneral = ({
 
   return (
     <button
-      type={type} // Передаем type
-      disabled={disabled} // Передаем disabled
+      type={type}
+      disabled={disabled}
       style={buttonStyle}
       className={styles.custom_button}
       onClick={handleClick}

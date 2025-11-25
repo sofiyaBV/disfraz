@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "../../src/style/products/productPage.module.css";
+import styles from "../style/pages/products/productPage.module.css";
 import dataProvider from "../utils/services/dataProvider";
 
 const CommentSection = ({ productAttributeId, refresh }) => {

@@ -1,6 +1,6 @@
 import { ReactSVG } from "react-svg";
 import heart from "../../assets/svg/heartborder.svg";
-import styles from "../../style/products/similarProducts.module.css";
+import styles from "../../style/pages/products/similarProducts.module.css";
 
 const SimilarProducts = ({ products = [] }) => {
   if (products.length === 0) return null;

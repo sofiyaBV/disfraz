@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "../../style/burgerMenu.module.css";
+import styles from "../../style/components/navigation/burgerMenu.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import Authorization from "../registrations/Authorization";
 import { useAuth } from "../../utils/context/AuthContext";

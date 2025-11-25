@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "../../style/products/imageGallery.module.css";
+import styles from "../../style/pages/products/imageGallery.module.css";
 
 const ImageGallery = ({ images = [], productName }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);

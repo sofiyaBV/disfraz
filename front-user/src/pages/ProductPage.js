@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ReactSVG } from "react-svg";
 
-import layoutStyles from "../style/products/productPage.module.css";
-import detailsStyles from "../style/products/productDetails.module.css";
-import commentsStyles from "../style/products/comments.module.css";
-import modalStyles from "../style/products/modals.module.css";
-import "../style/products/responsive.module.css";
+import layoutStyles from "../style/pages/products/productPage.module.css";
+import detailsStyles from "../style/pages/products/productDetails.module.css";
+import commentsStyles from "../style/pages/products/comments.module.css";
+import modalStyles from "../style/pages/products/modals.module.css";
+import "../style/pages/products/responsive.module.css";
 
 import heart from "../assets/svg/heartborder.svg";
 import ButtonGeneral from "../components/buttons/ButtonGeneral";

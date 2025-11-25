@@ -1,4 +1,4 @@
-import styles from "../../style/cart/cartSummary.module.css";
+import styles from "../../style/pages/cart/cartSummary.module.css";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 
 const CartSummary = ({

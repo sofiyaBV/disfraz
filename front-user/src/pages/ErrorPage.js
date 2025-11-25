@@ -1,7 +1,7 @@
 import React from "react";
 import errorFoto from "../img/eror.png";
 import ButtonGeneral from "../components/buttons/ButtonGeneral";
-import style from "../style/pagesStyle/error.module.css";
+import style from "../style/pages/home/error.module.css";
 const ErrorPage = () => {
   return (
     <div className={style.general_section}>

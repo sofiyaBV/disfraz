@@ -3,7 +3,7 @@ import CartItem from "../components/cart/CartItem";
 import CartSummary from "../components/cart/CartSummary";
 import EmptyCart from "../components/cart/EmptyCart";
 import useCartData from "../utils/hooks/useCartData";
-import styles from "../style/cart/cartPage.module.css";
+import styles from "../style/pages/cart/cartPage.module.css";
 
 const CartPage = () => {
   const navigate = useNavigate();
