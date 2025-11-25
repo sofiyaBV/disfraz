@@ -16,8 +16,8 @@
 .container_menu h4{
     color: #2B3338;
     font-size: 16px;
-    font-weight: 400; /* Regular font weight */
-    text-transform: uppercase; /* Ensures text is written in all caps */
+    font-weight: 400; 
+    text-transform: uppercase; 
 }
 
 .menu_item{
@@ -33,10 +33,9 @@
 }
 
 .container_info {
-    /* background-color: #882727; */
+   
     padding: 20px;
     display: flex;
-    /* flex-direction: column; */
     gap: 1.25rem;
     width: 80%;
     height: 100%;

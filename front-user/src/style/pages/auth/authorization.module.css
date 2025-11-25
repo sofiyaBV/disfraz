@@ -1,4 +1,4 @@
-/* Основной контейнер */
+
 .container {
   max-width: 400px;
   margin: 0 auto;
@@ -10,7 +10,7 @@
   position: relative;
 }
 
-/* Кнопка закрытия */
+
 .closeButton {
   position: absolute;
   top: 1rem;
@@ -33,7 +33,7 @@
   transition: opacity 0.2s;
 }
 
-/* Заголовки */
+
 .title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -50,7 +50,7 @@
   text-align: center;
 }
 
-/* Социальные кнопки */
+
 .socialAuth {
   display: flex;
   gap: 1rem;
@@ -106,7 +106,7 @@
   height: 18px;
 }
 
-/* Разделитель */
+
 .divider {
   text-align: center;
   margin: 1.5rem 0;
@@ -130,7 +130,7 @@
   z-index: -1;
 }
 
-/* Форма */
+
 .form {
   margin-bottom: 1.5rem;
 }
@@ -143,7 +143,7 @@
   text-align: center;
 }
 
-/* Переключатель метода входа */
+
 .methodOptions {
   display: flex;
   justify-content: center;
@@ -164,7 +164,7 @@
   accent-color: #151515;
 }
 
-/* Группы полей ввода */
+
 .inputGroup {
   margin-bottom: 1.5rem;
 }
@@ -208,7 +208,7 @@
   box-sizing: border-box;
 }
 
-/* Ссылки в форме */
+
 .formLinks {
   margin: 1rem 0;
 }
@@ -236,7 +236,7 @@
   pointer-events: none;
 }
 
-/* Сообщения об ошибках и успехе */
+
 .errorMessage {
   color: #dc3545;
   font-size: 0.9rem;
@@ -257,7 +257,7 @@
   text-align: center;
 }
 
-/* Кнопки действий */
+
 .actionButtons {
   margin-top: 1.5rem;
 }
@@ -297,7 +297,7 @@
   cursor: not-allowed;
 }
 
-/* Дополнительные ссылки */
+
 .additionalLinks {
   text-align: center;
   margin-top: 1rem;
