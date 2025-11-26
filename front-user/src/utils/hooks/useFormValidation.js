@@ -4,7 +4,6 @@ const useFormValidation = (initialState, validationRules) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
 
-  // Обробка зміни значень форми
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;

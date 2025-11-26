@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import dataProvider from "../services/dataProvider";
 
+// Хук для завантаження товарів з фільтрацією по темі та атрибуту
 const useProduct = ({ theme, attributeId } = {}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);

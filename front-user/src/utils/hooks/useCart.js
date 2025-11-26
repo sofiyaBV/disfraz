@@ -40,7 +40,6 @@ const useCart = () => {
     }
   };
 
-  // Очищення повідомлень
   const clearMessages = () => {
     setMessage(null);
     setError(null);

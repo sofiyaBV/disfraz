@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import cartService from "../services/cartService";
 
+// Хук для управління кошиком користувача
 const useCartData = () => {
   const { isAuthenticated } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Завантаження кошика
   const fetchCart = useCallback(async () => {
     if (!isAuthenticated) {
       setCartItems([]);
@@ -37,7 +37,6 @@ const useCartData = () => {
     }
   }, [isAuthenticated]);
 
-  // Оновлення кількості
   const updateQuantity = async (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
 
@@ -63,7 +62,6 @@ const useCartData = () => {
     }
   };
 
-  // Видалення товару
   const removeItem = async (cartItemId) => {
     try {
       await cartService.removeFromCart(cartItemId);
@@ -77,7 +75,6 @@ const useCartData = () => {
     }
   };
 
-  // Очищення кошика
   const clearCart = async () => {
     try {
       await cartService.clearCart(cartItems);
@@ -91,12 +88,10 @@ const useCartData = () => {
     }
   };
 
-  // Завантажуємо при монтуванні
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
-  // Підрахунок підсумків
   const totalItems = cartItems.length;
   const totalDiscount = cartItems.reduce((sum, item) => {
     const product = item.productAttribute?.product;

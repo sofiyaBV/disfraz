@@ -1,7 +1,6 @@
 import httpClient from "./httpClient";
 import { API_BASE_URL, buildQueryParams, normalizeListResponse } from "./api";
 
-// Отримання списку атрибутів
 export const fetchAttributes = async (params = {}) => {
   const queryParams = buildQueryParams(params);
 
@@ -21,7 +20,6 @@ export const fetchAttributes = async (params = {}) => {
   }
 };
 
-// Отримання атрибутів товарів з фільтрацією
 export const fetchProductAttributes = async (params = {}) => {
   const queryParams = buildQueryParams(params);
 

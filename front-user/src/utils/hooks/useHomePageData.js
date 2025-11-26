@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import dataProvider from "../services/dataProvider";
 import TematicsData from "../constants/TematicsData";
 
+// Хук для завантаження всіх товарів та групування по тематиках
 const useHomePageData = () => {
   const [thematicProductAttributes, setThematicProductAttributes] = useState(
     {}
@@ -16,14 +17,12 @@ const useHomePageData = () => {
       setError(null);
 
       try {
-        // Завантажуємо всі товари
         const allResponse = await dataProvider.getList("product-attributes", {
           filter: {},
         });
         const products = allResponse.data || [];
         setAllProducts(products);
 
-        // Групуємо по тематиках
         const themes = TematicsData.map((item) => item.theme);
         const productsByTheme = {};
 

@@ -1,7 +1,6 @@
 import httpClient from "./httpClient";
 import { API_BASE_URL } from "./api";
 
-// Отримання профілю поточного користувача
 export const fetchUserProfile = async () => {
   const url = `${API_BASE_URL}/auth/profile`;
 
@@ -13,7 +12,6 @@ export const fetchUserProfile = async () => {
   }
 };
 
-// Оновлення даних профілю користувача
 export const updateUserProfile = async (data) => {
   const url = `${API_BASE_URL}/auth/profile`;
 
@@ -28,7 +26,6 @@ export const updateUserProfile = async (data) => {
   }
 };
 
-// Реєстрація нового користувача
 export const register = async ({ email, phone, password }) => {
   const response = await httpClient(`${API_BASE_URL}/auth/register`, {
     method: "POST",
@@ -38,7 +35,6 @@ export const register = async ({ email, phone, password }) => {
   return { data: response };
 };
 
-// Авторизація користувача
 export const signin = async ({ email, phone, password }) => {
   const response = await httpClient(`${API_BASE_URL}/auth/signin`, {
     method: "POST",

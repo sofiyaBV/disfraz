@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  // Перевірка аутентифікації через API
+  // Перевірка стану автентифікації через cookie-based session
   const checkAuth = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/profile`, {
@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
       }
     } catch (error) {
-      
       if (process.env.NODE_ENV === 'development') {
         console.error("Auth check failed:", error);
       }
@@ -49,7 +48,6 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   };
 
-  // Функція виходу користувача з системи
   const logout = async () => {
     try {
       await fetch(`${API_BASE_URL}/auth/logout`, {

@@ -1,7 +1,6 @@
 import httpClient from "./httpClient";
 import { API_BASE_URL, buildQueryParams, normalizeListResponse } from "./api";
 
-// Отримання коментарів без авторизації
 export const fetchComments = async (params = {}) => {
   const queryParams = buildQueryParams(params);
 
@@ -14,7 +13,6 @@ export const fetchComments = async (params = {}) => {
   const url = `${API_BASE_URL}/comments?${query.toString()}`;
 
   try {
-    // Пропускаємо авторизацію для читання коментарів
     const response = await httpClient(url, { skipAuth: true });
     return normalizeListResponse(response);
   } catch (error) {
@@ -22,7 +20,6 @@ export const fetchComments = async (params = {}) => {
   }
 };
 
-// Створення нового коментаря
 export const createComment = async ({ productAttributeId, content }) => {
   const url = `${API_BASE_URL}/comments`;
 

@@ -34,7 +34,6 @@ const RegistrationForm = () => {
     };
   }, []);
 
-  // Редирект авторизованих користувачів
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       timeoutRef.current = setTimeout(() => {
@@ -190,10 +189,8 @@ const RegistrationForm = () => {
 
   return (
     <div className={styles.container}>
-      {/* Заголовок */}
       <h2 className={styles.title}>Реєстрація</h2>
 
-      {/* Розділювач */}
       <div className={styles.divider}>
         <span className={styles.dividerText}>
           За допомогою електронної пошти
@@ -201,7 +198,6 @@ const RegistrationForm = () => {
         <div className={styles.dividerLine}></div>
       </div>
 
-      {/* Вибір методу реєстрації */}
       <div className={styles.methodOptions}>
         <label className={styles.methodLabel}>
           <input
@@ -230,7 +226,6 @@ const RegistrationForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Поле телефону або email */}
         {method === "phone" ? (
           <div className={styles.inputGroup}>
             <label htmlFor="phone">Телефон</label>
@@ -267,7 +262,6 @@ const RegistrationForm = () => {
           </div>
         )}
 
-        {/* Поле пароля */}
         <div className={styles.inputGroup}>
           <label htmlFor="password">Пароль</label>
           <div className={styles.passwordWrapper}>
@@ -288,7 +282,6 @@ const RegistrationForm = () => {
           )}
         </div>
 
-        {/* Поле підтвердження пароля */}
         <div className={styles.inputGroup}>
           <label htmlFor="confirmPassword">Підтвердити пароль</label>
           <div className={styles.passwordWrapper}>
@@ -311,7 +304,6 @@ const RegistrationForm = () => {
           )}
         </div>
 
-        {/* Чекбокс підписки */}
         <div className={styles.checkboxGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -326,7 +318,6 @@ const RegistrationForm = () => {
           </label>
         </div>
 
-        {/* Чекбокс згоди */}
         <div className={styles.checkboxGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -347,14 +338,12 @@ const RegistrationForm = () => {
           {errors.agree && <span className={styles.error}>{errors.agree}</span>}
         </div>
 
-        {/* Повідомлення про помилки та успіх */}
         {serverError && <div className={styles.serverError}>{serverError}</div>}
 
         {serverMessage && (
           <div className={styles.serverMessage}>{serverMessage}</div>
         )}
 
-        {/* Кнопки дій */}
         <div className={styles.actionButtons}>
           <div className={styles.submitButton}>
             <ButtonGeneral
@@ -382,7 +371,6 @@ const RegistrationForm = () => {
         </div>
       </form>
 
-      {/* Додаткові посилання */}
       <div className={styles.additionalLinks}>
         <a href="/authorization">Вже маю акаунт</a>
       </div>

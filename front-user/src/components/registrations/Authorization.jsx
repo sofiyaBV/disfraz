@@ -27,7 +27,6 @@ const Authorization = ({ onClose }) => {
 
   const timeoutRef = useRef(null);
 
-  // Cleanup при unmount компонента
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -36,7 +35,6 @@ const Authorization = ({ onClose }) => {
     };
   }, []);
 
-  // Редирект авторизованих користувачів
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       timeoutRef.current = setTimeout(() => {
@@ -221,7 +219,6 @@ const Authorization = ({ onClose }) => {
 
   return (
     <div className={styles.container}>
-      {/* Кнопка закриття */}
       <button
         className={styles.closeButton}
         onClick={() => safeClose()}
@@ -236,11 +233,9 @@ const Authorization = ({ onClose }) => {
         />
       </button>
 
-      {/* Заголовок */}
       <h2 className={styles.title}>Вхід</h2>
       <p className={styles.subtitle}>Увійти за допомогою профілю</p>
 
-      {/* Соціальні мережі */}
       <div className={styles.socialAuth}>
         <button
           type="button"
@@ -262,13 +257,11 @@ const Authorization = ({ onClose }) => {
         </button>
       </div>
 
-      {/* Розділювач */}
       <div className={styles.divider}>
         <span className={styles.dividerText}>Або за допомогою</span>
         <div className={styles.dividerLine}></div>
       </div>
 
-      {/* Вибір методу авторизації */}
       <div className={styles.methodOptions}>
         <label className={styles.methodLabel}>
           <input
@@ -296,10 +289,8 @@ const Authorization = ({ onClose }) => {
         </label>
       </div>
 
-      {/* Форма авторизації */}
       <div className={styles.form}>
         <form onSubmit={handleSubmit}>
-          {/* Поле email/телефону */}
           <div className={styles.inputGroup}>
             <label htmlFor={isPhoneLogin ? "phone" : "email"}>
               {isPhoneLogin ? "Телефон" : "Email"}
@@ -317,7 +308,6 @@ const Authorization = ({ onClose }) => {
             />
           </div>
 
-          {/* Поле пароля */}
           <div className={styles.inputGroup}>
             <label htmlFor="password">Пароль</label>
             <input
@@ -333,14 +323,12 @@ const Authorization = ({ onClose }) => {
             />
           </div>
 
-          {/* Повідомлення про помилки та успіх */}
           {error && <div className={styles.errorMessage}>{error}</div>}
 
           {successMessage && (
             <div className={styles.successMessage}>{successMessage}</div>
           )}
 
-          {/* Додаткові посилання */}
           <div className={styles.formLinks}>
             <div className={styles.formLink}>
               <a
@@ -367,7 +355,6 @@ const Authorization = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Кнопки дій */}
           <div className={styles.actionButtons}>
             <div className={styles.actionButton}>
               <ButtonGeneral
@@ -399,7 +386,6 @@ const Authorization = ({ onClose }) => {
           </div>
         </form>
 
-        {/* Додаткові посилання */}
         <div className={styles.additionalLinks}>
           <a href="/registration">Я ще не маю акаунта</a>
         </div>

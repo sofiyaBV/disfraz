@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import dataProvider from "../services/dataProvider";
 
+// Хук для надсилання коментарів до товарів
 const useComments = (productAttributeId) => {
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);

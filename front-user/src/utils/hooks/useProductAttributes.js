@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import dataProvider from "../services/dataProvider";
 
+// Хук для завантаження атрибутів конкретного товару
 const useProductAttributes = ({ productId } = {}) => {
   const [productAttributes, setProductAttributes] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,5 @@
+// Обгортка для fetch з автоматичною обробкою помилок та cookies
 const httpClient = async (url, options = {}) => {
-  // Встановлюємо базові заголовки
   if (!options.headers) {
     options.headers = new Headers({
       Accept: "application/json",
@@ -12,7 +12,6 @@ const httpClient = async (url, options = {}) => {
   try {
     const response = await fetch(url, options);
 
-    // Обробляємо помилки запиту
     if (!response.ok) {
       const errorText = await response.text();
       let errorMessage;
@@ -28,6 +27,7 @@ const httpClient = async (url, options = {}) => {
     const contentType = response.headers.get("content-type");
     const contentLength = response.headers.get("content-length");
 
+    // Обробка порожніх відповідей
     if (
       contentLength === "0" ||
       !contentType ||

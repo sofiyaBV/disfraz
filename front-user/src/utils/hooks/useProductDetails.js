@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import dataProvider from "../services/dataProvider";
 import { transliterate } from "../helpers/transliterate";
 
+// Хук для завантаження деталей товару та схожих товарів за темою
 const useProductDetails = (theme, productName) => {
   const [product, setProduct] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]);

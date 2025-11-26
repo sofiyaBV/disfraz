@@ -1,11 +1,9 @@
 import httpClient from "./httpClient";
 import { API_BASE_URL, buildQueryParams, normalizeListResponse } from "./api";
 
-// Отримання списку товарів з підтримкою пагінації та фільтрації
 export const fetchProducts = async (params = {}) => {
   const queryParams = buildQueryParams(params);
 
-  // Додаткова фільтрація
   const { filter = {} } = params;
   if (filter.theme) {
     queryParams["attribute.theme"] = filter.theme;
@@ -28,7 +26,6 @@ export const fetchProducts = async (params = {}) => {
   }
 };
 
-// Отримання конкретного товару за ID
 export const fetchProductById = async (id) => {
   const url = `${API_BASE_URL}/products/${id}`;
 

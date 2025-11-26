@@ -6,8 +6,8 @@ import cartService from "./cartService";
 import orderService from "./orderService";
 import paymentService from "./paymentService";
 
+// Уніфікований інтерфейс для роботи з API
 const dataProvider = {
-  // Отримання списків даних
   getList: async (resource, params) => {
     switch (resource) {
       case "products":
@@ -23,7 +23,6 @@ const dataProvider = {
     }
   },
 
-  // Отримання одного запису
   getOne: async (resource, params) => {
     switch (resource) {
       case "products":
@@ -35,7 +34,6 @@ const dataProvider = {
     }
   },
 
-  // Створення нових записів
   create: async (resource, params) => {
     switch (resource) {
       case "users":
@@ -53,7 +51,6 @@ const dataProvider = {
     }
   },
 
-  // Оновлення існуючих записів
   update: async (resource, params) => {
     switch (resource) {
       case "user/profile":
@@ -63,7 +60,6 @@ const dataProvider = {
     }
   },
 
-  // Метод для авторизації
   signin: async (params) => {
     return authService.signin(params);
   },

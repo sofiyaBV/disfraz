@@ -35,7 +35,6 @@ const styles = {
 const ProductPage = () => {
   const { theme, productName } = useParams();
 
-  // Хуки
   const { product, similarProducts, loading, error } = useProductDetails(
     theme,
     productName
@@ -44,7 +43,6 @@ const ProductPage = () => {
   const { submitComment } = useComments(product?.id);
   const notifications = useNotifications(3000);
 
-  // Локальний стейт
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
