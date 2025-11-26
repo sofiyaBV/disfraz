@@ -23,7 +23,9 @@ const useCartData = () => {
       const data = await cartService.fetchMyCart();
       setCartItems(data || []);
     } catch (err) {
-      console.error("Помилка завантаження кошика:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Помилка завантаження кошика:", err);
+      }
 
       if (err.message === "Необхідна авторизація") {
         setError(err.message);
@@ -54,7 +56,9 @@ const useCartData = () => {
       );
       setError(null);
     } catch (err) {
-      console.error("Помилка оновлення кількості:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Помилка оновлення кількості:", err);
+      }
       setError("Не вдалося оновити кількість");
     }
   };
@@ -66,7 +70,9 @@ const useCartData = () => {
       setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
       setError(null);
     } catch (err) {
-      console.error("Помилка видалення товару:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Помилка видалення товару:", err);
+      }
       setError("Не вдалося видалити товар");
     }
   };
@@ -78,7 +84,9 @@ const useCartData = () => {
       setCartItems([]);
       setError(null);
     } catch (err) {
-      console.error("Помилка очищення кошика:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Помилка очищення кошика:", err);
+      }
       setError("Не вдалося очистити кошик");
     }
   };
@@ -98,7 +106,7 @@ const useCartData = () => {
     return sum;
   }, 0);
   const totalPrice = cartItems.reduce((sum, item) => {
-    return sum + Number(item.price);
+    return sum + Number(item.price) * item.quantity;
   }, 0);
 
   return {

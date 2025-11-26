@@ -24,7 +24,9 @@ const useProduct = ({ theme, attributeId } = {}) => {
         setProducts(response.data);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching products:", err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching products:", err);
+        }
         setError(err.message || "Помилка під час завантаження товарів");
         setLoading(false);
       }

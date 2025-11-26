@@ -39,7 +39,9 @@ const useHomePageData = () => {
 
         setThematicProductAttributes(productsByTheme);
       } catch (err) {
-        console.error("Помилка завантаження даних:", err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Помилка завантаження даних:", err);
+        }
         setError(err.message || "Помилка при завантаженні даних");
       } finally {
         setLoading(false);

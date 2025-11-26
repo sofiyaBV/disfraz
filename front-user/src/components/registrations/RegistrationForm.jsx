@@ -8,7 +8,7 @@ import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/valid
 
 // Компонент форми реєстрації з підтримкою соціальних мереж
 const RegistrationForm = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [method, setMethod] = useState("phone");
   const [formData, setFormData] = useState({
@@ -24,10 +24,8 @@ const RegistrationForm = () => {
   const [serverError, setServerError] = useState(null);
   const [serverMessage, setServerMessage] = useState(null);
 
-  // Ref для збереження timeout ID для cleanup
   const timeoutRef = useRef(null);
 
-  // Cleanup при unmount компонента
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -35,6 +33,15 @@ const RegistrationForm = () => {
       }
     };
   }, []);
+
+  // Редирект авторизованих користувачів
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      timeoutRef.current = setTimeout(() => {
+        navigate("/home", { replace: true });
+      }, 500);
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -51,10 +58,11 @@ const RegistrationForm = () => {
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
     } else if (oauth === "success") {
+      // Викликаємо login для оновлення контексту
       login();
-      setServerMessage("Авторизація через Google успішна! Перенаправлення...");
+      setServerMessage("Авторізація через Google успішна! Перенаправлення...");
 
-      
+      // Очищуємо URL від параметрів
       const newUrl =
         window.location.protocol +
         "//" +
@@ -62,13 +70,13 @@ const RegistrationForm = () => {
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
 
+      // Перенаправляємо після короткої затримки для показу повідомлення
       timeoutRef.current = setTimeout(() => {
-        navigate("/home");
-      }, 1500);
+        navigate("/home", { replace: true });
+      }, 800);
     }
   }, [login, navigate]);
 
-  // Зміна методу реєстрації 
   const handleMethodChange = (e) => {
     setMethod(e.target.value);
     setErrors({});
@@ -76,7 +84,6 @@ const RegistrationForm = () => {
     setServerMessage(null);
   };
 
-  // Обробка змін у полях форми
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -90,7 +97,6 @@ const RegistrationForm = () => {
     }
   };
 
-  // Валідація форми реєстрації
   const validateForm = () => {
     const newErrors = {};
 
@@ -128,7 +134,6 @@ const RegistrationForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Відправка форми реєстрації
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -164,8 +169,8 @@ const RegistrationForm = () => {
         });
 
         timeoutRef.current = setTimeout(() => {
-          navigate("/home");
-        }, 1500);
+          navigate("/home", { replace: true });
+        }, 800);
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
@@ -179,7 +184,6 @@ const RegistrationForm = () => {
     }
   };
 
-  // Перехід на головну сторінку без реєстрації
   const handleSkipRegistration = () => {
     navigate("/home");
   };

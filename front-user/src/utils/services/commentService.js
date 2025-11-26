@@ -24,11 +24,6 @@ export const fetchComments = async (params = {}) => {
 
 // Створення нового коментаря
 export const createComment = async ({ productAttributeId, content }) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Необхідна авторизація для надсилання коментаря");
-  }
-
   const url = `${API_BASE_URL}/comments`;
 
   const response = await httpClient(url, {

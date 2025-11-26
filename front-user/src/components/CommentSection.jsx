@@ -11,14 +11,9 @@ const CommentSection = ({ productAttributeId, refresh }) => {
     const fetchComments = async () => {
       setLoading(true);
       try {
-        console.log(
-          "Fetching comments for productAttributeId:",
-          productAttributeId
-        );
         const response = await dataProvider.getList("comments", {
           filter: { productAttributeId },
         });
-        console.log("Fetched comments:", response.data);
         setComments(response.data || []);
         setLoading(false);
       } catch (err) {
@@ -39,8 +34,8 @@ const CommentSection = ({ productAttributeId, refresh }) => {
       {comments.length === 0 ? (
         <p className={styles.noComments}>Коментарі відсутні</p>
       ) : (
-        comments.map((comment, index) => (
-          <div key={index} className={styles.comment}>
+        comments.map((comment) => (
+          <div key={comment.id || comment.content + comment.createdAt} className={styles.comment}>
             <p className={styles.commentEmail}>
               {comment.user ? comment.user.email : "Anonymous"}
             </p>

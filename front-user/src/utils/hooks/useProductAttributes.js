@@ -22,7 +22,9 @@ const useProductAttributes = ({ productId } = {}) => {
         setProductAttributes(response.data);
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching product attributes:", err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching product attributes:", err);
+        }
         setError(
           err.message || "Помилка при завантаженні зв'язків продукт-атрибут"
         );

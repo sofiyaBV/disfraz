@@ -26,7 +26,9 @@ const useComments = (productAttributeId) => {
       onSuccess?.("Коментар надіслано!");
       return true;
     } catch (err) {
-      console.error("Помилка при надсиланні коментаря:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Помилка при надсиланні коментаря:", err);
+      }
       onError?.(
         "Помилка при надсиланні коментаря: " +
           (err.message || "Невідома помилка")

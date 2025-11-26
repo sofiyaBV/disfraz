@@ -11,7 +11,7 @@ const ImageGallery = ({ images = [], productName }) => {
       <div className={styles.thumbnailColumn}>
         {images.map((img, index) => (
           <img
-            key={index}
+            key={img.id || img.url || index}
             src={img.url}
             alt={`${productName} ${index + 1}`}
             className={`${styles.thumbnail} ${

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { API_BASE_URL } from "../services/api";
 
 const AuthContext = createContext();
@@ -8,12 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   // Перевірка аутентифікації через API
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         method: "GET",
@@ -42,7 +38,11 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const login = () => {
     setIsAuthenticated(true);

@@ -10,7 +10,7 @@ const CartSummary = ({
   totalPrice,
   onClearCart,
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,14 +24,16 @@ const CartSummary = ({
     setError(null);
 
     try {
+      const orderData = {
+        customerName: user?.name || user?.email || "Користувач",
+        customerEmail: user?.email || "",
+        customerPhone: user?.phone || "",
+        deliveryAddress: user?.address || "Адреса не вказана",
+        deliveryMethod: "Нова Пошта - відділення",
+      };
+
       const orderResponse = await dataProvider.create("orders", {
-        data: {
-          customerName: "Користувач",
-          customerEmail: "user@example.com",
-          customerPhone: "+380971234567",
-          deliveryAddress: "Київ, Україна",
-          deliveryMethod: "Нова Пошта - відділення",
-        },
+        data: orderData,
       });
 
       const orderId = orderResponse.data.id;
@@ -64,7 +66,7 @@ const CartSummary = ({
       <div className={styles.header}>
         <span className={styles.totalLabel}>ВСЬОГО :</span>
         <span className={styles.totalItems}>{totalItems} товарів</span>
-        <button className={styles.closeBtn}>×</button>
+        <button className={styles.closeBtn} onClick={onClearCart} type="button">×</button>
       </div>
 
       <div className={styles.row}>

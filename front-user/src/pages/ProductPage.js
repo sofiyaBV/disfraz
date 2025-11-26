@@ -186,8 +186,8 @@ const ProductPage = () => {
                 <option value="" disabled>
                   Розмір
                 </option>
-                {sizes.map((size, index) => (
-                  <option key={index} value={size}>
+                {sizes.map((size) => (
+                  <option key={size} value={size}>
                     {size}
                   </option>
                 ))}

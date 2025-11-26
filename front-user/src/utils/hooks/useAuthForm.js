@@ -9,10 +9,8 @@ const useAuthForm = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Ref для збереження timeout ID для cleanup
   const timeoutRef = useRef(null);
 
-  // Cleanup при unmount компонента
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -21,7 +19,6 @@ const useAuthForm = () => {
     };
   }, []);
 
-  // Обробка OAuth redirect
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const oauth = urlParams.get("oauth");
@@ -32,13 +29,12 @@ const useAuthForm = () => {
       clearUrlParams();
     } else if (oauth === "success") {
       login();
-      setSuccessMessage("Авторізація через Google успішна!");
+      setSuccessMessage("Авторізація через Google успішна! Перенаправлення...");
       clearUrlParams();
-      redirectToHome(1500);
+      redirectToHome(800);
     }
   }, [login]);
 
-  // Очищення URL параметрів
   const clearUrlParams = () => {
     const newUrl =
       window.location.protocol +
@@ -48,14 +44,12 @@ const useAuthForm = () => {
     window.history.replaceState({}, document.title, newUrl);
   };
 
-  // Навігація на головну з затримкою
   const redirectToHome = (delay = 1500) => {
     timeoutRef.current = setTimeout(() => {
       navigate("/home");
     }, delay);
   };
 
-  // Скидання повідомлень
   const clearMessages = () => {
     setError(null);
     setSuccessMessage(null);

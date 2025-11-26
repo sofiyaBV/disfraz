@@ -1,14 +1,23 @@
-// Отримуємо URL API з env
 const apiUrl = process.env.REACT_APP_JSON_SERVER_URL;
 
-// Перевірка налаштування
-if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
-  throw new Error(
-    "REACT_APP_JSON_SERVER_URL is not defined or invalid in .env"
-  );
-}
+const getApiBaseUrl = () => {
+  if (!apiUrl || typeof apiUrl !== "string" || apiUrl.trim() === "") {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "CRITICAL: REACT_APP_JSON_SERVER_URL must be defined in production environment"
+      );
+    }
 
-export const API_BASE_URL = apiUrl;
+    console.warn(
+      "REACT_APP_JSON_SERVER_URL is not defined. Using development fallback: http://localhost:3000"
+    );
+    return "http://localhost:3000";
+  }
+
+  return apiUrl.trim();
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 // Helper для формування query параметрів
 export const buildQueryParams = (params = {}) => {

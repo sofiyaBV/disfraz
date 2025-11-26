@@ -12,7 +12,7 @@ import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/valid
 
 // Компонент авторизації користувачів з підтримкою різних методів входу
 const Authorization = ({ onClose }) => {
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ const Authorization = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  
+
   const timeoutRef = useRef(null);
 
   // Cleanup при unmount компонента
@@ -36,7 +36,15 @@ const Authorization = ({ onClose }) => {
     };
   }, []);
 
-  // Безпечне закриття модального вікна з перенаправленням
+  // Редирект авторизованих користувачів
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      timeoutRef.current = setTimeout(() => {
+        navigate("/home", { replace: true });
+      }, 500);
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
   const safeClose = (message = null) => {
     if (typeof onClose === "function") {
       onClose(message);
@@ -52,7 +60,6 @@ const Authorization = ({ onClose }) => {
 
     if (error) {
       setError("Помилка авторізації через Google. Спробуйте ще раз.");
-
       const newUrl =
         window.location.protocol +
         "//" +
@@ -61,9 +68,8 @@ const Authorization = ({ onClose }) => {
       window.history.replaceState({}, document.title, newUrl);
     } else if (oauth === "success") {
       login();
-      setSuccessMessage("Авторізація через Google успішна!");
+      setSuccessMessage("Авторізація через Google успішна! Перенаправлення...");
 
-      // Очищуємо URL від параметрів
       const newUrl =
         window.location.protocol +
         "//" +
@@ -71,16 +77,12 @@ const Authorization = ({ onClose }) => {
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
 
-      const timeoutId = setTimeout(() => {
-        navigate("/home");
-      }, 1500);
-
-     
-      return () => clearTimeout(timeoutId);
+      timeoutRef.current = setTimeout(() => {
+        navigate("/home", { replace: true });
+      }, 800);
     }
   }, [login, navigate]);
 
-  // Перемикання між методами входу 
   const toggleLoginMethod = () => {
     setIsPhoneLogin(!isPhoneLogin);
     setFormData({ ...formData, email: "", phone: "" });
@@ -88,7 +90,6 @@ const Authorization = ({ onClose }) => {
     setSuccessMessage(null);
   };
 
-  // Обробка змін у полях форми
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -98,7 +99,6 @@ const Authorization = ({ onClose }) => {
     }
   };
 
-  // Валідація даних форми
   const validateForm = () => {
     const { email, phone, password } = formData;
 
@@ -135,7 +135,6 @@ const Authorization = ({ onClose }) => {
     return true;
   };
 
-  // Відправка форми авторизації
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -167,15 +166,14 @@ const Authorization = ({ onClose }) => {
         });
 
         timeoutRef.current = setTimeout(() => {
-          navigate("/home");
-        }, 1500);
+          navigate("/home", { replace: true });
+        }, 800);
       }
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error("Signin error:", err);
       }
 
-      // Обробка різних типів помилок
       let errorMessage = "Не вдалося авторизуватися. Спробуйте ще раз.";
 
       if (err.message) {
@@ -199,7 +197,6 @@ const Authorization = ({ onClose }) => {
     }
   };
 
-  // Авторизація через Google
   const handleGoogleAuth = () => {
     setError(null);
     setSuccessMessage(null);
@@ -218,7 +215,6 @@ const Authorization = ({ onClose }) => {
     setError("Авторизація через Facebook поки не реалізована");
   };
 
-  // Пропуск авторизації
   const handleSkipAuth = () => {
     navigate("/home");
   };
