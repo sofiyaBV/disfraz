@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DOMPurify from "dompurify";
 import styles from "../style/pages/products/comments.module.css";
 import dataProvider from "../utils/services/dataProvider";
 
@@ -27,21 +28,31 @@ const CommentSection = ({ productAttributeId, refresh }) => {
 
   if (loading)
     return <div className={styles.loading}>Завантаження коментарів...</div>;
-  if (error) return <div className={styles.error}>Помилка: {error}</div>;
+  if (error)
+    return <div className={styles.error}>Не вдалося завантажити коментарі</div>;
 
   return (
     <div className={styles.commentSection}>
       {comments.length === 0 ? (
         <p className={styles.noComments}>Коментарі відсутні</p>
       ) : (
-        comments.map((comment) => (
-          <div key={comment.id} className={styles.comment}>
-            <p className={styles.commentEmail}>
-              {comment.user ? comment.user.email : "Anonymous"}
-            </p>
-            <p className={styles.commentContent}>{comment.content}</p>
-          </div>
-        ))
+        comments.map((comment) => {
+          const sanitizedContent = DOMPurify.sanitize(comment.content, {
+            ALLOWED_TAGS: [],
+            ALLOWED_ATTR: [],
+          });
+          const sanitizedEmail = DOMPurify.sanitize(
+            comment.user ? comment.user.email : "Anonymous",
+            { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }
+          );
+
+          return (
+            <div key={comment.id} className={styles.comment}>
+              <p className={styles.commentEmail}>{sanitizedEmail}</p>
+              <p className={styles.commentContent}>{sanitizedContent}</p>
+            </div>
+          );
+        })
       )}
     </div>
   );

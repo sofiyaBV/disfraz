@@ -28,9 +28,10 @@ const useCartData = () => {
       }
 
       if (err.message === "Необхідна авторизація") {
-        setError(err.message);
+        setError("Необхідна авторизація");
       } else {
         setCartItems([]);
+        setError("Не вдалося завантажити кошик");
       }
     } finally {
       setLoading(false);

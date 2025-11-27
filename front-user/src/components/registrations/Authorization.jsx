@@ -84,8 +84,18 @@ const Authorization = ({ onClose }) => {
       return false;
     }
 
-    if (password.length < 6) {
-      setError("Пароль повинен бути не менше 6 символів");
+    if (password.length < 8) {
+      setError("Пароль повинен бути не менше 8 символів");
+      return false;
+    }
+
+    if (!/\d/.test(password)) {
+      setError("Пароль повинен містити принаймні одну цифру");
+      return false;
+    }
+
+    if (!/[a-zA-Z]/.test(password)) {
+      setError("Пароль повинен містити принаймні одну літеру");
       return false;
     }
 
@@ -124,11 +134,10 @@ const Authorization = ({ onClose }) => {
     setSuccessMessage(null);
 
     try {
-      const params = {
-        email: isPhoneLogin ? "" : formData.email,
-        phone: isPhoneLogin ? formData.phone : "",
-        password: formData.password,
-      };
+      
+      const params = isPhoneLogin
+        ? { phone: formData.phone, password: formData.password }
+        : { email: formData.email, password: formData.password };
 
       const response = await dataProvider.signin(params);
 

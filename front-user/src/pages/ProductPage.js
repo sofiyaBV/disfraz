@@ -125,7 +125,7 @@ const ProductPage = () => {
 
   // Стани завантаження
   if (loading) return <div className={styles.loading}>Завантаження...</div>;
-  if (error) return <div className={styles.error}>Помилка: {error}</div>;
+  if (error) return <div className={styles.error}>Не вдалося завантажити товар</div>;
   if (!product) return <div className={styles.error}>Товар не знайдено</div>;
 
   const images = product.product.images || [];

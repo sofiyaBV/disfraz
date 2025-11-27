@@ -4,7 +4,10 @@ import styles from "../../style/pages/auth/registration.module.css";
 import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/validation";
+import {
+  validateUkrainianPhone,
+  validateEmail,
+} from "../../utils/helpers/validation";
 import useOAuthCallback from "../../utils/hooks/useOAuthCallback";
 
 // Компонент форми реєстрації з підтримкою соціальних мереж
@@ -65,7 +68,6 @@ const RegistrationForm = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -78,7 +80,8 @@ const RegistrationForm = () => {
       if (!formData.phone) {
         newErrors.phone = "Номер телефону обов'язковий";
       } else if (!validateUkrainianPhone(formData.phone)) {
-        newErrors.phone = "Некоректний формат номера телефону. Використовуйте формат: +380XXXXXXXXX або 0XXXXXXXXX";
+        newErrors.phone =
+          "Некоректний формат номера телефону. Використовуйте формат: +380XXXXXXXXX або 0XXXXXXXXX";
       }
     } else {
       if (!formData.email) {
@@ -90,8 +93,12 @@ const RegistrationForm = () => {
 
     if (!formData.password) {
       newErrors.password = "Пароль обов'язковий";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Пароль повинен бути не менше 6 символів";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Пароль повинен бути не менше 8 символів";
+    } else if (!/\d/.test(formData.password)) {
+      newErrors.password = "Пароль повинен містити принаймні одну цифру";
+    } else if (!/[a-zA-Z]/.test(formData.password)) {
+      newErrors.password = "Пароль повинен містити принаймні одну літеру";
     }
 
     if (!formData.confirmPassword) {
@@ -117,11 +124,10 @@ const RegistrationForm = () => {
     setServerMessage(null);
 
     try {
-      const requestData = {
-        email: method === "email" ? formData.email : "",
-        phone: method === "phone" ? formData.phone : "",
-        password: formData.password,
-      };
+      const requestData =
+        method === "phone"
+          ? { phone: formData.phone, password: formData.password }
+          : { email: formData.email, password: formData.password };
 
       const response = await dataProvider.create("users", {
         data: requestData,
@@ -147,7 +153,7 @@ const RegistrationForm = () => {
         }, 800);
       }
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         console.error("Помилка при реєстрації:", error);
       }
       setServerError(

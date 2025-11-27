@@ -42,9 +42,6 @@ const ProfilePage = () => {
 
   // Завантаження профілю при монтуванні (ProtectedRoute вже перевірив auth)
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log("ProfilePage mounted, fetching profile");
-    }
     fetchUserProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -54,13 +51,7 @@ const ProfilePage = () => {
       setIsLoading(true);
       setError(null);
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Fetching user profile...");
-      }
       const response = await dataProvider.getOne("user/profile");
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Profile response:", response);
-      }
 
       setUserProfile(response.data);
       setEditForm({

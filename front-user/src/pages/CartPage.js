@@ -33,7 +33,7 @@ const CartPage = () => {
 
   // Помилку показуємо тільки якщо є товари
   if (error) {
-    return <div className={styles.error}>Помилка: {error}</div>;
+    return <div className={styles.error}>Не вдалося завантажити кошик</div>;
   }
 
   return (

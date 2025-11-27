@@ -71,13 +71,13 @@ export const validateEmail = (email) => {
 
 /**
  * Валідація пароля
- * Мінімум 6 символів, рекомендовано містити цифри та літери
+ * Мінімум 8 символів, обов'язково містить цифри та літери (2025 стандарт)
  */
 export const validatePassword = (password, options = {}) => {
   const {
-    minLength = 6,
-    requireNumbers = false,
-    requireLetters = false,
+    minLength = 8,
+    requireNumbers = true,
+    requireLetters = true,
   } = options;
 
   if (!password) return { valid: false, message: "Пароль обов'язковий" };
