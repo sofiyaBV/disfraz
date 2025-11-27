@@ -138,8 +138,6 @@ export const formatUkrainianPhone = (phone) => {
 
 /**
  * Нормалізація українського номера телефону до формату +380XXXXXXXXX
- * Приймає: +380684729147, 380684729147, 0684729147, +38 (068) 472-91-47
- * Повертає: +380684729147
  */
 export const normalizeUkrainianPhone = (phone) => {
   if (!phone) return "";

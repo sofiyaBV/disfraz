@@ -5,6 +5,7 @@ import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/validation";
+import useOAuthCallback from "../../utils/hooks/useOAuthCallback";
 
 // Компонент форми реєстрації з підтримкою соціальних мереж
 const RegistrationForm = () => {
@@ -42,33 +43,13 @@ const RegistrationForm = () => {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const oauth = urlParams.get("oauth");
-    const error = urlParams.get("error");
-
-    const cleanUrl = () => {
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-    };
-
-    if (error && typeof error === "string") {
-      setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
-      cleanUrl();
-    } else if (oauth === "success") {
-      login();
-      setServerMessage("Авторізація через Google успішна! Перенаправлення...");
-      cleanUrl();
-
-      timeoutRef.current = setTimeout(() => {
-        navigate("/home", { replace: true });
-      }, 800);
-    }
-  }, [login, navigate]);
+  // Централізована обробка OAuth редіректів
+  useOAuthCallback({
+    onSuccess: (message) => setServerMessage(message),
+    onError: (message) => setServerError(message),
+    redirectTo: "/home",
+    redirectDelay: 800,
+  });
 
   const handleMethodChange = (e) => {
     setMethod(e.target.value);

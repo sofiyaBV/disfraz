@@ -40,38 +40,27 @@ const ProfilePage = () => {
     { id: "logout", icon: "📤", label: "ВИХІД" },
   ];
 
+  // Завантаження профілю при монтуванні (ProtectedRoute вже перевірив auth)
   useEffect(() => {
-    console.log(
-      "ProfilePage useEffect - authLoading:",
-      authLoading,
-      "isAuthenticated:",
-      isAuthenticated,
-      "user:",
-      user
-    );
-
-    if (authLoading) {
-      return;
+    if (process.env.NODE_ENV === 'development') {
+      console.log("ProfilePage mounted, fetching profile");
     }
-
-    if (!isAuthenticated) {
-      console.log("User not authenticated, redirecting to registration");
-      navigate("/");
-      return;
-    }
-
-    console.log("User authenticated, fetching profile");
     fetchUserProfile();
-  }, [isAuthenticated, authLoading, user, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      console.log("Fetching user profile...");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Fetching user profile...");
+      }
       const response = await dataProvider.getOne("user/profile");
-      console.log("Profile response:", response);
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Profile response:", response);
+      }
 
       setUserProfile(response.data);
       setEditForm({
@@ -81,11 +70,15 @@ const ProfilePage = () => {
         confirmPassword: "",
       });
     } catch (error) {
-      console.error("Ошибка при получении профиля:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Ошибка при получении профиля:", error);
+      }
       setError("Не удалось загрузить профиль. Попробуйте еще раз.");
 
       if (error.response?.status === 401) {
-        console.log("401 error, logging out");
+        if (process.env.NODE_ENV === 'development') {
+          console.log("401 error, logging out");
+        }
         logout();
         navigate("/");
       }
@@ -182,7 +175,9 @@ const ProfilePage = () => {
 
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
-      console.error("Ошибка при обновлении профиля:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Ошибка при обновлении профиля:", error);
+      }
       setError(
         error.response?.data?.message || "Помилка при оновленні профілю"
       );

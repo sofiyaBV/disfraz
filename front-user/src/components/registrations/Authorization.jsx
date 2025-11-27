@@ -9,6 +9,7 @@ import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
 import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/validation";
+import useOAuthCallback from "../../utils/hooks/useOAuthCallback";
 
 // Компонент авторизації користувачів з підтримкою різних методів входу
 const Authorization = ({ onClose }) => {
@@ -51,33 +52,13 @@ const Authorization = ({ onClose }) => {
     }
   };
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const oauth = urlParams.get("oauth");
-    const error = urlParams.get("error");
-
-    const cleanUrl = () => {
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-    };
-
-    if (error && typeof error === "string") {
-      setError("Помилка авторізації через Google. Спробуйте ще раз.");
-      cleanUrl();
-    } else if (oauth === "success") {
-      login();
-      setSuccessMessage("Авторізація через Google успішна! Перенаправлення...");
-      cleanUrl();
-
-      timeoutRef.current = setTimeout(() => {
-        navigate("/home", { replace: true });
-      }, 800);
-    }
-  }, [login, navigate]);
+  // Централізована обробка OAuth редіректів
+  useOAuthCallback({
+    onSuccess: (message) => setSuccessMessage(message),
+    onError: (message) => setError(message),
+    redirectTo: "/home",
+    redirectDelay: 800,
+  });
 
   const toggleLoginMethod = () => {
     setIsPhoneLogin(!isPhoneLogin);
