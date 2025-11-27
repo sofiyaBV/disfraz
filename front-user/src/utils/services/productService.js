@@ -18,23 +18,14 @@ export const fetchProducts = async (params = {}) => {
   const query = new URLSearchParams(queryParams);
   const url = `${API_BASE_URL}/products?${query.toString()}`;
 
-  try {
-    const response = await httpClient(url);
-    return normalizeListResponse(response);
-  } catch (error) {
-    throw new Error(error.message || "Помилка при завантаженні товарів");
-  }
+  const response = await httpClient(url);
+  return normalizeListResponse(response);
 };
 
 export const fetchProductById = async (id) => {
   const url = `${API_BASE_URL}/products/${id}`;
-
-  try {
-    const response = await httpClient(url);
-    return { data: response };
-  } catch (error) {
-    throw new Error(error.message || "Помилка при завантаженні товару");
-  }
+  const response = await httpClient(url);
+  return { data: response };
 };
 
 const productService = {

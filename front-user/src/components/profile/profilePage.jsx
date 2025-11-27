@@ -74,14 +74,7 @@ const ProfilePage = () => {
         console.error("Ошибка при получении профиля:", error);
       }
       setError("Не удалось загрузить профиль. Попробуйте еще раз.");
-
-      if (error.response?.status === 401) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log("401 error, logging out");
-        }
-        logout();
-        navigate("/");
-      }
+  
     } finally {
       setIsLoading(false);
     }

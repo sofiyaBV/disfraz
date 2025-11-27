@@ -20,8 +20,8 @@ const useCartData = () => {
     setError(null);
 
     try {
-      const data = await cartService.fetchMyCart();
-      setCartItems(data || []);
+      const response = await cartService.fetchMyCart();
+      setCartItems(response.data || []);
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
         console.error("Помилка завантаження кошика:", err);

@@ -12,12 +12,8 @@ export const fetchComments = async (params = {}) => {
   const query = new URLSearchParams(queryParams);
   const url = `${API_BASE_URL}/comments?${query.toString()}`;
 
-  try {
-    const response = await httpClient(url, { skipAuth: true });
-    return normalizeListResponse(response);
-  } catch (error) {
-    throw new Error(error.message || "Помилка при завантаженні коментарів");
-  }
+  const response = await httpClient(url, { skipAuth: true });
+  return normalizeListResponse(response);
 };
 
 export const createComment = async ({ productAttributeId, content }) => {

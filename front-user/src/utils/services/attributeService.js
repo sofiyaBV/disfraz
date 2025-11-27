@@ -12,12 +12,8 @@ export const fetchAttributes = async (params = {}) => {
   const query = new URLSearchParams(queryParams);
   const url = `${API_BASE_URL}/attributes?${query.toString()}`;
 
-  try {
-    const response = await httpClient(url);
-    return normalizeListResponse(response);
-  } catch (error) {
-    throw new Error(error.message || "Помилка при завантаженні атрибутів");
-  }
+  const response = await httpClient(url);
+  return normalizeListResponse(response);
 };
 
 export const fetchProductAttributes = async (params = {}) => {
@@ -46,14 +42,8 @@ export const fetchProductAttributes = async (params = {}) => {
   const query = new URLSearchParams(queryParams);
   const url = `${API_BASE_URL}/product-attribute?${query.toString()}`;
 
-  try {
-    const response = await httpClient(url);
-    return normalizeListResponse(response);
-  } catch (error) {
-    throw new Error(
-      error.message || "Помилка при завантаженні зв'язків продукт-атрибут"
-    );
-  }
+  const response = await httpClient(url);
+  return normalizeListResponse(response);
 };
 
 const attributeService = {

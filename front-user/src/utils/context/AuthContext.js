@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { API_BASE_URL } from "../services/api";
 import authService from "../services/authService";
 
@@ -30,6 +30,24 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, [checkAuth]);
 
+  // Глобальна обробка 401 Unauthorized з будь-якого API запиту
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Unauthorized event received - logging out user');
+      }
+      setUser(null);
+      setIsAuthenticated(false);
+      // Редірект на головну буде через ProtectedRoute
+    };
+
+    window.addEventListener('unauthorized', handleUnauthorized);
+
+    return () => {
+      window.removeEventListener('unauthorized', handleUnauthorized);
+    };
+  }, []);
+
   const login = useCallback(async () => {
     setIsAuthenticated(true);
     await checkAuth();
@@ -48,17 +66,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Мемоізація value для оптимізації ре-рендерів
+  const value = useMemo(
+    () => ({
+      isAuthenticated,
+      user,
+      isLoading,
+      login,
+      logout,
+      checkAuth,
+    }),
+    [isAuthenticated, user, isLoading, login, logout, checkAuth]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        user,
-        isLoading,
-        login,
-        logout,
-        checkAuth,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

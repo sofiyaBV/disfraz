@@ -17,7 +17,6 @@ const usePagination = (totalItems, itemsPerPage = 4) => {
     setCurrentIndex(0);
   }, []);
 
-  // Індекси для slice
   const startIndex = currentIndex * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 

@@ -2,16 +2,8 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * Централізований hook для обробки OAuth редіректів (Google, Facebook, etc.)
- * Парсить URL параметри ?oauth=success або ?error=...
- *
- * @param {Object} options - Опції конфігурації
- * @param {Function} options.onSuccess - Callback при успішній OAuth авторизації
- * @param {Function} options.onError - Callback при помилці OAuth
- * @param {string} options.redirectTo - Куди редіректити після успіху (за замовчуванням /home)
- * @param {number} options.redirectDelay - Затримка перед редіректом в мс (за замовчуванням 800)
- */
+// Централізований hook для обробки OAuth редіректів (Google, Facebook, etc.)
+
 const useOAuthCallback = (options = {}) => {
   const {
     onSuccess,
@@ -50,9 +42,10 @@ const useOAuthCallback = (options = {}) => {
 
     // Обробка помилки OAuth
     if (error && typeof error === "string") {
-      const errorMessage = "Помилка авторізації через Google. Спробуйте ще раз.";
+      const errorMessage =
+        "Помилка авторізації через Google. Спробуйте ще раз.";
 
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         console.error("OAuth error:", error);
       }
 
@@ -67,14 +60,15 @@ const useOAuthCallback = (options = {}) => {
 
     // Обробка успішної OAuth авторизації
     if (oauth === "success") {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         console.log("OAuth success, logging in user");
       }
 
       login();
       cleanUrl();
 
-      const successMessage = "Авторізація через Google успішна! Перенаправлення...";
+      const successMessage =
+        "Авторізація через Google успішна! Перенаправлення...";
 
       if (onSuccess) {
         onSuccess(successMessage);

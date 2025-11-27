@@ -13,6 +13,15 @@ const httpClient = async (url, options = {}) => {
     const response = await fetch(url, options);
 
     if (!response.ok) {
+      // Глобальна обробка 401 Unauthorized 
+      if (response.status === 401) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('401 Unauthorized - dispatching global logout event');
+        }
+        // Відправляємо глобальну подію для logout
+        window.dispatchEvent(new Event('unauthorized'));
+      }
+
       const errorText = await response.text();
       let errorMessage;
       try {

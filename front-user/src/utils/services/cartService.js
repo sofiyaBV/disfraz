@@ -4,7 +4,7 @@ import { API_BASE_URL } from "./api";
 export const fetchMyCart = async () => {
   const url = `${API_BASE_URL}/cart/my`;
   const response = await httpClient(url);
-  return response;
+  return { data: response };
 };
 
 export const addToCart = async ({ productAttributeId, quantity }) => {
@@ -13,8 +13,7 @@ export const addToCart = async ({ productAttributeId, quantity }) => {
     method: "POST",
     body: JSON.stringify({ productAttributeId, quantity }),
   });
-
-  return response;
+  return { data: response };
 };
 
 export const updateCartItem = async (cartItemId, quantity) => {
@@ -23,15 +22,15 @@ export const updateCartItem = async (cartItemId, quantity) => {
     method: "PATCH",
     body: JSON.stringify({ quantity }),
   });
-
-  return response;
+  return { data: response };
 };
 
 export const removeFromCart = async (cartItemId) => {
   const url = `${API_BASE_URL}/cart/${cartItemId}`;
-  await httpClient(url, {
+  const response = await httpClient(url, {
     method: "DELETE",
   });
+  return { data: response };
 };
 
 export const clearCart = async (cartItems) => {

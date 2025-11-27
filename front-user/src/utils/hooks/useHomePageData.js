@@ -26,15 +26,11 @@ const useHomePageData = () => {
         const themes = TematicsData.map((item) => item.theme);
         const productsByTheme = {};
 
-        for (const theme of themes) {
-          const themeResponse = await dataProvider.getList(
-            "product-attributes",
-            {
-              filter: { "attribute.theme": theme },
-            }
+        themes.forEach((theme) => {
+          productsByTheme[theme] = products.filter(
+            (product) => product.attribute?.theme === theme
           );
-          productsByTheme[theme] = themeResponse.data || [];
-        }
+        });
 
         setThematicProductAttributes(productsByTheme);
       } catch (err) {
