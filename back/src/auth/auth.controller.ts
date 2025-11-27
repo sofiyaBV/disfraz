@@ -115,8 +115,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Отримання профілю користувача' })
   @ApiResponse({ status: 200, description: 'Інформація про користувача' })
   @ApiResponse({ status: 401, description: 'Неавторизований запит' })
-  getProfile(@Request() req: RequestWithUser) {
-    return req.user;
+  async getProfile(@Request() req: RequestWithUser) {
+    const userId = req.user.id;
+    return this.authService.getUserProfile(userId);
   }
 
   @Put('profile')

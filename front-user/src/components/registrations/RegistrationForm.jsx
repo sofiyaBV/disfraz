@@ -47,29 +47,23 @@ const RegistrationForm = () => {
     const oauth = urlParams.get("oauth");
     const error = urlParams.get("error");
 
-    if (error) {
-      setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
-
+    const cleanUrl = () => {
       const newUrl =
         window.location.protocol +
         "//" +
         window.location.host +
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
+    };
+
+    if (error && typeof error === "string") {
+      setServerError("Помилка авторизації через Google. Спробуйте ще раз.");
+      cleanUrl();
     } else if (oauth === "success") {
-      // Викликаємо login для оновлення контексту
       login();
       setServerMessage("Авторізація через Google успішна! Перенаправлення...");
+      cleanUrl();
 
-      // Очищуємо URL від параметрів
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-
-      // Перенаправляємо після короткої затримки для показу повідомлення
       timeoutRef.current = setTimeout(() => {
         navigate("/home", { replace: true });
       }, 800);

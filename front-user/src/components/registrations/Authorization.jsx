@@ -56,24 +56,22 @@ const Authorization = ({ onClose }) => {
     const oauth = urlParams.get("oauth");
     const error = urlParams.get("error");
 
-    if (error) {
-      setError("Помилка авторізації через Google. Спробуйте ще раз.");
+    const cleanUrl = () => {
       const newUrl =
         window.location.protocol +
         "//" +
         window.location.host +
         window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
+    };
+
+    if (error && typeof error === "string") {
+      setError("Помилка авторізації через Google. Спробуйте ще раз.");
+      cleanUrl();
     } else if (oauth === "success") {
       login();
       setSuccessMessage("Авторізація через Google успішна! Перенаправлення...");
-
-      const newUrl =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
+      cleanUrl();
 
       timeoutRef.current = setTimeout(() => {
         navigate("/home", { replace: true });

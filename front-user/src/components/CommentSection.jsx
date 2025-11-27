@@ -35,7 +35,7 @@ const CommentSection = ({ productAttributeId, refresh }) => {
         <p className={styles.noComments}>Коментарі відсутні</p>
       ) : (
         comments.map((comment) => (
-          <div key={comment.id || comment.content + comment.createdAt} className={styles.comment}>
+          <div key={comment.id} className={styles.comment}>
             <p className={styles.commentEmail}>
               {comment.user ? comment.user.email : "Anonymous"}
             </p>

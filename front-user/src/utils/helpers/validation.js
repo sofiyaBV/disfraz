@@ -135,3 +135,32 @@ export const formatUkrainianPhone = (phone) => {
 
   return phone;
 };
+
+/**
+ * Нормалізація українського номера телефону до формату +380XXXXXXXXX
+ * Приймає: +380684729147, 380684729147, 0684729147, +38 (068) 472-91-47
+ * Повертає: +380684729147
+ */
+export const normalizeUkrainianPhone = (phone) => {
+  if (!phone) return "";
+
+  // Видаляємо всі нецифрові символи
+  const cleaned = phone.replace(/\D/g, "");
+
+  // Якщо номер починається з 380 (12 цифр)
+  if (cleaned.startsWith("380") && cleaned.length === 12) {
+    return `+${cleaned}`;
+  }
+
+  // Якщо номер починається з 0 (10 цифр) - додаємо +38
+  if (cleaned.startsWith("0") && cleaned.length === 10) {
+    return `+38${cleaned}`;
+  }
+
+  // Якщо вже в правильному форматі з +
+  if (phone.startsWith("+380") && cleaned.length === 12) {
+    return phone;
+  }
+
+  return phone;
+};

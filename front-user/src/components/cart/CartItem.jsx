@@ -90,7 +90,9 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
       {/* Ціна */}
       <div className={styles.priceSection}>
-        <span className={styles.totalPrice}>{item.price} грн</span>
+        <span className={styles.totalPrice}>
+          {Number(item.price).toFixed(2)} грн
+        </span>
       </div>
 
       {/* Дії */}

@@ -92,7 +92,21 @@ const useCartData = () => {
     fetchCart();
   }, [fetchCart]);
 
-  const totalItems = cartItems.length;
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      fetchCart();
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, [fetchCart]);
+
+  // Загальна кількість товарів (сума всіх quantity)
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   const totalDiscount = cartItems.reduce((sum, item) => {
     const product = item.productAttribute?.product;
     if (product?.discount > 0 && product?.newPrice) {
@@ -100,8 +114,10 @@ const useCartData = () => {
     }
     return sum;
   }, 0);
+
+  // item.price вже містить загальну вартість (ціна_за_одиницю * кількість)
   const totalPrice = cartItems.reduce((sum, item) => {
-    return sum + Number(item.price) * item.quantity;
+    return sum + Number(item.price);
   }, 0);
 
   return {

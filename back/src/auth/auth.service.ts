@@ -59,6 +59,16 @@ export class AuthService {
     return await this.usersService.createUser(createUserDto);
   }
 
+  async getUserProfile(userId: number): Promise<User> {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Користувач не знайдений');
+    }
+    // Видаляємо пароль з відповіді
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword as User;
+  }
+
   async updateProfile(
     userId: number,
     updateData: UpdateProfileDto,
