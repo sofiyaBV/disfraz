@@ -7,5 +7,4 @@ export { default as cartService } from "./cartService";
 export { default as httpClient } from "./httpClient";
 export { default as dataProvider } from "./dataProvider";
 
-// Експортуємо helpers з api.js
 export * from "./api";

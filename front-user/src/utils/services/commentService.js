@@ -12,7 +12,7 @@ export const fetchComments = async (params = {}) => {
   const query = new URLSearchParams(queryParams);
   const url = `${API_BASE_URL}/comments?${query.toString()}`;
 
-  const response = await httpClient(url, { skipAuth: true });
+  const response = await httpClient(url);
   return normalizeListResponse(response);
 };
 

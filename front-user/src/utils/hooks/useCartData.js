@@ -78,7 +78,7 @@ const useCartData = () => {
 
   const clearCart = async () => {
     try {
-      await cartService.clearCart(cartItems);
+      await cartService.clearCart();
       setCartItems([]);
       setError(null);
     } catch (err) {

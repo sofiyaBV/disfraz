@@ -22,6 +22,7 @@ const resourceHandlers = {
 
   create: {
     users: (params) => authService.register(params.data),
+    "auth/signin": (params) => authService.signin(params.data),
     cart: (params) => cartService.addToCart(params.data),
     comments: (params) => commentService.createComment(params.data),
     orders: (params) => orderService.createOrder(params.data),
@@ -66,10 +67,6 @@ const dataProvider = {
       throw new Error(`Unsupported resource for update: ${resource}`);
     }
     return handler(params);
-  },
-
-  signin: async (params) => {
-    return authService.signin(params);
   },
 };
 

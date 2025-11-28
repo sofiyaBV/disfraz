@@ -33,9 +33,12 @@ export const removeFromCart = async (cartItemId) => {
   return { data: response };
 };
 
-export const clearCart = async (cartItems) => {
-  const promises = cartItems.map((item) => removeFromCart(item.id));
-  await Promise.all(promises);
+export const clearCart = async () => {
+  const url = `${API_BASE_URL}/cart/clear`;
+  const response = await httpClient(url, {
+    method: "DELETE",
+  });
+  return { data: response };
 };
 
 const cartService = {

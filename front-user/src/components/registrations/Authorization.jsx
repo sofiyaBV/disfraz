@@ -139,7 +139,7 @@ const Authorization = ({ onClose }) => {
         ? { phone: formData.phone, password: formData.password }
         : { email: formData.email, password: formData.password };
 
-      const response = await dataProvider.signin(params);
+      const response = await dataProvider.create("auth/signin", { data: params });
 
       if (response) {
         login();

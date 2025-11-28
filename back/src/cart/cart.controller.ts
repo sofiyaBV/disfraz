@@ -111,6 +111,14 @@ export class CartController {
     return this.cartService.update(id, updateCartDto);
   }
 
+  @Delete('clear')
+  @Roles(Role.User, Role.Admin)
+  @ApiOperation({ summary: 'Очистити весь кошик поточного користувача' })
+  @ApiResponse({ status: 200, description: 'Кошик успішно очищений' })
+  async clearMyCart(@User() user: RequestUser): Promise<void> {
+    return this.cartService.clearByUserId(user.id);
+  }
+
   @Delete(':id')
   @Roles(Role.User, Role.Admin)
   @ApiOperation({ summary: 'Видалити кошик за ID' })
