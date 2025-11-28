@@ -1,48 +1,48 @@
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import add from "../../assets/add.png";
 import add_hover from "../../assets/add_hover.png";
 import facebook from "../../img/icon/facebook_color.png";
 import google from "../../img/icon/google_color.png";
 import styles from "../../style/pages/auth/authorization.module.css";
-import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import { validateUkrainianPhone, validateEmail } from "../../utils/helpers/validation";
-import useOAuthCallback from "../../utils/hooks/useOAuthCallback";
+import useAuthForm from "../../utils/hooks/useAuthForm";
+import { signinValidation } from "../../utils/validation/authSchemas";
 
 // Компонент авторизації користувачів з підтримкою різних методів входу
 const Authorization = ({ onClose }) => {
-  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [isPhoneLogin, setIsPhoneLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    email: "",
-    phone: "",
-    password: "",
+
+  // Використання спільного хука для управління формою
+  const {
+    formData,
+    errors,
+    isSubmitting,
+    serverError,
+    serverMessage,
+    handleChange,
+    handleSubmit,
+    setServerError,
+    setServerMessage,
+  } = useAuthForm({
+    initialValues: {
+      email: "",
+      phone: "",
+      password: "",
+    },
+    validationSchema: (data) => signinValidation(data, isPhoneLogin),
+    onSubmit: async (data) => {
+      const params = isPhoneLogin
+        ? { phone: data.phone, password: data.password }
+        : { email: data.email, password: data.password };
+
+      return await dataProvider.create("auth/signin", { data: params });
+    },
+    redirectTo: "/home",
+    redirectDelay: 800,
   });
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(null);
-
-
-  const timeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      timeoutRef.current = setTimeout(() => {
-        navigate("/home", { replace: true });
-      }, 500);
-    }
-  }, [isAuthenticated, isLoading, navigate]);
 
   const safeClose = (message = null) => {
     if (typeof onClose === "function") {
@@ -52,145 +52,20 @@ const Authorization = ({ onClose }) => {
     }
   };
 
-  // Централізована обробка OAuth редіректів
-  useOAuthCallback({
-    onSuccess: (message) => setSuccessMessage(message),
-    onError: (message) => setError(message),
-    redirectTo: "/home",
-    redirectDelay: 800,
-  });
-
   const toggleLoginMethod = () => {
     setIsPhoneLogin(!isPhoneLogin);
-    setFormData({ ...formData, email: "", phone: "" });
-    setError(null);
-    setSuccessMessage(null);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-
-    if (error) {
-      setError(null);
-    }
-  };
-
-  const validateForm = () => {
-    const { email, phone, password } = formData;
-
-    if (!password) {
-      setError("Пароль обов'язковий");
-      return false;
-    }
-
-    if (password.length < 8) {
-      setError("Пароль повинен бути не менше 8 символів");
-      return false;
-    }
-
-    if (!/\d/.test(password)) {
-      setError("Пароль повинен містити принаймні одну цифру");
-      return false;
-    }
-
-    if (!/[a-zA-Z]/.test(password)) {
-      setError("Пароль повинен містити принаймні одну літеру");
-      return false;
-    }
-
-    if (isPhoneLogin) {
-      if (!phone) {
-        setError("Введіть номер телефону");
-        return false;
-      }
-      if (!validateUkrainianPhone(phone)) {
-        setError("Некоректний формат номера телефону. Використовуйте формат: +380XXXXXXXXX або 0XXXXXXXXX");
-        return false;
-      }
-    } else {
-      if (!email) {
-        setError("Введіть email");
-        return false;
-      }
-      if (!validateEmail(email)) {
-        setError("Некоректний формат email");
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    try {
-      
-      const params = isPhoneLogin
-        ? { phone: formData.phone, password: formData.password }
-        : { email: formData.email, password: formData.password };
-
-      const response = await dataProvider.create("auth/signin", { data: params });
-
-      if (response) {
-        login();
-        setSuccessMessage("Авторизація пройшла успішно!");
-
-        setFormData({
-          email: "",
-          phone: "",
-          password: "",
-        });
-
-        timeoutRef.current = setTimeout(() => {
-          navigate("/home", { replace: true });
-        }, 800);
-      }
-    } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("Signin error:", err);
-      }
-
-      let errorMessage = "Не вдалося авторизуватися. Спробуйте ще раз.";
-
-      if (err.message) {
-        if (err.message.includes("Invalid credentials")) {
-          errorMessage = "Неправильний email/телефон або пароль";
-        } else if (err.message.includes("User not found")) {
-          errorMessage = "Користувача з такими даними не знайдено";
-        } else if (
-          err.message.includes("network") ||
-          err.message.includes("fetch")
-        ) {
-          errorMessage = "Помилка з'єднання з сервером";
-        } else {
-          errorMessage = err.message;
-        }
-      }
-
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    setServerError(null);
+    setServerMessage(null);
   };
 
   const handleGoogleAuth = () => {
-    setError(null);
-    setSuccessMessage(null);
+    setServerError(null);
+    setServerMessage(null);
 
     const apiUrl = process.env.REACT_APP_JSON_SERVER_URL;
 
     if (!apiUrl) {
-      setError("Конфігурація API не налаштована. Зверніться до адміністратора.");
+      setServerError("Конфігурація API не налаштована. Зверніться до адміністратора.");
       return;
     }
 
@@ -198,7 +73,7 @@ const Authorization = ({ onClose }) => {
   };
 
   const handleFacebookAuth = () => {
-    setError("Авторизація через Facebook поки не реалізована");
+    setServerError("Авторизація через Facebook поки не реалізована");
   };
 
   const handleSkipAuth = () => {
@@ -229,7 +104,7 @@ const Authorization = ({ onClose }) => {
           type="button"
           className={`${styles.socialButton} ${styles.facebookButton}`}
           onClick={handleFacebookAuth}
-          disabled={loading}
+          disabled={isSubmitting}
         >
           <img src={facebook} alt="Facebook" className={styles.socialIcon} />
           <span>FACEBOOK</span>
@@ -238,7 +113,7 @@ const Authorization = ({ onClose }) => {
           type="button"
           className={`${styles.socialButton} ${styles.googleButton}`}
           onClick={handleGoogleAuth}
-          disabled={loading}
+          disabled={isSubmitting}
         >
           <img src={google} alt="Google" className={styles.socialIcon} />
           <span>GOOGLE</span>
@@ -259,7 +134,7 @@ const Authorization = ({ onClose }) => {
             checked={isPhoneLogin}
             onChange={() => setIsPhoneLogin(true)}
             className={styles.radio}
-            disabled={loading}
+            disabled={isSubmitting}
           />
           За номером телефону
         </label>
@@ -271,7 +146,7 @@ const Authorization = ({ onClose }) => {
             checked={!isPhoneLogin}
             onChange={() => setIsPhoneLogin(false)}
             className={styles.radio}
-            disabled={loading}
+            disabled={isSubmitting}
           />
           По e-mail
         </label>
@@ -290,10 +165,16 @@ const Authorization = ({ onClose }) => {
               placeholder={isPhoneLogin ? "38 (___) ___ - __ -__" : "Email"}
               value={isPhoneLogin ? formData.phone : formData.email}
               onChange={handleChange}
-              disabled={loading}
+              disabled={isSubmitting}
               required
               className={styles.input}
             />
+            {isPhoneLogin && errors.phone && (
+              <div className={styles.errorMessage}>{errors.phone}</div>
+            )}
+            {!isPhoneLogin && errors.email && (
+              <div className={styles.errorMessage}>{errors.email}</div>
+            )}
           </div>
 
           <div className={styles.inputGroup}>
@@ -305,23 +186,26 @@ const Authorization = ({ onClose }) => {
               placeholder="Пароль"
               value={formData.password}
               onChange={handleChange}
-              disabled={loading}
+              disabled={isSubmitting}
               required
               className={styles.input}
             />
+            {errors.password && (
+              <div className={styles.errorMessage}>{errors.password}</div>
+            )}
           </div>
 
-          {error && <div className={styles.errorMessage}>{error}</div>}
+          {serverError && <div className={styles.errorMessage}>{serverError}</div>}
 
-          {successMessage && (
-            <div className={styles.successMessage}>{successMessage}</div>
+          {serverMessage && (
+            <div className={styles.successMessage}>{serverMessage}</div>
           )}
 
           <div className={styles.formLinks}>
             <div className={styles.formLink}>
               <a
                 href="#"
-                className={loading ? styles.disabled : ""}
+                className={isSubmitting ? styles.disabled : ""}
                 onClick={(e) => e.preventDefault()}
               >
                 Не пам'ятаю пароль
@@ -332,9 +216,9 @@ const Authorization = ({ onClose }) => {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (!loading) toggleLoginMethod();
+                  if (!isSubmitting) toggleLoginMethod();
                 }}
-                className={loading ? styles.disabled : ""}
+                className={isSubmitting ? styles.disabled : ""}
               >
                 {isPhoneLogin
                   ? "Увійти за допомогою електронної пошти"
@@ -349,13 +233,13 @@ const Authorization = ({ onClose }) => {
                 initialColor="#151515"
                 borderColor="#151515"
                 textColor="#F2F2F2"
-                text={loading ? "Завантаження..." : "Увійти"}
+                text={isSubmitting ? "Завантаження..." : "Увійти"}
                 width="100%"
                 height="3rem"
                 transitionDuration="0.3s"
                 type="submit"
                 colorHover="#333"
-                disabled={loading}
+                disabled={isSubmitting}
                 onClick={handleSubmit}
                 link="#"
               />
@@ -366,7 +250,7 @@ const Authorization = ({ onClose }) => {
             <button
               type="button"
               className={styles.skipButton}
-              disabled={loading}
+              disabled={isSubmitting}
               onClick={handleSkipAuth}
             >
               ПРОДОВЖИТИ БЕЗ АВТОРИЗАЦІЇ

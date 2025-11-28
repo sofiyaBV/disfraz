@@ -1,10 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../utils/context/AuthContext";
 
-/**
- * Компонент для захисту маршрутів від неавторизованих користувачів
- * Використання: <ProtectedRoute><ProfilePage /></ProtectedRoute>
- */
+//Компонент для захисту маршрутів від неавторизованих користувачів
+
 const ProtectedRoute = ({ children, redirectTo = "/" }) => {
   const { isAuthenticated, isLoading } = useAuth();
 

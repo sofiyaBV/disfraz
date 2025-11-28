@@ -5,6 +5,8 @@ import ButtonGeneral from "../buttons/ButtonGeneral";
 import Authorization from "../registrations/Authorization";
 import { useAuth } from "../../utils/context/AuthContext";
 import CatalogMenu from "./CatalogMenu";
+import { useCatalogModal } from "../../utils/hooks/useCatalogModal";
+import { SOCIAL_NETWORKS } from "../../constants/socialNetworks";
 import {
   FaHome,
   FaUser,
@@ -30,9 +32,13 @@ import vector from "../../img/Vector.png";
 const BurgerMenuLogged = ({ onClose }) => {
   const { isAuthenticated } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
-  const [isClosing] = useState(false);
+  const {
+    isCatalogMenuOpen,
+    openCatalogMenu,
+    closeCatalogMenu,
+    handleOverlayClick,
+  } = useCatalogModal();
 
   const openAuthModal = () => {
     setIsAuthModalOpen(true);
@@ -48,40 +54,13 @@ const BurgerMenuLogged = ({ onClose }) => {
     }
   };
 
-  const handleOverlayClick = (e) => {
-    if (e.target.className.includes(styles.modalOverlay)) {
-      closeCatalogMenu();
-    }
-  };
-
-  const openCatalogMenu = () => {
-    setIsCatalogMenuOpen(true);
-  };
-
-  const closeCatalogMenu = () => {
-    setIsCatalogMenuOpen(false);
-  };
-
- 
   const handleClose = () => {
     onClose();
   };
 
-  
-  const socialNetworks = [
-    { Icon: FaYoutube, name: "YouTube", link: "#" },
-    { Icon: FaFacebook, name: "Facebook", link: "#" },
-    { Icon: FaInstagram, name: "Instagram", link: "#" },
-    { Icon: FaTelegram, name: "Telegram", link: "#" },
-    { Icon: FaPinterest, name: "Pinterest", link: "#" },
-    { Icon: FaLinkedin, name: "LinkedIn", link: "#" },
-    { Icon: FaTiktok, name: "TikTok", link: "#" },
-    { Icon: FaWhatsapp, name: "WhatsApp", link: "#" },
-  ];
-
   return (
     <>
-      <div className={`${styles.container} ${isClosing ? styles.closing : ""}`}>
+      <div className={styles.container}>
         <div className={styles.header}>
           <img src={LOGO} alt="LOGO" />
           <div>
@@ -269,7 +248,7 @@ const BurgerMenuLogged = ({ onClose }) => {
           <div className={styles.cotial}>
             <h3>Ми в соціальних мережах</h3>
             <div className={styles.imgs}>
-              {socialNetworks.map(({ Icon, name, link }, index) => (
+              {SOCIAL_NETWORKS.map(({ Icon, name, link }, index) => (
                 <a
                   key={index}
                   href={link}

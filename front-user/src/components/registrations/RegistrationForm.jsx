@@ -1,167 +1,53 @@
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../style/pages/auth/registration.module.css";
-import { useAuth } from "../../utils/context/AuthContext";
 import dataProvider from "../../utils/services/dataProvider";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import {
-  validateUkrainianPhone,
-  validateEmail,
-} from "../../utils/helpers/validation";
-import useOAuthCallback from "../../utils/hooks/useOAuthCallback";
+import useAuthForm from "../../utils/hooks/useAuthForm";
+import { registrationValidation } from "../../utils/validation/authSchemas";
 
 // Компонент форми реєстрації з підтримкою соціальних мереж
 const RegistrationForm = () => {
-  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [method, setMethod] = useState("phone");
-  const [formData, setFormData] = useState({
-    phone: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agree: false,
-    loginLater: false,
-  });
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [serverError, setServerError] = useState(null);
-  const [serverMessage, setServerMessage] = useState(null);
 
-  const timeoutRef = useRef(null);
+  // Використання спільного хука для управління формою
+  const {
+    formData,
+    errors,
+    isSubmitting,
+    serverError,
+    serverMessage,
+    handleChange,
+    handleSubmit,
+    setServerError,
+    setServerMessage,
+  } = useAuthForm({
+    initialValues: {
+      phone: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agree: false,
+      loginLater: false,
+    },
+    validationSchema: (data) => registrationValidation(data, method),
+    onSubmit: async (data) => {
+      const requestData =
+        method === "phone"
+          ? { phone: data.phone, password: data.password }
+          : { email: data.email, password: data.password };
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      timeoutRef.current = setTimeout(() => {
-        navigate("/home", { replace: true });
-      }, 500);
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  // Централізована обробка OAuth редіректів
-  useOAuthCallback({
-    onSuccess: (message) => setServerMessage(message),
-    onError: (message) => setServerError(message),
+      return await dataProvider.create("users", { data: requestData });
+    },
     redirectTo: "/home",
     redirectDelay: 800,
   });
 
   const handleMethodChange = (e) => {
     setMethod(e.target.value);
-    setErrors({});
     setServerError(null);
     setServerMessage(null);
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (method === "phone") {
-      if (!formData.phone) {
-        newErrors.phone = "Номер телефону обов'язковий";
-      } else if (!validateUkrainianPhone(formData.phone)) {
-        newErrors.phone =
-          "Некоректний формат номера телефону. Використовуйте формат: +380XXXXXXXXX або 0XXXXXXXXX";
-      }
-    } else {
-      if (!formData.email) {
-        newErrors.email = "E-mail обов'язковий";
-      } else if (!validateEmail(formData.email)) {
-        newErrors.email = "Некоректний формат e-mail";
-      }
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Пароль обов'язковий";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Пароль повинен бути не менше 8 символів";
-    } else if (!/\d/.test(formData.password)) {
-      newErrors.password = "Пароль повинен містити принаймні одну цифру";
-    } else if (!/[a-zA-Z]/.test(formData.password)) {
-      newErrors.password = "Пароль повинен містити принаймні одну літеру";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Підтвердження пароля обов'язкове";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Паролі не співпадають";
-    }
-
-    if (!formData.agree) {
-      newErrors.agree = "Необхідно погодитися з умовами";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-    setServerError(null);
-    setServerMessage(null);
-
-    try {
-      const requestData =
-        method === "phone"
-          ? { phone: formData.phone, password: formData.password }
-          : { email: formData.email, password: formData.password };
-
-      const response = await dataProvider.create("users", {
-        data: requestData,
-      });
-
-      if (response) {
-        login();
-        setServerMessage(
-          "Реєстрація успішна! Перенаправлення на головну сторінку..."
-        );
-
-        setFormData({
-          phone: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          agree: false,
-          loginLater: false,
-        });
-
-        timeoutRef.current = setTimeout(() => {
-          navigate("/home", { replace: true });
-        }, 800);
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Помилка при реєстрації:", error);
-      }
-      setServerError(
-        error.message || "Помилка при реєстрації. Спробуйте ще раз."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const handleSkipRegistration = () => {

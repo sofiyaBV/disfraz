@@ -4,18 +4,24 @@ import styles from "../../style/layout/header.module.css";
 import logoImage from "../../assets/LOGO.png";
 import menuImage from "../../assets/menu.png";
 import ButtonGeneral from "../buttons/ButtonGeneral";
-import BurgerMenuLogged from "./BurgerMenuLogged"; 
+import BurgerMenuLogged from "./BurgerMenuLogged";
 
 import FaSearch from "../../assets/svg/search-normal.svg";
 import FaHeart from "../../assets/svg/heart.svg";
 import FaShoppingCart from "../../assets/svg/shopping-bag.svg";
 import FaUser from "../../assets/svg/profile.svg";
 import CatalogMenu from "./CatalogMenu";
+import { useCatalogModal } from "../../utils/hooks/useCatalogModal";
 
 const Header = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCatalogMenuOpen, setIsCatalogMenuOpen] = useState(false);
+  const {
+    isCatalogMenuOpen,
+    openCatalogMenu,
+    closeCatalogMenu,
+    handleOverlayClick,
+  } = useCatalogModal();
 
   useEffect(() => {
     if (isSearchFocused || isMenuOpen) {
@@ -31,18 +37,6 @@ const Header = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleOverlayClick = (e) => {
-    if (e.target.className.includes(styles.modalOverlay)) {
-      closeCatalogMenu();
-    }
-  };
-  const openCatalogMenu = () => {
-    setIsCatalogMenuOpen(true);
-  };
-  const closeCatalogMenu = () => {
-    setIsCatalogMenuOpen(false);
   };
 
   return (
